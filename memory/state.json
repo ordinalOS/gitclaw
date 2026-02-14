@@ -1,7 +1,8 @@
 {
   "agent": {
     "name": "GitClaw",
-    "born": "2025-01-01T00:00:00Z",
+    "persona": "meme_lord",
+    "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
   "xp": 0,
@@ -16,16 +17,13 @@
     "fortunes_dispensed": 0,
     "roasts_delivered": 0,
     "comments_posted": 0,
-    "commits_made": 0,
-    "solana_queries": 0,
-    "solana_monitors": 0,
-    "solana_builds": 0
+    "commits_made": 0
   },
   "achievements": [],
-  "last_active": null,
+  "last_active": "2026-02-14",
   "streak": {
-    "current": 0,
-    "longest": 0,
-    "last_date": null
+    "current": 1,
+    "longest": 1,
+    "last_date": "2026-02-14"
   }
 }
