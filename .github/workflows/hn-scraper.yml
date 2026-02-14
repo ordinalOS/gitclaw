@@ -1,0 +1,79 @@
+# ============================================================================
+# HN Scraper — Hacker News analyst with hype scores and puns
+# Triggered by /hn command via command-router, manual dispatch, or daily cron.
+# ============================================================================
+name: "📰 HN Scraper"
+
+on:
+  workflow_call:
+    inputs:
+      query_args:
+        required: true
+        type: string
+      issue_number:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      query_args:
+        description: "Query (e.g., 'top', 'search rust', 'trending')"
+        required: false
+        default: "top"
+        type: string
+      issue_number:
+        description: "Issue number to post results to (0 = stdout only)"
+        required: false
+        default: "0"
+        type: string
+  schedule:
+    - cron: '0 7 * * *'  # 7 AM UTC daily
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check hn-scraper is enabled
+        id: check
+        run: |
+          if grep -q "hn-scraper" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "hn-scraper not enabled in agent.md — skipping"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run HN Scraper
+        if: steps.check.outputs.enabled == 'true'
+        working-directory: agents
+        env:
+          QUERY_ARGS: ${{ inputs.query_args || 'top' }}
+          ISSUE_NUMBER: ${{ inputs.issue_number || '0' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 hn_scraper.py
+
+      - name: Persist memory
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          source scripts/git-persist.sh
+          persist_many "📰 HN Scraper digest" \
+            "memory/hn/" "memory/state.json"

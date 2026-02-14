@@ -23,6 +23,12 @@ enable: hype-man
 enable: roast-battle
 enable: meme-machine
 
+## Market & News Plugin (optional — uncomment to enable)
+# enable: hn-scraper
+# enable: news-scraper
+# enable: crypto-quant
+# enable: stock-quant
+
 ## Solana Plugin (optional — uncomment to enable)
 # enable: solana
 # solana-network: devnet

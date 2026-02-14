@@ -1,0 +1,99 @@
+# ============================================================================
+# Crypto Oracle — Mystical-yet-data-driven crypto quant analysis
+# MODULAR PLUGIN: Only runs when crypto-quant is enabled in agent.md.
+# Triggered by /crypto command via command-router.
+# ============================================================================
+name: "🔮 Crypto Oracle"
+
+on:
+  workflow_call:
+    inputs:
+      query_args:
+        required: true
+        type: string
+      issue_number:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      query_args:
+        description: "Query (e.g., 'btc', 'compare btc eth', 'market')"
+        required: true
+        type: string
+      issue_number:
+        description: "Issue number to post results to"
+        required: false
+        default: "0"
+        type: string
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  oracle:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check crypto-quant is enabled
+        id: check
+        run: |
+          if grep -qi "crypto-quant\|crypto.quant\|crypto_quant" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Crypto Oracle not enabled. Add 'enable: crypto-quant' to agent.md"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Crypto Oracle
+        if: steps.check.outputs.enabled == 'true'
+        working-directory: agents
+        env:
+          QUERY_ARGS: ${{ inputs.query_args }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 crypto_quant.py
+
+      - name: Crypto Oracle not enabled response
+        if: steps.check.outputs.enabled == 'false' && inputs.issue_number != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUM: ${{ inputs.issue_number }}
+        run: |
+          BODY="## 🔮 Crypto Oracle Not Enabled
+
+          To use the Crypto Oracle, add this to your \`agent.md\`:
+          \`\`\`
+          enable: crypto-quant
+          \`\`\`
+
+          Then try again! See [SETUP.md](./SETUP.md) for details.
+
+          — 🔮 *The Oracle awaits your summons.*"
+
+          gh api "repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUM/comments" \
+            -f body="$BODY"
+
+      - name: Persist
+        if: steps.check.outputs.enabled == 'true'
+        env:
+          QUERY_ARGS: ${{ inputs.query_args }}
+        run: |
+          source scripts/git-persist.sh
+          persist_many "🔮 Crypto Oracle: $QUERY_ARGS" \
+            "memory/crypto/" "memory/state.json"

@@ -48,6 +48,14 @@ features:
   hype_celebrations: true
   roast_battle: true
 
+  # Market & News Plugin (optional — enable via agent.md)
+  market:
+    enabled: false               # Master switch for market features
+    hn_scraper: false            # HN story scraping and analysis
+    news_scraper: false          # General news scraping
+    crypto_quant: false          # Crypto market quant analysis
+    stock_quant: false           # Stock market quant analysis
+
   # Solana Plugin (optional — enable via agent.md)
   solana:
     enabled: false               # Master switch for Solana features

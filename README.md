@@ -31,7 +31,9 @@
 
 Your agent persists its memory by committing to the repo. Every thought is a git commit. The repo **is** the agent.
 
-**Optional Solana Plugin** — Enable on-chain data queries (Dexscreener, Jupiter, RPC), wallet monitoring, and verifiable SBF program builds. Just add `enable: solana` to `agent.md`.
+**Optional Plugins:**
+- **Market & News Plugin** — HN scraping, news intelligence, crypto & stock quant analysis. Uncomment in `agent.md` to enable.
+- **Solana Plugin** — On-chain data queries (Dexscreener, Jupiter, RPC), wallet monitoring, and verifiable SBF program builds. Just add `enable: solana` to `agent.md`.
 
 ## 🚀 Quick Start
 
@@ -47,9 +49,12 @@ Go to **Settings → Secrets and variables → Actions** and add:
 |--------|----------|-------------|
 | `ANTHROPIC_API_KEY` | Yes* | Your Anthropic API key |
 | `OPENAI_API_KEY` | No* | Your OpenAI API key (alternative) |
+| `GNEWS_API_KEY` | No | GNews API key (for News Scraper) |
+| `NEWSDATA_API_KEY` | No | NewsData.io API key (News Scraper fallback) |
+| `ALPHA_VANTAGE_KEY` | No | Alpha Vantage API key (for Stock Quant) |
 | `SOLANA_RPC_URL` | No | Custom Solana RPC (Helius, Alchemy, etc.) |
 
-*At least one LLM key is required.
+*At least one LLM key is required. Plugin API keys only needed if you enable those plugins.
 
 ### 3. Enable workflows
 
@@ -65,7 +70,7 @@ Open any issue and comment `/help` to see all available commands.
 
 ## 🤖 Agents
 
-GitClaw runs 10 specialized AI agents, each with their own personality:
+GitClaw runs 10 core agents (+ optional plugin agents), each with their own personality:
 
 | Agent | Trigger | What It Does |
 |-------|---------|-------------|
@@ -79,6 +84,19 @@ GitClaw runs 10 specialized AI agents, each with their own personality:
 | 🔮 **Fortune Cookie** | Daily 8 AM UTC | Cryptic coding wisdom and lucky numbers |
 | 🎉 **Hype Man** | Issue closed / PR merged | Over-the-top victory celebrations with XP |
 | 🔥 **Roast Battle** | `/roast <target>` | Brutally honest (but constructive!) code roasts |
+
+### Market & News Plugin Agents (Optional)
+
+Uncomment in `agent.md` to enable (e.g., `enable: hn-scraper`):
+
+| Agent | Trigger | What It Does |
+|-------|---------|-------------|
+| 📰 **HN Hype Buster** | `/hn <cmd>` + Daily 7 AM UTC | Hacker News stories with hype scores and puns |
+| 🥷 **News Ninja** | `/news <topic>` + Daily 7:30 AM UTC | Global news analysis with ninja-style delivery |
+| 🔮 **Crypto Oracle** | `/crypto <coin>` | Crypto quant analysis — RSI, SMA, volatility, momentum |
+| 🧙 **Stock Wizard** | `/stock <ticker>` | Stock quant analysis — SMA, RSI, MACD, volume |
+
+**APIs used:** CoinGecko (free, no key), HN Algolia/Firebase (free, no key), GNews + NewsData.io (free tier with key), Alpha Vantage (free tier with key) + Yahoo Finance fallback.
 
 ### Solana Plugin Agents (Optional)
 
@@ -100,6 +118,20 @@ Post these in any issue comment:
 /dream <description> — Log and interpret a dream
 /roast <file>        — Get a code roast (brutal but constructive)
 /help                — Show all commands
+```
+
+**Market & News commands** (uncomment in `agent.md` to enable):
+```
+/hn top              — Top 10 HN stories with hype scores
+/hn search <term>    — Search HN for a topic
+/hn trending         — Trending stories by velocity
+/news <topic>        — News analysis (supports presets: markets, tech, crypto)
+/crypto <coin>       — Crypto quant analysis (e.g., /crypto bitcoin)
+/crypto compare <a> <b> — Compare two coins side-by-side
+/crypto market       — Top 10 market overview
+/stock <ticker>      — Stock quant analysis (e.g., /stock AAPL)
+/stock compare <a> <b>  — Compare two stocks
+/stock market        — Market overview (SPY, QQQ, DIA)
 ```
 
 **Solana commands** (requires `enable: solana` in `agent.md`):
@@ -203,6 +235,10 @@ gitclaw/
 │   ├── roast-battle.yml       # 🔥 Code roasts
 │   ├── heartbeat.yml          # 💓 Health & streaks
 │   ├── setup.yml              # 🦞 One-time initialization
+│   ├── hn-scraper.yml         # 📰 HN scraping (plugin)
+│   ├── news-scraper.yml       # 🥷 News intelligence (plugin)
+│   ├── crypto-quant.yml       # 🔮 Crypto analysis (plugin)
+│   ├── stock-quant.yml        # 🧙 Stock analysis (plugin)
 │   ├── solana-query.yml       # 🌐 Solana data queries (plugin)
 │   ├── solana-monitor.yml     # 📡 Wallet/price monitoring (plugin)
 │   └── solana-builder.yml     # 🔨 SBF program builds (plugin)
@@ -222,6 +258,10 @@ gitclaw/
 │   ├── dream_interpreter.py   # Dream pattern tracking
 │   ├── fortune_cookie.py      # Fortune generation
 │   ├── meme_machine.py        # Content generation
+│   ├── hn_scraper.py          # HN story scraping & analysis (plugin)
+│   ├── news_scraper.py        # News intelligence gathering (plugin)
+│   ├── crypto_quant.py        # Crypto quant indicators (plugin)
+│   ├── stock_quant.py         # Stock quant indicators (plugin)
 │   ├── solana_query.py        # Dex/RPC/Jupiter queries (plugin)
 │   ├── solana_monitor.py      # Wallet & price monitoring (plugin)
 │   └── solana_builder.py      # SBF verifiable builds (plugin)
@@ -235,6 +275,10 @@ gitclaw/
 │   ├── research/              # Research archive
 │   ├── fortunes/              # Fortune archive
 │   ├── roasts/                # Roast archive
+│   ├── hn/                    # HN digest archive (plugin)
+│   ├── news/                  # News briefing archive (plugin)
+│   ├── crypto/                # Crypto analysis archive (plugin)
+│   ├── stocks/                # Stock analysis archive (plugin)
 │   └── solana/                # Solana data (plugin)
 │       ├── prices/            # Price query history
 │       ├── wallets/           # Wallet snapshots
@@ -269,6 +313,10 @@ XP is earned through:
 - Research completed: **15 XP**
 - Quests completed: **50 XP**
 - Lore entries: **10 XP**
+- HN scrapes: **10 XP**
+- News scrapes: **10 XP**
+- Crypto analyses: **15 XP**
+- Stock analyses: **15 XP**
 - Dreams interpreted: **5 XP**
 - Fortunes dispensed: **2 XP**
 

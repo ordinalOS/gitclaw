@@ -81,6 +81,46 @@ jobs:
       issue_number: ${{ github.event.issue.number }}
     secrets: inherit
 
+  # ─── HN Scraper Agent ────────────────────────────────────────────
+  hn:
+    needs: route
+    if: needs.route.outputs.command == 'hn'
+    uses: ./.github/workflows/hn-scraper.yml
+    with:
+      query_args: ${{ needs.route.outputs.args }}
+      issue_number: ${{ github.event.issue.number }}
+    secrets: inherit
+
+  # ─── News Scraper Agent ─────────────────────────────────────────
+  news:
+    needs: route
+    if: needs.route.outputs.command == 'news'
+    uses: ./.github/workflows/news-scraper.yml
+    with:
+      query_args: ${{ needs.route.outputs.args }}
+      issue_number: ${{ github.event.issue.number }}
+    secrets: inherit
+
+  # ─── Crypto Quant Agent ─────────────────────────────────────────
+  crypto:
+    needs: route
+    if: needs.route.outputs.command == 'crypto'
+    uses: ./.github/workflows/crypto-quant.yml
+    with:
+      query_args: ${{ needs.route.outputs.args }}
+      issue_number: ${{ github.event.issue.number }}
+    secrets: inherit
+
+  # ─── Stock Quant Agent ──────────────────────────────────────────
+  stock:
+    needs: route
+    if: needs.route.outputs.command == 'stock'
+    uses: ./.github/workflows/stock-quant.yml
+    with:
+      query_args: ${{ needs.route.outputs.args }}
+      issue_number: ${{ github.event.issue.number }}
+    secrets: inherit
+
   # ─── Solana Query Agent ──────────────────────────────────────────
   sol:
     needs: route
@@ -122,6 +162,12 @@ jobs:
           | `/roast <file_or_topic>` | 🔥 Roast Battle | Get a brutally honest code roast |
           | `/help` | 🦞 GitClaw | Show this help message |
 
+          **Market & News Plugin** (enable in agent.md):
+          | `/hn [top\|search <term>\|trending]` | 📰 HN Scraper | Hacker News stories with hype scores |
+          | `/news <topic>` | 🥷 News Scraper | Global news analysis with ninja flair |
+          | `/crypto <coin>` | 🔮 Crypto Oracle | Crypto quant analysis (RSI, SMA, vol) |
+          | `/stock <ticker>` | 🧙 Stock Wizard | Stock quant analysis with wizard magic |
+
           **Solana Plugin** (enable with `enable: solana` in agent.md):
           | `/sol price <token>` | 🌐 Solana Query | Check token price via Dexscreener |
           | `/sol balance <addr>` | 🌐 Solana Query | Check wallet SOL balance |
@@ -135,6 +181,8 @@ jobs:
           - 🃏 **Code Jester** — Auto-reviews PRs
           - 🔮 **Fortune Cookie** — Daily coding wisdom (8 AM UTC)
           - 🎉 **Hype Man** — Celebrates closed issues/merged PRs
+          - 📰 **HN Scraper** — Daily HN digest (7 AM UTC, if enabled)
+          - 🥷 **News Scraper** — Daily news briefing (7:30 AM UTC, if enabled)
           - 📡 **Solana Monitor** — Wallet & price monitoring (if enabled)
 
           *— 🦞 GitClaw, at your service*

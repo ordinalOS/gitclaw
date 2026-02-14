@@ -18,7 +18,13 @@
     "roasts_delivered": 0,
     "comments_posted": 0,
     "commits_made": 1,
-    "solana_monitors": 1
+    "solana_queries": 0,
+    "solana_monitors": 1,
+    "solana_builds": 0,
+    "hn_scrapes": 0,
+    "news_scrapes": 0,
+    "crypto_analyses": 0,
+    "stock_analyses": 0
   },
   "achievements": [],
   "last_active": "2026-02-14",

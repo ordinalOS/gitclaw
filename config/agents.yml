@@ -92,6 +92,50 @@ agents:
     prompt_file: "templates/prompts/roast-battle.md"
     enabled: true
 
+# ── Market & News Plugin Agents (optional) ──────────────────────────────────
+
+  hn_scraper:
+    name: "HN Scraper"
+    emoji: "📰"
+    description: "Scrapes and analyzes Hacker News stories with hype scores"
+    trigger: "issue_comment"
+    command: "/hn"
+    schedule: "0 7 * * *"  # 7 AM UTC daily
+    prompt_file: "templates/prompts/hn-scraper.md"
+    plugin: "market"
+    enabled: false
+
+  news_scraper:
+    name: "News Scraper"
+    emoji: "🥷"
+    description: "Fetches and analyzes global news with ninja-style delivery"
+    trigger: "issue_comment"
+    command: "/news"
+    schedule: "30 7 * * *"  # 7:30 AM UTC daily
+    prompt_file: "templates/prompts/news-scraper.md"
+    plugin: "market"
+    enabled: false
+
+  crypto_quant:
+    name: "Crypto Oracle"
+    emoji: "🔮"
+    description: "Crypto market analysis with quant indicators (RSI, SMA, volatility)"
+    trigger: "issue_comment"
+    command: "/crypto"
+    prompt_file: "templates/prompts/crypto-quant.md"
+    plugin: "market"
+    enabled: false
+
+  stock_quant:
+    name: "Stock Wizard"
+    emoji: "🧙"
+    description: "Stock market analysis with quant indicators and wizard flair"
+    trigger: "issue_comment"
+    command: "/stock"
+    prompt_file: "templates/prompts/stock-quant.md"
+    plugin: "market"
+    enabled: false
+
 # ── Solana Plugin Agents (optional) ──────────────────────────────────────
 
   solana_query:
