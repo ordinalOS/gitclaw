@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 5,
+  "xp": 10,
   "level": "Unawakened",
   "stats": {
     "issues_triaged": 0,
@@ -17,7 +17,8 @@
     "fortunes_dispensed": 0,
     "roasts_delivered": 0,
     "comments_posted": 0,
-    "commits_made": 1
+    "commits_made": 1,
+    "solana_monitors": 1
   },
   "achievements": [],
   "last_active": "2026-02-14",
