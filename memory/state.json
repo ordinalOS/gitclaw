@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 10,
+  "xp": 15,
   "level": "Unawakened",
   "stats": {
     "issues_triaged": 0,
@@ -19,7 +19,7 @@
     "comments_posted": 0,
     "commits_made": 1,
     "solana_queries": 0,
-    "solana_monitors": 1,
+    "solana_monitors": 2,
     "solana_builds": 0,
     "hn_scrapes": 0,
     "news_scrapes": 0,
@@ -27,7 +27,7 @@
     "stock_analyses": 0
   },
   "achievements": [],
-  "last_active": "2026-02-14",
+  "last_active": "2026-02-15",
   "streak": {
     "current": 1,
     "longest": 1,
