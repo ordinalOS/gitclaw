@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 82,
+  "xp": 84,
   "level": "Novice",
   "stats": {
     "issues_triaged": 0,
@@ -14,7 +14,7 @@
     "quests_completed": 0,
     "lore_entries": 0,
     "dreams_interpreted": 1,
-    "fortunes_dispensed": 1,
+    "fortunes_dispensed": 2,
     "roasts_delivered": 0,
     "comments_posted": 0,
     "commits_made": 3,
