@@ -57,6 +57,10 @@ jobs:
         if: steps.check.outputs.enabled == 'true'
         run: |
           source scripts/git-persist.sh
+
+          git config user.name "gitclaw[bot]"
+          git config user.email "gitclaw[bot]@users.noreply.github.com"
+
           git add docs/ 2>/dev/null || true
 
           if ! git diff --cached --quiet 2>/dev/null; then
