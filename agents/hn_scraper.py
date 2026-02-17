@@ -7,7 +7,7 @@ Triggered by /hn command or daily schedule.
 import json
 import os
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from common import (
     MEMORY_DIR, award_xp, call_llm, gh_post_comment,
@@ -58,11 +58,12 @@ def fetch_top_stories(limit: int = 15) -> list[dict]:
 
 
 def search_stories(term: str, limit: int = 15) -> list[dict]:
-    """Search HN stories via the Algolia API."""
+    """Search HN stories via the Algolia API (last 30 days)."""
     encoded_term = urllib.request.quote(term)
+    month_ago = int((datetime.now(timezone.utc) - timedelta(days=30)).timestamp())
     url = (
         f"{HN_ALGOLIA_SEARCH}?query={encoded_term}"
-        f"&tags=story&numericFilters=points>10&hitsPerPage={limit}"
+        f"&tags=story&numericFilters=points>10,created_at_i>{month_ago}&hitsPerPage={limit}"
     )
     data = fetch_json(url)
     if not data or "hits" not in data:

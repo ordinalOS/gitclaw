@@ -9,7 +9,7 @@ import json
 import os
 import urllib.request
 import urllib.parse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from common import (
     MEMORY_DIR, award_xp, call_llm, gh_post_comment,
@@ -20,7 +20,7 @@ from common import (
 
 GNEWS_API = "https://gnews.io/api/v4/search"
 NEWSDATA_API = "https://newsdata.io/api/1/news"
-HN_ALGOLIA_API = "https://hn.algolia.com/api/v1/search"
+HN_ALGOLIA_API = "https://hn.algolia.com/api/v1/search_by_date"
 
 # ── Topic Presets ────────────────────────────────────────────────────────────
 
@@ -51,7 +51,9 @@ def fetch_gnews(query: str) -> list[dict]:
         return []
 
     encoded_q = urllib.parse.quote(query)
-    url = f"{GNEWS_API}?q={encoded_q}&lang=en&max=10&apikey={api_key}"
+    # Filter to articles from the last 7 days
+    from_date = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    url = f"{GNEWS_API}?q={encoded_q}&lang=en&max=10&from={from_date}&apikey={api_key}"
     data = fetch_json(url)
 
     if "error" in data or "articles" not in data:
@@ -78,7 +80,7 @@ def fetch_newsdata(query: str) -> list[dict]:
         return []
 
     encoded_q = urllib.parse.quote(query)
-    url = f"{NEWSDATA_API}?apikey={api_key}&q={encoded_q}&language=en"
+    url = f"{NEWSDATA_API}?apikey={api_key}&q={encoded_q}&language=en&timeframe=168"
     data = fetch_json(url)
 
     if "error" in data or "results" not in data:
@@ -101,7 +103,12 @@ def fetch_newsdata(query: str) -> list[dict]:
 def fetch_hackernews(query: str) -> list[dict]:
     """Fetch from Hacker News Algolia API (ultra-fallback, no key needed)."""
     encoded_q = urllib.parse.quote(query)
-    url = f"{HN_ALGOLIA_API}?query={encoded_q}&tags=story&hitsPerPage=10"
+    # Filter to last 7 days via numericFilters on created_at_i (Unix timestamp)
+    week_ago = int((datetime.now(timezone.utc) - timedelta(days=7)).timestamp())
+    url = (
+        f"{HN_ALGOLIA_API}?query={encoded_q}&tags=story&hitsPerPage=10"
+        f"&numericFilters=created_at_i>{week_ago}"
+    )
     data = fetch_json(url)
 
     if "error" in data or "hits" not in data:
