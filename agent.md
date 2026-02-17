@@ -23,11 +23,11 @@ enable: hype-man
 enable: roast-battle
 enable: meme-machine
 
-## Market & News Plugin (optional — uncomment to enable)
-# enable: hn-scraper
-# enable: news-scraper
-# enable: crypto-quant
-# enable: stock-quant
+## Market & News Plugin
+enable: hn-scraper
+enable: news-scraper
+enable: crypto-quant
+# enable: stock-quant  # needs ALPHA_VANTAGE_KEY (free tier at alphavantage.co)
 
 ## Solana Plugin (optional — uncomment to enable)
 # enable: solana

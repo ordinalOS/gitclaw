@@ -1,0 +1,98 @@
+# ============================================================================
+# Warmup — Trigger all GitClaw agents to populate memory and test the system.
+# Run manually from Actions tab or on a weekly schedule.
+# ============================================================================
+name: "🔥 Warmup"
+
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "Which agents to trigger"
+        type: choice
+        options:
+          - all
+          - core
+          - market
+          - memory
+        default: all
+  schedule:
+    - cron: '0 3 * * 0'  # Sundays 3 AM UTC — weekly full warmup
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  warmup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger agents
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SCOPE: ${{ inputs.scope || 'all' }}
+        run: |
+          REPO="${{ github.repository }}"
+
+          echo "=== GitClaw Warmup ($SCOPE) ==="
+          echo ""
+
+          # ── Core scheduled agents ──
+          if [[ "$SCOPE" == "all" || "$SCOPE" == "core" ]]; then
+            echo "Triggering core agents..."
+            gh workflow run morning-roast.yml -R "$REPO" && echo "  ☕ Morning Roast" || true
+            gh workflow run fortune-cookie.yml -R "$REPO" && echo "  🔮 Fortune Cookie" || true
+            gh workflow run heartbeat.yml -R "$REPO" && echo "  💓 Heartbeat" || true
+            gh workflow run pages-builder.yml -R "$REPO" && echo "  📺 Pages Builder" || true
+          fi
+
+          # ── Memory-populating agents (with seed topics) ──
+          if [[ "$SCOPE" == "all" || "$SCOPE" == "memory" ]]; then
+            echo "Triggering memory agents..."
+            gh workflow run wild-fact-finder.yml -R "$REPO" \
+              -f topic="the evolution of autonomous AI agent systems" \
+              && echo "  🔍 Research: AI agents" || true
+
+            gh workflow run lore-keeper.yml -R "$REPO" \
+              -f topic="the birth and awakening of GitClaw, a lobster-themed AI agent born in a git repo" \
+              && echo "  📜 Lore: origin story" || true
+
+            gh workflow run dream-interpreter.yml -R "$REPO" \
+              -f description="floating through an infinite git commit history, each commit a doorway to a different universe of code" \
+              && echo "  🌙 Dream: git universe" || true
+
+            gh workflow run roast-battle.yml -R "$REPO" \
+              -f target="agents/pages_builder.py" \
+              && echo "  🔥 Roast: pages_builder.py" || true
+
+            gh workflow run meme-machine.yml -R "$REPO" \
+              && echo "  🎨 Meme Machine" || true
+
+            gh workflow run karen.yml -R "$REPO" \
+              && echo "  💅 Karen QA" || true
+          fi
+
+          # ── Market & News agents ──
+          if [[ "$SCOPE" == "all" || "$SCOPE" == "market" ]]; then
+            echo "Triggering market agents..."
+            gh workflow run hn-scraper.yml -R "$REPO" \
+              && echo "  📰 HN Scraper" || true
+            gh workflow run news-scraper.yml -R "$REPO" \
+              && echo "  🥷 News Ninja" || true
+            gh workflow run crypto-quant.yml -R "$REPO" \
+              -f query_args="bitcoin" \
+              && echo "  🔮 Crypto: bitcoin" || true
+          fi
+
+          # ── Architect (only on 'all') ──
+          if [[ "$SCOPE" == "all" ]]; then
+            echo "Triggering architect..."
+            gh workflow run architect.yml -R "$REPO" \
+              && echo "  🏗️ Architect" || true
+          fi
+
+          echo ""
+          echo "=== Warmup complete! ==="
+          echo "Triggered agents for scope: $SCOPE"
+          echo "Check the Actions tab for individual workflow runs."

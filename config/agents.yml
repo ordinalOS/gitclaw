@@ -282,6 +282,15 @@ agents:
     prompt_file: null
     enabled: true
 
+  warmup:
+    name: "Warmup"
+    description: "Triggers all agents to populate memory and test the system"
+    trigger: "workflow_dispatch"
+    schedule: "0 3 * * 0"
+    prompt_file: null
+    plugin: "pages"
+    enabled: true
+
 # Global settings for all agents
 defaults:
   provider: "anthropic"

@@ -75,6 +75,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITCLAW_MODEL: "claude-sonnet-4-5-20250929"
           ANALYSIS_JSON: ${{ steps.analyze.outputs.analysis }}
           PROPOSAL_CONTEXT: ${{ inputs.proposal_context }}
         run: |
