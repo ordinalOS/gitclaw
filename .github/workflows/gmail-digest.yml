@@ -1,0 +1,56 @@
+# ============================================================================
+# Gmail Digest — Sends a daily HTML email digest of GitClaw activity.
+# Triggered by schedule (daily) or manual dispatch.
+# ============================================================================
+name: "📧 Gmail Digest"
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 10 * * *'  # 10 AM UTC — daily email
+
+permissions:
+  contents: write
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check gmail is enabled
+        id: check
+        run: |
+          if grep -q "gmail" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Gmail not enabled in agent.md — skipping"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Send digest email
+        if: steps.check.outputs.enabled == 'true'
+        working-directory: agents
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_TO_ADDRESS: ${{ secrets.GMAIL_TO_ADDRESS }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 gmail_digest.py
+
+      - name: Persist state
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          source scripts/git-persist.sh
+          persist "memory/state.json" "📧 Gmail digest sent"

@@ -308,5 +308,27 @@
     "prompt_file": null,
     "plugin": "pages",
     "enabled": true
+  },
+  {
+    "_key": "telegram_notify",
+    "name": "Telegram Notify",
+    "emoji": "\ud83d\udcec",
+    "description": "Sends alerts and daily digests to Telegram",
+    "trigger": "schedule",
+    "schedule": "0 9 * * *",
+    "prompt_file": null,
+    "plugin": "telegram",
+    "enabled": false
+  },
+  {
+    "_key": "gmail_digest",
+    "name": "Gmail Digest",
+    "emoji": "\ud83d\udce7",
+    "description": "Sends daily email digest of agent activity",
+    "trigger": "schedule",
+    "schedule": "0 10 * * *",
+    "prompt_file": null,
+    "plugin": "gmail",
+    "enabled": false
   }
 ]

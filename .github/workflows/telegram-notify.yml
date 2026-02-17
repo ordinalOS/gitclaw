@@ -1,0 +1,69 @@
+# ============================================================================
+# Telegram Notify — Sends alerts and daily digests to Telegram.
+# Triggered by schedule (daily digest), workflow dispatch (event alerts),
+# or workflow call from other agents.
+# ============================================================================
+name: "📬 Telegram Notify"
+
+on:
+  workflow_call:
+    inputs:
+      event_json:
+        required: false
+        type: string
+        default: ""
+  workflow_dispatch:
+    inputs:
+      event_json:
+        description: "Event JSON to notify about (empty = daily digest)"
+        required: false
+        type: string
+        default: ""
+  schedule:
+    - cron: '0 9 * * *'  # 9 AM UTC — daily digest
+
+permissions:
+  contents: write
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check telegram is enabled
+        id: check
+        run: |
+          if grep -q "telegram" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Telegram not enabled in agent.md — skipping"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Send notification
+        if: steps.check.outputs.enabled == 'true'
+        working-directory: agents
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_EVENT: ${{ inputs.event_json }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 telegram_notify.py
+
+      - name: Persist state
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          source scripts/git-persist.sh
+          persist "memory/state.json" "📬 Telegram notification sent"

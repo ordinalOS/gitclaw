@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="120">
+    <title>GitClaw | Plugins</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">Docs</a></div><div class="header-meta"><span>Apprentice</span><span class="xp-bar-container">XP 211<div class="xp-bar"><div class="xp-bar-fill" style="width:40%"></div></div></span><span>Streak 4d</span></div></div>
+    <nav class="nav"><a href="index.html">Dashboard</a>
+<a href="memory.html">Memory</a>
+<a href="council.html">Council</a>
+<a href="agents.html">Agents</a>
+<a href="plugins.html" class="active">Plugins</a>
+<a href="debug.html">Debug</a>
+<a href="blog/index.html">Blog</a></nav>
+    <main class="main">
+        
+    <div class="panel">
+      <h2 class="panel-title">Plugins (7 / 7 enabled)</h2>
+      <div class="plugin-grid">
+        
+        <div class="plugin-card enabled">
+          <div class="plugin-header">
+            <span class="plugin-icon">🦞</span>
+            <span class="plugin-name">Core Agents</span>
+            <span class="plugin-status on">Enabled</span>
+          </div>
+          <div class="plugin-desc">Essential GitClaw agents — digest, quests, reviews, research</div>
+          <div class="plugin-meta">
+            5 agents · builtin
+          </div>
+          <div class="plugin-meta"><strong>Secrets:</strong> <span class="secret-tag">ANTHROPIC_API_KEY</span></div>
+          
+        </div>
+        <div class="plugin-card enabled">
+          <div class="plugin-header">
+            <span class="plugin-icon">📊</span>
+            <span class="plugin-name">Market &amp; News</span>
+            <span class="plugin-status on">Enabled</span>
+          </div>
+          <div class="plugin-desc">Crypto, stocks, HN, and news analysis</div>
+          <div class="plugin-meta">
+            4 agents · data
+          </div>
+          <div class="plugin-meta"><strong>Secrets:</strong> <span class="secret-tag">ANTHROPIC_API_KEY</span></div><div class="plugin-meta"><strong>Optional:</strong> <span class="secret-tag">ALPHA_VANTAGE_KEY</span></div>
+          
+        </div>
+        <div class="plugin-card enabled">
+          <div class="plugin-header">
+            <span class="plugin-icon">🌐</span>
+            <span class="plugin-name">Solana</span>
+            <span class="plugin-status on">Enabled</span>
+          </div>
+          <div class="plugin-desc">On-chain monitoring, queries, and program builds</div>
+          <div class="plugin-meta">
+            3 agents · blockchain
+          </div>
+          
+          
+        </div>
+        <div class="plugin-card enabled">
+          <div class="plugin-header">
+            <span class="plugin-icon">🏗️</span>
+            <span class="plugin-name">Architect &amp; Council</span>
+            <span class="plugin-status on">Enabled</span>
+          </div>
+          <div class="plugin-desc">Autonomous PRs reviewed by the Council of 7</div>
+          <div class="plugin-meta">
+            5 agents · automation
+          </div>
+          <div class="plugin-meta"><strong>Secrets:</strong> <span class="secret-tag">ANTHROPIC_API_KEY</span></div>
+          
+        </div>
+        <div class="plugin-card enabled">
+          <div class="plugin-header">
+            <span class="plugin-icon">📺</span>
+            <span class="plugin-name">GitHub Pages</span>
+            <span class="plugin-status on">Enabled</span>
+          </div>
+          <div class="plugin-desc">Dashboard, memory browser, blog — auto-built from agent data</div>
+          <div class="plugin-meta">
+            2 agents · frontend
+          </div>
+          
+          
+        </div>
+        <div class="plugin-card enabled">
+          <div class="plugin-header">
+            <span class="plugin-icon">📬</span>
+            <span class="plugin-name">Telegram</span>
+            <span class="plugin-status on">Enabled</span>
+          </div>
+          <div class="plugin-desc">Push alerts and daily digests to a Telegram chat</div>
+          <div class="plugin-meta">
+            1 agent · notifications
+          </div>
+          <div class="plugin-meta"><strong>Secrets:</strong> <span class="secret-tag">TELEGRAM_BOT_TOKEN</span><span class="secret-tag">TELEGRAM_CHAT_ID</span></div>
+          <a class="plugin-link" href="https://core.telegram.org/bots#how-do-i-create-a-bot" target="_blank">Setup Guide ↗</a>
+        </div>
+        <div class="plugin-card enabled">
+          <div class="plugin-header">
+            <span class="plugin-icon">📧</span>
+            <span class="plugin-name">Gmail</span>
+            <span class="plugin-status on">Enabled</span>
+          </div>
+          <div class="plugin-desc">Daily email digest of agent activity and memory updates</div>
+          <div class="plugin-meta">
+            1 agent · notifications
+          </div>
+          <div class="plugin-meta"><strong>Secrets:</strong> <span class="secret-tag">GMAIL_ADDRESS</span><span class="secret-tag">GMAIL_APP_PASSWORD</span></div><div class="plugin-meta"><strong>Optional:</strong> <span class="secret-tag">GMAIL_TO_ADDRESS</span></div>
+          <a class="plugin-link" href="https://support.google.com/accounts/answer/185833" target="_blank">Setup Guide ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-box">
+      <h3>How to Enable a Plugin</h3>
+      <ol>
+        <li>Add required <strong>secrets</strong> to your GitHub repo settings
+            (Settings → Secrets and variables → Actions)</li>
+        <li>Add <code>enable: plugin-name</code> to <code>agent.md</code></li>
+        <li>Push — agents activate on the next scheduled or dispatched run</li>
+      </ol>
+    </div>
+    </main>
+    <footer class="footer">
+        <span>Powered by <a href="https://github.com/ordinalOS/gitclaw" class="footer-link">GitHub Actions</a> &middot; Zero Infrastructure</span>
+        <span id="clock"></span>
+    </footer>
+    <script src="assets/app.js"></script>
+</body>
+</html>

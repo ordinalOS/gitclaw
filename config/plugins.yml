@@ -1,0 +1,71 @@
+# ============================================================================
+# GitClaw Plugin Registry
+# ============================================================================
+# Each plugin groups related agents and declares its requirements.
+# Plugins are enabled via agent.md — secrets go in GitHub repo settings.
+
+plugins:
+  core:
+    name: "Core Agents"
+    icon: "🦞"
+    description: "Essential GitClaw agents — digest, quests, reviews, research"
+    category: "builtin"
+    agents: [morning_roast, quest_master, code_jester, wild_fact_finder,
+             meme_machine, lore_keeper, dream_interpreter, fortune_cookie,
+             hype_man, roast_battle, heartbeat]
+    secrets: [ANTHROPIC_API_KEY]
+
+  market:
+    name: "Market & News"
+    icon: "📊"
+    description: "Crypto, stocks, HN, and news analysis"
+    category: "data"
+    agents: [hn_scraper, news_scraper, crypto_quant, stock_quant]
+    secrets: [ANTHROPIC_API_KEY]
+    optional_secrets: [ALPHA_VANTAGE_KEY]
+
+  solana:
+    name: "Solana"
+    icon: "🌐"
+    description: "On-chain monitoring, queries, and program builds"
+    category: "blockchain"
+    agents: [solana_query, solana_monitor, solana_builder]
+    config_file: "config/solana.yml"
+    secrets: []
+
+  architect:
+    name: "Architect & Council"
+    icon: "🏗️"
+    description: "Autonomous PRs reviewed by the Council of 7"
+    category: "automation"
+    agents: [architect, council_zuckerberg, council_wonderful, council_musk,
+             council_toly, council_satoshi, council_cia, council_cobain,
+             proposal_lint, karen]
+    secrets: [ANTHROPIC_API_KEY]
+
+  pages:
+    name: "GitHub Pages"
+    icon: "📺"
+    description: "Dashboard, memory browser, blog — auto-built from agent data"
+    category: "frontend"
+    agents: [pages_builder, warmup]
+    secrets: []
+
+  telegram:
+    name: "Telegram"
+    icon: "📬"
+    description: "Push alerts and daily digests to a Telegram chat"
+    category: "notifications"
+    agents: [telegram_notify]
+    secrets: [TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID]
+    setup_url: "https://core.telegram.org/bots#how-do-i-create-a-bot"
+
+  gmail:
+    name: "Gmail"
+    icon: "📧"
+    description: "Daily email digest of agent activity and memory updates"
+    category: "notifications"
+    agents: [gmail_digest]
+    secrets: [GMAIL_ADDRESS, GMAIL_APP_PASSWORD]
+    optional_secrets: [GMAIL_TO_ADDRESS]
+    setup_url: "https://support.google.com/accounts/answer/185833"

@@ -158,6 +158,25 @@ jobs:
             echo "No PR to review — skipping council dispatch"
           fi
 
+      - name: Notify Telegram
+        if: steps.check.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM_NEW: ${{ steps.apply.outputs.pr_number }}
+          PR_NUM_REV: ${{ steps.revise.outputs.pr_number }}
+        run: |
+          PR_NUM="${PR_NUM_REV:-$PR_NUM_NEW}"
+          PR_NUM="${PR_NUM:-0}"
+          if [ "$PR_NUM" != "0" ] && [ -n "$PR_NUM" ] && grep -q "telegram" agent.md 2>/dev/null; then
+            EVENT_TYPE="architect_pr"
+            if [ -n "$PR_NUM_REV" ] && [ "$PR_NUM_REV" != "0" ]; then
+              EVENT_TYPE="architect_revision"
+            fi
+            gh workflow run telegram-notify.yml \
+              -f event_json="{\"type\":\"$EVENT_TYPE\",\"pr\":\"$PR_NUM\"}" \
+            || true
+          fi
+
       - name: Notify on issue (if triggered by /propose)
         if: steps.check.outputs.enabled == 'true' && inputs.issue_number != '0' && inputs.issue_number != ''
         env:

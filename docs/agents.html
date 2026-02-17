@@ -14,12 +14,13 @@
 <a href="memory.html">Memory</a>
 <a href="council.html">Council</a>
 <a href="agents.html" class="active">Agents</a>
+<a href="plugins.html">Plugins</a>
 <a href="debug.html">Debug</a>
 <a href="blog/index.html">Blog</a></nav>
     <main class="main">
         
     <div class="panel full-width">
-        <h2 class="panel-title">Agent Status <span class="tertiary" style="text-transform:none;font-weight:400">22 of 30 active</span></h2>
+        <h2 class="panel-title">Agent Status <span class="tertiary" style="text-transform:none;font-weight:400">22 of 32 active</span></h2>
         
         <div class="agent-group">
             <h3 class="agent-group-title">Core <span class="tertiary">(11/11)</span></h3>
@@ -483,6 +484,40 @@
                     <span class="status-active">Active</span>
                     <span class="tertiary">0 3 * * 0</span>
                     <span class="tertiary">workflow_dispatch</span>
+                </div>
+                
+            </div></div>
+        </div>
+        <div class="agent-group">
+            <h3 class="agent-group-title">Notifications <span class="tertiary">(0/2)</span></h3>
+            <div class="agent-grid">
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">TN</span>
+                    <span class="agent-name">Telegram Notify</span>
+                    
+                    <a href="https://github.com/ordinalOS/gitclaw/actions/workflows/telegram-notify.yml" class="trigger-link" target="_blank">Actions</a>
+                </div>
+                <div class="agent-desc">Sends alerts and daily digests to Telegram</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    <span class="tertiary">Daily 9:00 UTC</span>
+                    <span class="tertiary">schedule</span>
+                </div>
+                
+            </div>
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">GD</span>
+                    <span class="agent-name">Gmail Digest</span>
+                    
+                    <a href="https://github.com/ordinalOS/gitclaw/actions/workflows/gmail-digest.yml" class="trigger-link" target="_blank">Actions</a>
+                </div>
+                <div class="agent-desc">Sends daily email digest of agent activity</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    <span class="tertiary">Daily 10:00 UTC</span>
+                    <span class="tertiary">schedule</span>
                 </div>
                 
             </div></div>

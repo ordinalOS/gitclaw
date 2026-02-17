@@ -51,6 +51,10 @@ enable: council
 enable: pages-builder
 enable: karen
 
+## Notifications Plugin (optional)
+# enable: telegram  # needs TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID (from @BotFather)
+# enable: gmail     # needs GMAIL_ADDRESS + GMAIL_APP_PASSWORD (16-char app password)
+
 ## Custom Instructions
 # Add any custom instructions for your agent here.
 # These are injected into all agent system prompts.

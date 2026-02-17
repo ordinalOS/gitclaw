@@ -291,6 +291,28 @@ agents:
     plugin: "pages"
     enabled: true
 
+# ── Notifications Plugin Agents (optional) ──────────────────────────────────
+
+  telegram_notify:
+    name: "Telegram Notify"
+    emoji: "📬"
+    description: "Sends alerts and daily digests to Telegram"
+    trigger: "schedule"
+    schedule: "0 9 * * *"
+    prompt_file: null
+    plugin: "telegram"
+    enabled: false
+
+  gmail_digest:
+    name: "Gmail Digest"
+    emoji: "📧"
+    description: "Sends daily email digest of agent activity"
+    trigger: "schedule"
+    schedule: "0 10 * * *"
+    prompt_file: null
+    plugin: "gmail"
+    enabled: false
+
 # Global settings for all agents
 defaults:
   provider: "anthropic"

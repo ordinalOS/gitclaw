@@ -177,6 +177,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Count votes and decide
+        id: tally
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUM: ${{ needs.context.outputs.pr_number }}
@@ -278,3 +279,15 @@ jobs:
           update_state ".stats.council_reviews += $REVIEW_COUNT | .stats.council_tallies += 1 | .xp += ($REVIEW_COUNT * 10 + 20)"
           persist_many "⚖️ Council tally: PR #$PR_NUM ($REVIEW_COUNT reviews)" \
             "memory/council/" "memory/state.json"
+
+      - name: Notify Telegram
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ needs.context.outputs.pr_number }}
+          VERDICT: ${{ steps.tally.outputs.verdict }}
+        run: |
+          if grep -q "telegram" agent.md 2>/dev/null; then
+            gh workflow run telegram-notify.yml \
+              -f event_json="{\"type\":\"council_verdict\",\"pr\":\"$PR_NUM\",\"verdict\":\"$VERDICT\"}" \
+            || true
+          fi

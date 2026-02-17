@@ -33,7 +33,7 @@ EMOJI_AGENTS = {
     "🔥": "Roast", "📰": "HN Scraper", "🥷": "News Ninja",
     "📡": "Solana Monitor", "🌐": "Solana Query", "🔨": "Solana Builder",
     "📺": "Pages Builder", "💓": "Heartbeat", "🏗️": "Architect",
-    "💅": "Karen",
+    "💅": "Karen", "📬": "Telegram", "📧": "Gmail",
 }
 
 
@@ -230,6 +230,65 @@ def load_agent_config() -> list:
     return agents
 
 
+def load_plugin_config() -> list:
+    """Parse config/plugins.yml manually (no PyYAML dependency)."""
+    config_file = REPO_ROOT / "config" / "plugins.yml"
+    if not config_file.exists():
+        return []
+
+    plugins = []
+    current = {}
+    in_plugins_block = False
+    content = config_file.read_text()
+
+    for line in content.split("\n"):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+
+        # Top-level key
+        if not line.startswith(" ") and stripped.endswith(":"):
+            if current:
+                plugins.append(current)
+                current = {}
+            in_plugins_block = (stripped == "plugins:")
+            continue
+
+        # Plugin name (2-space indent, ends with colon, no value)
+        plugin_match = re.match(r'^  (\w+):\s*$', line)
+        if plugin_match and in_plugins_block:
+            if current:
+                plugins.append(current)
+            current = {"_key": plugin_match.group(1)}
+            continue
+
+        # Property (4+ space indent under plugin)
+        kv_match = re.match(r'\s+(\w+):\s*(.*)', line)
+        if kv_match and current:
+            key, raw_val = kv_match.group(1), kv_match.group(2).strip()
+            if raw_val and not raw_val.startswith('"'):
+                raw_val = raw_val.split("#")[0].strip()
+            if raw_val.startswith('"') and raw_val.endswith('"'):
+                raw_val = raw_val[1:-1]
+            # Handle list values like [agent1, agent2, agent3]
+            if raw_val.startswith("[") and raw_val.endswith("]"):
+                items = [s.strip().strip("'\"") for s in raw_val[1:-1].split(",")]
+                current[key] = [i for i in items if i]
+            elif raw_val.lower() == "true":
+                current[key] = True
+            elif raw_val.lower() == "false":
+                current[key] = False
+            elif raw_val.lower() == "null" or raw_val == "":
+                current[key] = None
+            else:
+                current[key] = raw_val
+
+    if current:
+        plugins.append(current)
+
+    return plugins
+
+
 def get_recent_activity(limit: int = 50) -> list:
     """Build a chronological activity feed from all memory categories."""
     categories = [
@@ -285,6 +344,7 @@ def nav_html(active: str, subdir: bool = False) -> str:
         ("memory.html", "Memory"),
         ("council.html", "Council"),
         ("agents.html", "Agents"),
+        ("plugins.html", "Plugins"),
         ("debug.html", "Debug"),
         ("blog/index.html", "Blog"),
     ]
@@ -727,6 +787,7 @@ def generate_agents_page(state: dict) -> str:
         ("Market & News", [a for a in agents if a.get("plugin") == "market"]),
         ("Solana", [a for a in agents if a.get("plugin") == "solana"]),
         ("Architect & Council", [a for a in agents if a.get("plugin") in ("architect", "council", "pages")]),
+        ("Notifications", [a for a in agents if a.get("plugin") in ("telegram", "gmail")]),
     ]
 
     sections = ""
@@ -808,6 +869,116 @@ def generate_agents_page(state: dict) -> str:
     </div>"""
 
     return page_wrapper("Agents", "agents", state, body)
+
+
+def generate_plugins_page(state: dict) -> str:
+    """Generate the plugins registry page with status cards and setup guide."""
+    plugins = load_plugin_config()
+    agents = load_agent_config()
+
+    # Read agent.md to check what's enabled
+    agent_md = ""
+    agent_md_path = REPO_ROOT / "agent.md"
+    if agent_md_path.exists():
+        agent_md = agent_md_path.read_text().lower()
+
+    # Count enabled plugins
+    def plugin_enabled(plugin: dict) -> bool:
+        key = plugin.get("_key", "")
+        # Core is always enabled
+        if key == "core":
+            return True
+        # Check agent.md for any agent in this plugin
+        plugin_agents = plugin.get("agents", [])
+        if isinstance(plugin_agents, str):
+            plugin_agents = [s.strip() for s in plugin_agents.split(",")]
+        for agent_key in plugin_agents:
+            check_name = agent_key.replace("_", "-")
+            if check_name in agent_md:
+                return True
+        # Also check plugin key itself
+        if key in agent_md:
+            return True
+        return False
+
+    enabled_count = sum(1 for p in plugins if plugin_enabled(p))
+    total_count = len(plugins)
+
+    # Build plugin cards
+    cards = ""
+    for plugin in plugins:
+        key = plugin.get("_key", "")
+        name = e(plugin.get("name", key))
+        icon = plugin.get("icon", "📦")
+        desc = e(plugin.get("description", ""))
+        category = e(plugin.get("category", ""))
+        is_enabled = plugin_enabled(plugin)
+        status_cls = "on" if is_enabled else "off"
+        card_cls = "enabled" if is_enabled else "disabled"
+        status_label = "Enabled" if is_enabled else "Disabled"
+
+        # Agent count
+        plugin_agents = plugin.get("agents", [])
+        if isinstance(plugin_agents, str):
+            plugin_agents = [s.strip() for s in plugin_agents.split(",")]
+        agent_count = len(plugin_agents)
+
+        # Secrets
+        secrets = plugin.get("secrets", [])
+        if isinstance(secrets, str):
+            secrets = [s.strip() for s in secrets.split(",")]
+        optional_secrets = plugin.get("optional_secrets", [])
+        if isinstance(optional_secrets, str):
+            optional_secrets = [s.strip() for s in optional_secrets.split(",")]
+
+        secrets_html = ""
+        if secrets:
+            tags = "".join(f'<span class="secret-tag">{e(s)}</span>' for s in secrets)
+            secrets_html = f'<div class="plugin-meta"><strong>Secrets:</strong> {tags}</div>'
+        if optional_secrets:
+            opt_tags = "".join(f'<span class="secret-tag">{e(s)}</span>' for s in optional_secrets)
+            secrets_html += f'<div class="plugin-meta"><strong>Optional:</strong> {opt_tags}</div>'
+
+        # Setup link
+        setup_url = plugin.get("setup_url", "")
+        setup_html = ""
+        if setup_url:
+            setup_html = f'<a class="plugin-link" href="{e(setup_url)}" target="_blank">Setup Guide ↗</a>'
+
+        cards += f"""
+        <div class="plugin-card {card_cls}">
+          <div class="plugin-header">
+            <span class="plugin-icon">{icon}</span>
+            <span class="plugin-name">{name}</span>
+            <span class="plugin-status {status_cls}">{status_label}</span>
+          </div>
+          <div class="plugin-desc">{desc}</div>
+          <div class="plugin-meta">
+            {agent_count} agent{"s" if agent_count != 1 else ""} · {e(category)}
+          </div>
+          {secrets_html}
+          {setup_html}
+        </div>"""
+
+    body = f"""
+    <div class="panel">
+      <h2 class="panel-title">Plugins ({enabled_count} / {total_count} enabled)</h2>
+      <div class="plugin-grid">
+        {cards}
+      </div>
+    </div>
+
+    <div class="setup-box">
+      <h3>How to Enable a Plugin</h3>
+      <ol>
+        <li>Add required <strong>secrets</strong> to your GitHub repo settings
+            (Settings → Secrets and variables → Actions)</li>
+        <li>Add <code>enable: plugin-name</code> to <code>agent.md</code></li>
+        <li>Push — agents activate on the next scheduled or dispatched run</li>
+      </ol>
+    </div>"""
+
+    return page_wrapper("Plugins", "plugins", state, body)
 
 
 def generate_debug_page(state: dict) -> str:
@@ -933,6 +1104,7 @@ def build_site():
         "memory.html": generate_memory_browser(state),
         "council.html": generate_council_log(state),
         "agents.html": generate_agents_page(state),
+        "plugins.html": generate_plugins_page(state),
         "debug.html": generate_debug_page(state),
         "blog/index.html": generate_blog(state),
     }
@@ -954,7 +1126,10 @@ def build_site():
     agents = load_agent_config()
     (DATA_DIR / "agents.json").write_text(json.dumps(agents, indent=2, default=str))
 
-    log("Pages", f"Site built: {len(pages)} pages, 4 data files")
+    plugins = load_plugin_config()
+    (DATA_DIR / "plugins.json").write_text(json.dumps(plugins, indent=2, default=str))
+
+    log("Pages", f"Site built: {len(pages)} pages, 5 data files")
 
     update_stats("pages_built")
     award_xp(5)
