@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="120">
+    <title>GitClaw | About</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">Docs</a></div><div class="header-meta"><span>Apprentice</span><span class="xp-bar-container">XP 216<div class="xp-bar"><div class="xp-bar-fill" style="width:44%"></div></div></span><span>Streak 4d</span></div></div>
+    <nav class="nav"><a href="index.html">Dashboard</a>
+<a href="memory.html">Memory</a>
+<a href="council.html">Council</a>
+<a href="agents.html">Agents</a>
+<a href="plugins.html">Plugins</a>
+<a href="debug.html">Debug</a>
+<a href="blog/index.html">Blog</a>
+<a href="about.html" class="active">About</a>
+<a href="changelog.html">Changelog</a></nav>
+    <main class="main">
+        
+    <div class="panel full-width">
+        <h2 class="panel-title">About GitClaw</h2>
+        <div class="about-hero">
+            <p>GitClaw is a <strong>100% GitHub Actions-based AI agent system</strong>.
+            No servers, no binaries — the repository IS the agent.
+            Memory is persisted via git, agents run on schedules and respond to commands,
+            and everything is powered by LLM APIs.</p>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="panel">
+            <h2 class="panel-title">Architecture</h2>
+            <div class="arch-diagram">
+                <div class="arch-row">
+                    <div class="arch-box">Triggers<br><span class="tertiary">schedule / issues / PRs / commands</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">Command Router<br><span class="tertiary">command-router.yml</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">Agent Workflows<br><span class="tertiary">32 agents in Python + Shell</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">LLM API<br><span class="tertiary">Anthropic / OpenAI</span></div>
+                    <div class="arch-box">Memory<br><span class="tertiary">git-persisted files</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">GitHub Pages<br><span class="tertiary">Static dashboard</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <h2 class="panel-title">Setup Checklist</h2>
+            <div class="setup-checklist">
+                <div class="checklist-item checklist-done">&#x2705; agent.md configured</div><div class="checklist-item checklist-done">&#x2705; Agent registry exists</div><div class="checklist-item checklist-done">&#x2705; At least one workflow has run</div><div class="checklist-item checklist-done">&#x2705; Memory populated</div><div class="checklist-item checklist-done">&#x2705; Pages generated</div>
+            </div>
+            <div style="margin-top:16px">
+                <h2 class="panel-title">System Info</h2>
+                <table class="data-table">
+                    <tr><td>Name</td><td>GitClaw</td></tr>
+                    <tr><td>Persona</td><td>meme_lord</td></tr>
+                    <tr><td>Born</td><td>2026-02-14</td></tr>
+                    <tr><td>Version</td><td>1.0.0</td></tr>
+                    <tr><td>Repo</td><td><a href="https://github.com/ordinalOS/gitclaw" class="footer-link" target="_blank">https://github.com/ordinalOS/gitclaw</a></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel full-width" style="margin-top:20px">
+        <h2 class="panel-title">Agent Roster (32 agents)</h2>
+        <div class="table-scroll">
+        <table class="data-table">
+            <thead><tr><th>Agent</th><th>Description</th><th>Status</th></tr></thead>
+            <tbody><tr><td>☕ Morning Roast</td><td class='tertiary' style='font-size:13px'>Serves your daily issue digest with extra sass and coffee me</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>⚔️ Quest Master</td><td class='tertiary' style='font-size:13px'>Turns boring issues into epic RPG quests with XP rewards</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🃏 Code Jester</td><td class='tertiary' style='font-size:13px'>Reviews PRs with witty commentary and actually useful feedba</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🔍 Wild Fact Finder</td><td class='tertiary' style='font-size:13px'>Researches anything you ask with entertaining tangents and s</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🎨 Meme Machine</td><td class='tertiary' style='font-size:13px'>Generates viral content ideas, tweet drafts, and creative co</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>📜 Lore Keeper</td><td class='tertiary' style='font-size:13px'>Curates your repo&#x27;s knowledge base with dramatic narrative f</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🌙 Dream Interpreter</td><td class='tertiary' style='font-size:13px'>Personal journaling agent — interprets dreams and life musin</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🔮 Fortune Cookie</td><td class='tertiary' style='font-size:13px'>Daily wisdom, coding fortunes, and motivational nonsense</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🎉 Hype Man</td><td class='tertiary' style='font-size:13px'>Celebrates milestones, merged PRs, and closed issues with fa</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🔥 Roast Battle</td><td class='tertiary' style='font-size:13px'>On-demand code roasts — point it at any file for brutal hone</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>📰 HN Scraper</td><td class='tertiary' style='font-size:13px'>Scrapes and analyzes Hacker News stories with hype scores</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>🥷 News Scraper</td><td class='tertiary' style='font-size:13px'>Fetches and analyzes global news with ninja-style delivery</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>🔮 Crypto Oracle</td><td class='tertiary' style='font-size:13px'>Crypto market analysis with quant indicators (RSI, SMA, vola</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>🧙 Stock Wizard</td><td class='tertiary' style='font-size:13px'>Stock market analysis with quant indicators and wizard flair</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>🌐 Solana Query</td><td class='tertiary' style='font-size:13px'>On-chain data from Dexscreener, Jupiter, and Solana RPC</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>📡 Solana Monitor</td><td class='tertiary' style='font-size:13px'>Scheduled wallet balance and token price monitoring</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>🔨 Solana Builder</td><td class='tertiary' style='font-size:13px'>Verifiable Solana program builds via cargo-build-sbf / Ancho</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>🏗️ Architect</td><td class='tertiary' style='font-size:13px'>Autonomously analyzes the repo and proposes code improvement</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>👓 Council: Zuckerberg</td><td class='tertiary' style='font-size:13px'>Move fast and break things — velocity-focused council review</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>💰 Council: Mr. Wonderful</td><td class='tertiary' style='font-size:13px'>ROI-obsessed Shark Tank dealmaker council reviewer</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🚀 Council: Musk</td><td class='tertiary' style='font-size:13px'>First principles, 10x ambition, contrarian council reviewer</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>⚡ Council: Toly</td><td class='tertiary' style='font-size:13px'>Throughput-obsessed, parallel execution, crypto-native counc</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>₿ Council: Satoshi</td><td class='tertiary' style='font-size:13px'>Minimalist, trustless, privacy-focused council reviewer</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🕵️ Council: CIA</td><td class='tertiary' style='font-size:13px'>Classified briefing format, OPSEC-focused council reviewer</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>🎸 Council: Cobain</td><td class='tertiary' style='font-size:13px'>Anti-establishment, raw authenticity, anti-bloat council rev</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>📺 Pages Builder</td><td class='tertiary' style='font-size:13px'>Builds the GitHub Pages frontend from memory data</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>💅 Karen</td><td class='tertiary' style='font-size:13px'>QA compliance officer — audits memory, finds bugs, reviews P</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>🔍 Proposal Lint</td><td class='tertiary' style='font-size:13px'>Syntax gate for Architect PRs — validates Python and YAML</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td> Heartbeat</td><td class='tertiary' style='font-size:13px'>Vital signs monitor — updates agent state and maintains stre</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td> Warmup</td><td class='tertiary' style='font-size:13px'>Triggers all agents to populate memory and test the system</td><td><span class="status-active" style="font-size:11px">Active</span></td></tr>
+<tr><td>📬 Telegram Notify</td><td class='tertiary' style='font-size:13px'>Sends alerts and daily digests to Telegram</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+<tr><td>📧 Gmail Digest</td><td class='tertiary' style='font-size:13px'>Sends daily email digest of agent activity</td><td><span class="tertiary" style="font-size:11px">Disabled</span></td></tr>
+</tbody>
+        </table>
+        </div>
+    </div>
+    </main>
+    <footer class="footer">
+        <span>Powered by <a href="https://github.com/ordinalOS/gitclaw" class="footer-link">GitHub Actions</a> &middot; Zero Infrastructure</span>
+        <span id="clock"></span>
+    </footer>
+    <script src="assets/app.js"></script>
+</body>
+</html>

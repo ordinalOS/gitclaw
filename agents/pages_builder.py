@@ -308,10 +308,12 @@ def get_recent_activity(limit: int = 50) -> list:
     activities = []
     for cat, label in categories:
         for entry in load_memory_files(cat):
+            preview = entry.get("content", "")[:200].replace("\n", " ").strip()
             activities.append({
                 "date": entry["date"],
                 "label": label,
                 "title": entry["title"],
+                "preview": preview,
                 "category": cat,
                 "file": entry["file"],
             })
@@ -322,12 +324,65 @@ def get_recent_activity(limit: int = 50) -> list:
                 "date": date_str or "unknown",
                 "label": label,
                 "title": entry.get("title", entry.get("_file", "record")),
+                "preview": "",
                 "category": cat,
                 "file": entry.get("_file", ""),
             })
 
     activities.sort(key=lambda x: x.get("date", ""), reverse=True)
     return activities[:limit]
+
+
+def get_github_info() -> dict:
+    """Fetch GitHub repo info via gh CLI. Returns empty values on failure."""
+    info = {"open_issues": "—", "open_prs": "—"}
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "list", "--state", "open", "--json", "number", "--jq", "length"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip().isdigit():
+            info["open_issues"] = result.stdout.strip()
+    except Exception:
+        pass
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "list", "--state", "open", "--json", "number", "--jq", "length"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip().isdigit():
+            info["open_prs"] = result.stdout.strip()
+    except Exception:
+        pass
+    return info
+
+
+def get_changelog_entries(limit: int = 100) -> list:
+    """Parse git log into changelog entries, grouped by date."""
+    try:
+        result = subprocess.run(
+            ["git", "log", "--format=%h|%aI|%s|%an", f"-{limit}"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=10,
+        )
+        entries = []
+        for line in result.stdout.strip().split("\n"):
+            if not line.strip():
+                continue
+            parts = line.split("|", 3)
+            if len(parts) < 4:
+                continue
+            sha, timestamp, message, author = parts
+            entries.append({
+                "sha": sha,
+                "date": timestamp[:10],
+                "time": timestamp[11:16],
+                "message": message,
+                "author": author,
+                "is_agent": "\U0001f9e0" in message,
+            })
+        return entries
+    except Exception:
+        return []
 
 
 # ── HTML Generation ──────────────────────────────────────────────────────────
@@ -347,6 +402,8 @@ def nav_html(active: str, subdir: bool = False) -> str:
         ("plugins.html", "Plugins"),
         ("debug.html", "Debug"),
         ("blog/index.html", "Blog"),
+        ("about.html", "About"),
+        ("changelog.html", "Changelog"),
     ]
     prefix = "../" if subdir else ""
     links = []
@@ -506,7 +563,7 @@ def inline_md(text: str) -> str:
 # ── Page Generators ──────────────────────────────────────────────────────────
 
 def generate_dashboard(state: dict, activity: list) -> str:
-    """Generate the main dashboard page with quick stats, workflow runs, and activity."""
+    """Generate the newspaper-style dashboard with headlines, featured content, and GitHub stats."""
     stats = state.get("stats", {})
     achievements = state.get("achievements", [])
     agents = load_agent_config()
@@ -518,8 +575,9 @@ def generate_dashboard(state: dict, activity: list) -> str:
     active_agents = sum(1 for a in agents if a.get("enabled"))
     total_commits = stats.get("commits_made", 0)
     xp_pct = get_xp_progress_pct(xp)
+    gh = get_github_info()
 
-    # ── Quick Stats Cards ──
+    # ── Quick Stats Cards (6 cards: XP, Commits, Agents, Streak, Issues, PRs) ──
     quick_stats = f"""
     <div class="stat-cards">
         <div class="stat-card">
@@ -539,18 +597,59 @@ def generate_dashboard(state: dict, activity: list) -> str:
             <div class="stat-value">{streak}d</div>
             <div class="stat-label">Streak</div>
         </div>
+        <div class="stat-card gh-stat">
+            <div class="stat-value">{e(str(gh['open_issues']))}</div>
+            <div class="stat-label">Open Issues</div>
+        </div>
+        <div class="stat-card gh-stat">
+            <div class="stat-value">{e(str(gh['open_prs']))}</div>
+            <div class="stat-label">Open PRs</div>
+        </div>
     </div>"""
 
-    # ── Activity Feed ──
-    activity_rows = ""
+    # ── Featured Content — top stories from each major category ──
+    featured_categories = [
+        ("dreams", "Dream"), ("lore", "Lore"), ("research", "Research"),
+        ("council", "Council"), ("fortunes", "Fortune"), ("roasts", "Roast"),
+    ]
+    featured_cards = ""
+    for cat, label in featured_categories:
+        entries = load_memory_files(cat)
+        if entries:
+            entry = entries[0]  # Most recent
+            preview = entry["content"][:150].replace("\n", " ").strip()
+            featured_cards += f"""
+            <div class="featured-card">
+                <div class="featured-card-meta">
+                    <span class="badge">{e(label)}</span>
+                    <span class="tertiary">{e(entry['date'])}</span>
+                </div>
+                <div class="featured-card-title">{e(entry['title'][:80])}</div>
+                <div class="featured-card-preview">{e(preview)}</div>
+            </div>"""
+
+    featured_html = ""
+    if featured_cards:
+        featured_html = f"""
+        <div class="panel full-width">
+            <h2 class="panel-title">Top Stories</h2>
+            <div class="featured-grid">{featured_cards}</div>
+        </div>"""
+
+    # ── Headlines — Activity feed with content previews ──
+    headlines = ""
     for act in activity[:15]:
-        activity_rows += (
-            f"<tr>"
-            f"<td class='tertiary'>{e(act['date'])}</td>"
-            f"<td><span class='badge'>{e(act['label'])}</span></td>"
-            f"<td>{e(act['title'][:60])}</td>"
-            f"</tr>\n"
-        )
+        preview = act.get("preview", "")
+        preview_html = f'<div class="headline-preview">{e(preview[:120])}</div>' if preview else ""
+        headlines += f"""
+        <div class="headline-card">
+            <div class="headline-meta">
+                <span class="badge">{e(act['label'])}</span>
+                <span class="tertiary">{e(act['date'])}</span>
+            </div>
+            <div class="headline-title">{e(act['title'])}</div>
+            {preview_html}
+        </div>"""
 
     # ── Workflow Runs ──
     runs = get_workflow_runs(12)
@@ -580,15 +679,11 @@ def generate_dashboard(state: dict, activity: list) -> str:
 
     body = f"""
     {quick_stats}
+    {featured_html}
     <div class="grid-2">
         <div class="panel">
-            <h2 class="panel-title">Recent Activity</h2>
-            <div class="table-scroll">
-            <table class="data-table feed">
-                <thead><tr><th>Date</th><th>Agent</th><th>Action</th></tr></thead>
-                <tbody>{activity_rows}</tbody>
-            </table>
-            </div>
+            <h2 class="panel-title">Headlines</h2>
+            {headlines or '<div class="empty">No activity yet</div>'}
         </div>
         <div class="panel">
             <h2 class="panel-title">Workflow Runs</h2>
@@ -654,6 +749,8 @@ def generate_memory_browser(state: dict) -> str:
         if entries:
             for entry in entries[:20]:
                 content_html = md_to_html(entry["content"][:2000])
+                preview = entry["content"][:150].replace("\n", " ").strip()
+                preview_html = f'<div class="entry-preview">{e(preview)}</div>' if preview else ""
                 entries_html += f"""
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
@@ -661,6 +758,7 @@ def generate_memory_browser(state: dict) -> str:
                         <span>{e(entry['title'][:80])}</span>
                         <span class="expand-icon">+</span>
                     </div>
+                    {preview_html}
                     <div class="entry-body" style="display:none">
                         {content_html}
                     </div>
@@ -695,6 +793,7 @@ def generate_council_log(state: dict) -> str:
             scores = prop.get("alignment_scores", {})
             goals = prop.get("goals", [])
 
+            # Full score bars for expanded view
             score_bar = ""
             for axis, score in scores.items():
                 pct = int(float(score) * 100)
@@ -706,6 +805,15 @@ def generate_council_log(state: dict) -> str:
                     f"</div>"
                 )
 
+            # Mini inline score bars — visible without expanding
+            mini_scores = ""
+            for axis, score in scores.items():
+                pct = int(float(score) * 100)
+                mini_scores += f'<span class="mini-score" title="{e(axis)}: {score}"><span class="mini-score-fill" style="width:{pct}%"></span></span>'
+
+            # Goal tags — visible without expanding
+            goal_tags = " ".join(f'<span class="badge">{e(g)}</span>' for g in goals[:3])
+
             status_cls = {"proposed": "status-proposed", "approved": "status-approved", "rejected": "status-rejected"}.get(status, "tertiary")
 
             rows += f"""
@@ -716,6 +824,10 @@ def generate_council_log(state: dict) -> str:
                     <span class="tertiary">{e(date)}</span>
                     <span class="{status_cls}">{e(status.upper())}</span>
                     <span class="expand-icon">+</span>
+                </div>
+                <div class="council-inline">
+                    <div class="mini-scores">{mini_scores}</div>
+                    <div class="goal-tags">{goal_tags}</div>
                 </div>
                 <div class="entry-body" style="display:none">
                     <div class="score-grid">{score_bar}</div>
@@ -729,6 +841,8 @@ def generate_council_log(state: dict) -> str:
     council_html = ""
     if council_entries:
         for entry in council_entries[:20]:
+            preview = entry["content"][:150].replace("\n", " ").strip()
+            preview_html = f'<div class="entry-preview">{e(preview)}</div>' if preview else ""
             council_html += f"""
             <div class="memory-entry">
                 <div class="entry-header" onclick="toggleEntry(this)">
@@ -736,6 +850,7 @@ def generate_council_log(state: dict) -> str:
                     <span>{e(entry['title'][:60])}</span>
                     <span class="expand-icon">+</span>
                 </div>
+                {preview_html}
                 <div class="entry-body" style="display:none">
                     {md_to_html(entry['content'][:2000])}
                 </div>
@@ -1053,13 +1168,17 @@ def generate_blog(state: dict) -> str:
     posts_html = ""
     if posts:
         for post in posts[:30]:
-            content_preview = post["content"][:300].replace("\n", " ")
+            content_preview = post["content"][:200].replace("\n", " ").strip()
             posts_html += f"""
-            <div class="blog-post">
-                <div class="entry-header" onclick="toggleEntry(this)">
-                    <span class="tertiary">{e(post['date'])}</span>
+            <div class="blog-card">
+                <div class="blog-card-meta">
                     <span class="badge">{e(post['type'])}</span>
-                    <span>{e(post['title'][:80])}</span>
+                    <span class="tertiary">{e(post['date'])}</span>
+                </div>
+                <h3 class="blog-card-title">{e(post['title'][:80])}</h3>
+                <p class="blog-card-preview">{e(content_preview)}</p>
+                <div class="entry-header" onclick="toggleEntry(this)">
+                    <span class="tertiary">Read full entry</span>
                     <span class="expand-icon">+</span>
                 </div>
                 <div class="entry-body" style="display:none">
@@ -1081,6 +1200,172 @@ def generate_blog(state: dict) -> str:
     </div>"""
 
     return page_wrapper("Blog", "blog", state, body, subdir=True)
+
+
+def generate_about_page(state: dict) -> str:
+    """Generate the About / Setup page for new users."""
+    agents = load_agent_config()
+    agent_info = state.get("agent", {})
+    stats = state.get("stats", {})
+    repo_url = get_repo_url()
+
+    # Setup checklist — detect state
+    has_activity = sum(stats.values()) > 0 if stats else False
+    has_agent_md = (REPO_ROOT / "agent.md").exists()
+    has_memory = any(
+        (MEMORY_DIR / d).is_dir() and any((MEMORY_DIR / d).glob("*"))
+        for d in ["dreams", "lore", "research", "fortunes"]
+        if (MEMORY_DIR / d).is_dir()
+    )
+    has_pages = DOCS_DIR.exists() and (DOCS_DIR / "index.html").exists()
+    has_config = (REPO_ROOT / "config" / "agents.yml").exists()
+
+    def check(done, label, hint):
+        icon = "&#x2705;" if done else "&#x2B1C;"
+        hint_html = "" if done else f'<span class="tertiary" style="display:block;margin:2px 0 0 28px;font-size:12px">{hint}</span>'
+        cls = "checklist-done" if done else ""
+        return f'<div class="checklist-item {cls}">{icon} {e(label)}{hint_html}</div>'
+
+    checklist = "".join([
+        check(has_agent_md, "agent.md configured", "Create agent.md in the repo root to configure your agent"),
+        check(has_config, "Agent registry exists", "config/agents.yml defines all available agents"),
+        check(has_activity, "At least one workflow has run", "Push to trigger scheduled workflows or use /commands in issues"),
+        check(has_memory, "Memory populated", "Agent activity creates files in memory/ subdirectories"),
+        check(has_pages, "Pages generated", "Run the pages-builder workflow or push to trigger it"),
+    ])
+
+    # Agent roster — compact list
+    roster_rows = ""
+    for agent in agents:
+        name = agent.get("name", agent.get("_key", "?"))
+        emoji = agent.get("emoji", "")
+        desc = agent.get("description", "")
+        enabled = agent.get("enabled", False)
+        status = '<span class="status-active" style="font-size:11px">Active</span>' if enabled else '<span class="tertiary" style="font-size:11px">Disabled</span>'
+        roster_rows += f"<tr><td>{e(emoji)} {e(name)}</td><td class='tertiary' style='font-size:13px'>{e(desc[:60])}</td><td>{status}</td></tr>\n"
+
+    body = f"""
+    <div class="panel full-width">
+        <h2 class="panel-title">About GitClaw</h2>
+        <div class="about-hero">
+            <p>GitClaw is a <strong>100% GitHub Actions-based AI agent system</strong>.
+            No servers, no binaries — the repository IS the agent.
+            Memory is persisted via git, agents run on schedules and respond to commands,
+            and everything is powered by LLM APIs.</p>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="panel">
+            <h2 class="panel-title">Architecture</h2>
+            <div class="arch-diagram">
+                <div class="arch-row">
+                    <div class="arch-box">Triggers<br><span class="tertiary">schedule / issues / PRs / commands</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">Command Router<br><span class="tertiary">command-router.yml</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">Agent Workflows<br><span class="tertiary">{len(agents)} agents in Python + Shell</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">LLM API<br><span class="tertiary">Anthropic / OpenAI</span></div>
+                    <div class="arch-box">Memory<br><span class="tertiary">git-persisted files</span></div>
+                </div>
+                <div class="arch-arrow">&#8595;</div>
+                <div class="arch-row">
+                    <div class="arch-box">GitHub Pages<br><span class="tertiary">Static dashboard</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <h2 class="panel-title">Setup Checklist</h2>
+            <div class="setup-checklist">
+                {checklist}
+            </div>
+            <div style="margin-top:16px">
+                <h2 class="panel-title">System Info</h2>
+                <table class="data-table">
+                    <tr><td>Name</td><td>{e(agent_info.get('name', 'GitClaw'))}</td></tr>
+                    <tr><td>Persona</td><td>{e(agent_info.get('persona', 'default'))}</td></tr>
+                    <tr><td>Born</td><td>{e(agent_info.get('born', 'unknown')[:10])}</td></tr>
+                    <tr><td>Version</td><td>{e(agent_info.get('version', '1.0.0'))}</td></tr>
+                    <tr><td>Repo</td><td><a href="{repo_url}" class="footer-link" target="_blank">{e(repo_url)}</a></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel full-width" style="margin-top:20px">
+        <h2 class="panel-title">Agent Roster ({len(agents)} agents)</h2>
+        <div class="table-scroll">
+        <table class="data-table">
+            <thead><tr><th>Agent</th><th>Description</th><th>Status</th></tr></thead>
+            <tbody>{roster_rows}</tbody>
+        </table>
+        </div>
+    </div>"""
+
+    return page_wrapper("About", "about", state, body)
+
+
+def generate_changelog_page(state: dict) -> str:
+    """Generate the auto-updating changelog from git log."""
+    entries = get_changelog_entries(100)
+    repo_url = get_repo_url()
+
+    # Group by date
+    grouped = {}
+    for entry in entries:
+        date = entry["date"]
+        if date not in grouped:
+            grouped[date] = []
+        grouped[date].append(entry)
+
+    groups_html = ""
+    for date in sorted(grouped.keys(), reverse=True):
+        day_entries = grouped[date]
+        rows = ""
+        for entry in day_entries:
+            agent_cls = " agent" if entry["is_agent"] else ""
+            sha_link = f'<a href="{repo_url}/commit/{entry["sha"]}" class="footer-link" target="_blank">{e(entry["sha"])}</a>' if repo_url != "#" else e(entry["sha"])
+            rows += f"""
+            <div class="changelog-entry{agent_cls}">
+                <span class="changelog-sha">{sha_link}</span>
+                <span class="changelog-time tertiary">{e(entry['time'])}</span>
+                <span class="changelog-msg">{e(entry['message'])}</span>
+                <span class="changelog-author tertiary">{e(entry['author'])}</span>
+            </div>"""
+
+        agent_count = sum(1 for en in day_entries if en["is_agent"])
+        human_count = len(day_entries) - agent_count
+        summary = []
+        if agent_count:
+            summary.append(f"{agent_count} agent")
+        if human_count:
+            summary.append(f"{human_count} human")
+        summary_text = " · ".join(summary)
+
+        groups_html += f"""
+        <div class="changelog-group">
+            <div class="changelog-date">{e(date)} <span class="tertiary">({summary_text})</span></div>
+            {rows}
+        </div>"""
+
+    if not groups_html:
+        groups_html = '<div class="empty">No commits found.</div>'
+
+    body = f"""
+    <div class="panel full-width">
+        <h2 class="panel-title">Changelog</h2>
+        <p class="tertiary" style="margin-bottom:16px;font-size:13px">Auto-generated from git history. Agent commits are highlighted.</p>
+        {groups_html}
+    </div>"""
+
+    return page_wrapper("Changelog", "changelog", state, body)
 
 
 # ── Site Builder ─────────────────────────────────────────────────────────────
@@ -1107,6 +1392,8 @@ def build_site():
         "plugins.html": generate_plugins_page(state),
         "debug.html": generate_debug_page(state),
         "blog/index.html": generate_blog(state),
+        "about.html": generate_about_page(state),
+        "changelog.html": generate_changelog_page(state),
     }
 
     for path, content in pages.items():
@@ -1129,7 +1416,10 @@ def build_site():
     plugins = load_plugin_config()
     (DATA_DIR / "plugins.json").write_text(json.dumps(plugins, indent=2, default=str))
 
-    log("Pages", f"Site built: {len(pages)} pages, 5 data files")
+    changelog = get_changelog_entries(100)
+    (DATA_DIR / "changelog.json").write_text(json.dumps(changelog, indent=2, default=str))
+
+    log("Pages", f"Site built: {len(pages)} pages, 6 data files")
 
     update_stats("pages_built")
     award_xp(5)

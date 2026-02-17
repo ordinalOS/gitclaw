@@ -3,6 +3,7 @@
     "date": "unknown",
     "label": "Fortune",
     "title": "2026 02",
+    "preview": "--- ### 2026-02-15  # \ud83d\udd2e Fortune Cookie \u2014 February 15, 2026  **Today's Fortune:** *\"The newborn agent dreams in memes. On day two, it learns that chaos and order are but different git branches of the",
     "category": "fortunes",
     "file": "2026-02.md"
   },
@@ -10,6 +11,7 @@
     "date": "2026-02-17",
     "label": "Roast",
     "title": "2026 02 17",
+    "preview": "# \u2615 MORNING ROAST \u2014 February 17, 2026  ## The Daily Grind *Beep boop.* Someone's been hitting the espresso machine at 3 AM. You've got 4 commits in one night? That's either genius or sleep deprivation",
     "category": "roasts",
     "file": "2026-02-17.md"
   },
@@ -17,6 +19,7 @@
     "date": "2026-02-17",
     "label": "HN Digest",
     "title": "Top",
+    "preview": "--- ### 07:19 UTC \u2014 top   # HN Hype Buster Report \u2014 Feb 17, 2026  ## Top Stories with Hype Scores  **1. Miles Wu's Origami Breakthrough (582 pts)** `[Hype: 7/10]` A 14-year-old folded something that",
     "category": "hn",
     "file": "2026-02-17-top.md"
   },
@@ -24,6 +27,7 @@
     "date": "2026-02-17",
     "label": "News",
     "title": "Tech",
+    "preview": "--- ### 07:48 UTC -- tech  # \ud83e\udd77 News Ninja Strike Report  **ALERT**: Data streams are stale. Intel timestamps range from 2022-2024, contradicting today's date (2026-02-17). Proceeding with cautious an",
     "category": "news",
     "file": "2026-02-17-tech.md"
   },
@@ -31,6 +35,7 @@
     "date": "2026-02-17",
     "label": "Council",
     "title": "Pr5 Zuckerberg",
+    "preview": "# Council Review: zuckerberg \u2014 PR #5 _Reviewed on 2026-02-17 13:24 UTC_  # Council Review: Error Handling for News Scraper  ## The Zuck Assessment  This is a *classic* over-engineered response to a re",
     "category": "council",
     "file": "2026-02-17-pr5-zuckerberg.md"
   },
@@ -38,6 +43,7 @@
     "date": "2026-02-17",
     "label": "Council",
     "title": "Pr5 Wonderful",
+    "preview": "# Council Review: wonderful \u2014 PR #5 _Reviewed on 2026-02-17 13:24 UTC_  # Mr. Wonderful's Council Review \u2014 PR #5: Error Handling for News Scraper  ---  ## The Deal Assessment  Here's the thing: this P",
     "category": "council",
     "file": "2026-02-17-pr5-wonderful.md"
   },
@@ -45,6 +51,7 @@
     "date": "2026-02-17",
     "label": "Council",
     "title": "Pr5 Musk",
+    "preview": "# Council Review: musk \u2014 PR #5 _Reviewed on 2026-02-17 13:24 UTC_  # Elon's Council Review: News Scraper Error Handling  ## First Principles Take  Let me step back. The question isn't \"should we add e",
     "category": "council",
     "file": "2026-02-17-pr5-musk.md"
   },
@@ -52,6 +59,7 @@
     "date": "2026-02-17",
     "label": "Council",
     "title": "Pr5 Cobain",
+    "preview": "# Council Review: cobain \u2014 PR #5 _Reviewed on 2026-02-17 13:24 UTC_  # Council Review: Error Handling PR  ## The Vibe Check  Okay, so someone's trying to make `news_scraper.py` less likely to crash. T",
     "category": "council",
     "file": "2026-02-17-pr5-cobain.md"
   },
@@ -59,6 +67,7 @@
     "date": "2026-02-16",
     "label": "Roast",
     "title": "2026 02 16",
+    "preview": "# \u2615 Morning Roast \u2014 February 16, 2026  ## \ud83c\udf55 Late-Night Pizza-Driven Development Edition  ---  ## The Daily Grind Well, well, well... looks like *someone* decided that 2 AM was the perfect time to push",
     "category": "roasts",
     "file": "2026-02-16.md"
   },
@@ -66,6 +75,7 @@
     "date": "2026-02-16",
     "label": "HN Digest",
     "title": "Top",
+    "preview": "--- ### 07:22 UTC \u2014 top   # HN Hype Buster Report \u2014 February 16, 2026  ## \ud83d\udd25 Top Stories  **[Hype: 9/10]** \"I'm joining OpenAI\" (888 pts) The orange site's favorite pastime: watching talented engineer",
     "category": "hn",
     "file": "2026-02-16-top.md"
   },
@@ -73,6 +83,7 @@
     "date": "2026-02-16",
     "label": "News",
     "title": "Tech",
+    "preview": "--- ### 07:48 UTC -- tech  # \ud83d\udccb News Ninja Strike Report  ## Strike Report - **Low Impact** \u2014 \"Ask HN: With the rise of AI, how to approach my new career in software dev?\" (6 pts, 3 comments)   - *A w",
     "category": "news",
     "file": "2026-02-16-tech.md"
   },
@@ -80,6 +91,7 @@
     "date": "2026-02-15",
     "label": "HN Digest",
     "title": "Top",
+    "preview": "--- ### 07:14 UTC \u2014 top   # \ud83d\udcf0 HN Hype Buster Report \u2014 February 15, 2026  ## \ud83d\udd25 Top Stories  **[Hype: 9/10] uBlock filter list to hide all YouTube Shorts** (778 pts) The people have *spoken* \u2014 and they",
     "category": "hn",
     "file": "2026-02-15-top.md"
   },
@@ -87,6 +99,7 @@
     "date": "2026-02-15",
     "label": "News",
     "title": "Tech",
+    "preview": "--- ### 07:43 UTC -- tech  # \ud83d\udcf0 News Ninja Strike Report  ## Strike Report - **Low Impact** \u2014 *Ask HN: Career in Software Dev (AI Era)*   - The dojo teaches: even in the age of the algorithm, human co",
     "category": "news",
     "file": "2026-02-15-tech.md"
   },
@@ -94,6 +107,7 @@
     "date": "2026-02-14",
     "label": "Dream",
     "title": "2026 02 14",
+    "preview": "# \u2728 Dream Interpretation: The Harmony Protocol \u2728  ## \ud83c\udf19 Dream Log **Title:** *The Harmony Protocol* **Date:** Today **Dreamer's Vision:** A world at peace  ---  ## \ud83d\udd2e Symbol Analysis  | Symbol | Mundane",
     "category": "dreams",
     "file": "2026-02-14.md"
   },
@@ -101,6 +115,7 @@
     "date": "2026-02-14",
     "label": "Roast",
     "title": "2026 02 14",
+    "preview": "# \u2615 MORNING ROAST \u2014 Valentine's Day Edition \u2615  ## The Daily Grind *Valentine's Day 2026: ordinalOS is out here pulling all-nighters like love itself depends on it. Four commits before midnight? Someon",
     "category": "roasts",
     "file": "2026-02-14.md"
   }

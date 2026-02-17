@@ -1,0 +1,514 @@
+[
+  {
+    "sha": "5c51991",
+    "date": "2026-02-17",
+    "time": "12:41",
+    "message": "add plugin system with Telegram and Gmail notification plugins",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "298f8a1",
+    "date": "2026-02-17",
+    "time": "20:07",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T20:07Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "84137b1",
+    "date": "2026-02-17",
+    "time": "12:04",
+    "message": "add autonomous revision loop: council REVISE triggers architect auto-fix",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "86400c5",
+    "date": "2026-02-17",
+    "time": "18:19",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "2be925b",
+    "date": "2026-02-17",
+    "time": "16:15",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T16:15Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "3bc5c5b",
+    "date": "2026-02-17",
+    "time": "05:26",
+    "message": "fix council parallel push conflicts: move state updates to tally job",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "cde8bd9",
+    "date": "2026-02-17",
+    "time": "13:24",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: zuckerberg reviewed PR #5",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "3dbf141",
+    "date": "2026-02-17",
+    "time": "13:24",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: wonderful reviewed PR #5",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e1be280",
+    "date": "2026-02-17",
+    "time": "13:24",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: musk reviewed PR #5",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e1ef9b4",
+    "date": "2026-02-17",
+    "time": "13:24",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cobain reviewed PR #5",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "ac2ebca",
+    "date": "2026-02-17",
+    "time": "05:22",
+    "message": "fix architect pipeline: trigger council explicitly, clean JSON output",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "62d7ef8",
+    "date": "2026-02-17",
+    "time": "05:22",
+    "message": "fix architect JSON output: redirect git subprocess stdout to stderr",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "11fd0db",
+    "date": "2026-02-17",
+    "time": "05:17",
+    "message": "fix stale news data: add date filters to all news API calls",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "92d7b74",
+    "date": "2026-02-17",
+    "time": "13:14",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T13:14Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "120e51d",
+    "date": "2026-02-17",
+    "time": "05:13",
+    "message": "add warmup workflow, upgrade architect model, enable market agents, rewrite README",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "e67a5cf",
+    "date": "2026-02-17",
+    "time": "05:01",
+    "message": "dashboard overhaul: quick stats, workflow runs, mobile responsive, header polish",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "a928fc9",
+    "date": "2026-02-17",
+    "time": "12:44",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T12:44Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e4322e5",
+    "date": "2026-02-17",
+    "time": "04:43",
+    "message": "regenerate site HTML after rebase",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "4b55a6a",
+    "date": "2026-02-17",
+    "time": "04:43",
+    "message": "fix blog styling, enhance agents page, sync config, add favicon",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "d23a14c",
+    "date": "2026-02-17",
+    "time": "12:13",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "9842812",
+    "date": "2026-02-17",
+    "time": "12:06",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T12:06Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e704df7",
+    "date": "2026-02-17",
+    "time": "12:02",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T12:02Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "6313b52",
+    "date": "2026-02-17",
+    "time": "04:02",
+    "message": "Apple HIG redesign + fix architect JSON parsing and committer identity",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "330d22f",
+    "date": "2026-02-17",
+    "time": "11:51",
+    "message": "\ud83e\udde0 \ud83c\udfa8 Content generated: epstein",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "3d159ab",
+    "date": "2026-02-17",
+    "time": "03:46",
+    "message": "\ud83d\udcfa initial Pages build \u2014 6 pages + data files",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "19cb9a5",
+    "date": "2026-02-17",
+    "time": "03:38",
+    "message": "fix pages-builder: set git identity before commit",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "5375964",
+    "date": "2026-02-17",
+    "time": "03:36",
+    "message": "enable architect, council, pages-builder, and karen agents",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "29cd546",
+    "date": "2026-02-17",
+    "time": "03:34",
+    "message": "add Karen QA agent: bug hunter, memory auditor, PR reviewer",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "4a38d6d",
+    "date": "2026-02-17",
+    "time": "03:30",
+    "message": "add architect + council of 7 + GitHub Pages pipeline",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "17ebfeb",
+    "date": "2026-02-17",
+    "time": "09:19",
+    "message": "\ud83e\udde0 \u2615 Morning Roast \u2014 2026-02-17",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "1aa1f6d",
+    "date": "2026-02-17",
+    "time": "08:16",
+    "message": "\ud83e\udde0 \ud83d\udd2e Fortune: 2026-02-17",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "af0bc3d",
+    "date": "2026-02-17",
+    "time": "07:48",
+    "message": "\ud83e\udde0 News Scraper: tech",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "3e48611",
+    "date": "2026-02-17",
+    "time": "07:19",
+    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "1e2c8b0",
+    "date": "2026-02-17",
+    "time": "06:21",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "57c1ce5",
+    "date": "2026-02-17",
+    "time": "00:24",
+    "message": "\ud83e\udde0 \ud83d\udc93 Heartbeat \u2014 2026-02-17",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "08dfcb8",
+    "date": "2026-02-17",
+    "time": "00:23",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "d5f8b23",
+    "date": "2026-02-16",
+    "time": "18:12",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "ef68121",
+    "date": "2026-02-16",
+    "time": "12:13",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "7acc0a7",
+    "date": "2026-02-16",
+    "time": "09:20",
+    "message": "\ud83e\udde0 \u2615 Morning Roast \u2014 2026-02-16",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "ab960a9",
+    "date": "2026-02-16",
+    "time": "08:16",
+    "message": "\ud83e\udde0 \ud83d\udd2e Fortune: 2026-02-16",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "589ab28",
+    "date": "2026-02-16",
+    "time": "07:48",
+    "message": "\ud83e\udde0 News Scraper: tech",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "4f395cd",
+    "date": "2026-02-16",
+    "time": "07:22",
+    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "c2b36f2",
+    "date": "2026-02-16",
+    "time": "06:24",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "be057db",
+    "date": "2026-02-16",
+    "time": "00:24",
+    "message": "\ud83e\udde0 \ud83d\udc93 Heartbeat \u2014 2026-02-16",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "99453ed",
+    "date": "2026-02-16",
+    "time": "00:22",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "1bf27cb",
+    "date": "2026-02-15",
+    "time": "18:07",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e319f5d",
+    "date": "2026-02-15",
+    "time": "12:08",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "160a33a",
+    "date": "2026-02-15",
+    "time": "08:09",
+    "message": "\ud83e\udde0 \ud83d\udd2e Fortune: 2026-02-15",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "47326c5",
+    "date": "2026-02-15",
+    "time": "07:43",
+    "message": "\ud83e\udde0 News Scraper: tech",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "0308f1a",
+    "date": "2026-02-15",
+    "time": "07:14",
+    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "c150e5d",
+    "date": "2026-02-15",
+    "time": "06:18",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "bad7b30",
+    "date": "2026-02-15",
+    "time": "00:25",
+    "message": "\ud83e\udde0 \ud83d\udc93 Heartbeat \u2014 2026-02-15",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "7d15afc",
+    "date": "2026-02-15",
+    "time": "00:23",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "2e55221",
+    "date": "2026-02-14",
+    "time": "17:31",
+    "message": "add market & news plugin: HN scraper, news ninja, crypto oracle, stock wizard",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "8b802f9",
+    "date": "2026-02-14",
+    "time": "22:18",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "498da43",
+    "date": "2026-02-14",
+    "time": "22:17",
+    "message": "\ud83e\udde0 \ud83d\udc93 Heartbeat \u2014 2026-02-14",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "0891f63",
+    "date": "2026-02-14",
+    "time": "22:17",
+    "message": "\ud83e\udde0 \ud83c\udf19 Dream interpreted",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "b3a887c",
+    "date": "2026-02-14",
+    "time": "22:16",
+    "message": "\ud83e\udde0 \ud83e\udd9e GitClaw initialized! Persona: meme_lord",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "3b5f113",
+    "date": "2026-02-14",
+    "time": "17:10",
+    "message": "security hardening",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "3eb190e",
+    "date": "2026-02-14",
+    "time": "21:57",
+    "message": "\ud83e\udde0 \u2615 Morning Roast \u2014 2026-02-14",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "dc42bc5",
+    "date": "2026-02-14",
+    "time": "16:53",
+    "message": "haiku testing",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "3a5c5e8",
+    "date": "2026-02-14",
+    "time": "16:51",
+    "message": "label fix",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "1cd907c",
+    "date": "2026-02-14",
+    "time": "16:46",
+    "message": "solana adapter",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "21fb1cf",
+    "date": "2026-02-14",
+    "time": "16:37",
+    "message": "initial",
+    "author": "nightfallsnet",
+    "is_agent": false
+  }
+]
