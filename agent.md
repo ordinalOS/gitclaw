@@ -49,6 +49,7 @@ enable: meme-machine
 # enable: architect
 # enable: council
 # enable: pages-builder
+# enable: karen
 
 ## Custom Instructions
 # Add any custom instructions for your agent here.

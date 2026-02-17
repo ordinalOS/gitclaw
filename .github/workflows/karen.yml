@@ -1,0 +1,210 @@
+# ============================================================================
+# Karen — QA compliance officer.
+# Audits memory for empty values, broken JSON, missing data, rendering issues.
+# Reviews PRs for bugs and quality problems.
+# Files complaints. Speaks to the manager.
+# ============================================================================
+name: "💅 Karen"
+
+on:
+  workflow_call:
+    inputs:
+      query_args:
+        required: false
+        type: string
+        default: "audit"
+      issue_number:
+        required: false
+        type: string
+        default: "0"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Audit mode"
+        required: false
+        default: "audit"
+        type: choice
+        options:
+          - audit
+      issue_number:
+        description: "Issue to post results to (0 = create new)"
+        required: false
+        default: "0"
+        type: string
+  pull_request:
+    types: [opened, synchronize]
+  schedule:
+    - cron: '0 5 * * 1'  # Weekly Monday 5 AM UTC
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: write
+
+jobs:
+  # ── Full Audit Mode (schedule, command, manual) ─────────────────────────
+  audit:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Check if enabled
+        id: check
+        run: |
+          if grep -q "enable: karen" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Karen not enabled in agent.md"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run audit
+        if: steps.check.outputs.enabled == 'true'
+        id: audit
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd agents
+          REPORT=$(python3 karen.py audit)
+
+          echo "report<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$REPORT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Post audit to issue
+        if: steps.check.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT_BODY: ${{ steps.audit.outputs.report }}
+          ISSUE_NUM: ${{ inputs.issue_number }}
+        run: |
+          ISSUE="$ISSUE_NUM"
+
+          if [ "$ISSUE" = "0" ] || [ -z "$ISSUE" ]; then
+            gh label create "gitclaw:karen" --description "💅 Karen QA audit" --color "d63384" 2>/dev/null || true
+
+            URL=$(gh issue create \
+              --title "💅 Karen QA Audit — $(date -u +%Y-%m-%d)" \
+              --body "$REPORT_BODY")
+            NUMBER=$(echo "$URL" | grep -o '[0-9]*$')
+            gh issue edit "$NUMBER" --add-label "gitclaw:karen"
+          else
+            gh api repos/${{ github.repository }}/issues/$ISSUE/comments \
+              -f body="$REPORT_BODY"
+          fi
+
+      - name: Persist
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          source scripts/git-persist.sh
+          update_state '.stats.karen_audits += 1 | .xp += 15'
+          persist_many "💅 Karen QA audit — $(date -u +%Y-%m-%d)" \
+            "memory/karen/" "memory/state.json"
+
+      - name: Post disabled notice
+        if: steps.check.outputs.enabled == 'false' && inputs.issue_number != '0' && inputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUM: ${{ inputs.issue_number }}
+        run: |
+          MSG="## 💅 Karen Is Not Enabled
+
+          I'd LIKE to audit this repo but I'm not enabled. Add this to \`agent.md\`:
+
+          \`\`\`
+          enable: karen
+          \`\`\`
+
+          Don't worry. I'll wait. I have ALL day.
+
+          — 💅 *Karen*"
+
+          gh api repos/${{ github.repository }}/issues/$ISSUE_NUM/comments \
+            -f body="$MSG"
+
+  # ── PR Review Mode ─────────────────────────────────────────────────────
+  review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if enabled
+        id: check
+        run: |
+          if grep -q "enable: karen" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Get PR diff
+        if: steps.check.outputs.enabled == 'true'
+        id: diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          DIFF=$(gh pr diff "$PR_NUM" | head -500)
+
+          echo "pr_diff<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DIFF" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Karen reviews PR
+        if: steps.check.outputs.enabled == 'true'
+        id: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PR_DIFF: ${{ steps.diff.outputs.pr_diff }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          cd agents
+          REVIEW=$(python3 karen.py review)
+
+          echo "review<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$REVIEW" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Post review
+        if: steps.check.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_BODY: ${{ steps.review.outputs.review }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr review "$PR_NUM" --comment --body "$REVIEW_BODY"
+
+      - name: Persist
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          source scripts/git-persist.sh
+          update_state '.stats.karen_reviews += 1 | .xp += 10'
+          persist "memory/state.json" "💅 Karen reviewed PR #${{ github.event.pull_request.number }}"

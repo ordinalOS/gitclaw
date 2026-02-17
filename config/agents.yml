@@ -254,6 +254,17 @@ agents:
     plugin: "pages"
     enabled: false
 
+  karen:
+    name: "Karen"
+    emoji: "💅"
+    description: "QA compliance officer — audits memory, finds bugs, reviews PRs, files complaints"
+    trigger: "issue_comment"
+    command: "/karen"
+    schedule: "0 5 * * 1"
+    prompt_file: "templates/prompts/karen.md"
+    plugin: "architect"
+    enabled: false
+
   proposal_lint:
     name: "Proposal Lint"
     emoji: "🔍"

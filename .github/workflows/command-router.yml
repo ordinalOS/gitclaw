@@ -141,6 +141,16 @@ jobs:
       issue_number: ${{ github.event.issue.number }}
     secrets: inherit
 
+  # ─── Karen QA Agent ───────────────────────────────────────────────
+  karen:
+    needs: route
+    if: needs.route.outputs.command == 'karen'
+    uses: ./.github/workflows/karen.yml
+    with:
+      query_args: ${{ needs.route.outputs.args }}
+      issue_number: ${{ github.event.issue.number }}
+    secrets: inherit
+
   # ─── Architect Agent ──────────────────────────────────────────────
   propose:
     needs: route
@@ -171,6 +181,7 @@ jobs:
           | `/dream <description>` | 🌙 Dream Interpreter | Log and interpret a dream |
           | `/roast <file_or_topic>` | 🔥 Roast Battle | Get a brutally honest code roast |
           | `/propose [hint]` | 🏗️ Architect | Propose a code improvement PR |
+          | `/karen` | 💅 Karen | QA audit — find bugs, empty values, broken things |
           | `/help` | 🦞 GitClaw | Show this help message |
 
           **Market & News Plugin** (enable in agent.md):
@@ -198,6 +209,7 @@ jobs:
 
           **Architect & Council Plugin** (enable in agent.md):
           | `/propose [hint]` | 🏗️ Architect | Propose a code improvement PR |
+          - 💅 **Karen** — Weekly QA audit + PR review (Mondays 5 AM UTC, if enabled)
           - 🏗️ **Architect** — Daily autonomous improvement proposals (6 AM UTC, if enabled)
           - ⚖️ **Council of 7** — Auto-reviews Architect PRs with 7 persona voters
           - 📺 **Pages Builder** — Rebuilds Bloomberg-terminal site (every 4h, if enabled)
