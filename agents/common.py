@@ -1,238 +1,204 @@
+#!/usr/bin/env python3
 """
-GitClaw Agent Commons
-Shared utilities, LLM client, and state management for all agents.
-The Python equivalent of scripts/utils.sh + scripts/llm.sh.
+Common utilities for all agents.
+
+Provides:
+- LLM API interaction with error handling
+- Environment variable access with validation
+- Response parsing and validation
 """
 
-import json
 import os
-import subprocess
+import json
 import sys
-import urllib.error
-from datetime import datetime, timezone
-from pathlib import Path
-
-# ── Paths ────────────────────────────────────────────────────────────────────
-
-REPO_ROOT = Path(subprocess.check_output(
-    ["git", "rev-parse", "--show-toplevel"], text=True
-).strip())
-
-STATE_FILE = REPO_ROOT / "memory" / "state.json"
-CONFIG_DIR = REPO_ROOT / "config"
-PROMPTS_DIR = REPO_ROOT / "templates" / "prompts"
-MEMORY_DIR = REPO_ROOT / "memory"
+from urllib.request import urlopen, Request
+from urllib.error import URLError, HTTPError
+from datetime import datetime
 
 
-# ── LLM Client ──────────────────────────────────────────────────────────────
+def get_env(key: str, default: str = None) -> str:
+    """
+    Get environment variable with fallback and validation.
+    
+    Args:
+        key: Environment variable name
+        default: Default value if not found
+        
+    Returns:
+        Environment variable value or default
+        
+    Raises:
+        ValueError: If required var (no default) is missing
+    """
+    value = os.environ.get(key, default)
+    if value is None:
+        raise ValueError(f"Required environment variable not set: {key}")
+    if isinstance(value, str) and not value.strip():
+        raise ValueError(f"Environment variable is empty: {key}")
+    return value
 
-def call_llm(
-    system_prompt: str,
-    user_message: str,
-    provider: str | None = None,
-    model: str | None = None,
-    max_tokens: int = 2048,
-) -> str:
-    """Call an LLM API and return the response text."""
-    import urllib.request
 
-    provider = provider or os.environ.get("GITCLAW_PROVIDER", "anthropic")
-    model = model or os.environ.get("GITCLAW_MODEL", "claude-haiku-4-5-20251001")
-
-    if provider == "anthropic":
-        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-        if not api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY not set")
-
-        payload = json.dumps({
+def call_llm(prompt: str, model: str = None, temperature: float = 0.7, max_tokens: int = 2000) -> str:
+    """
+    Call the LLM API with comprehensive error handling.
+    
+    Args:
+        prompt: The prompt to send to the LLM
+        model: Model name (defaults to CLAUDE_MODEL env var)
+        temperature: Temperature for response generation (0.0-1.0)
+        max_tokens: Maximum tokens in response
+        
+    Returns:
+        LLM response text
+        
+    Raises:
+        RuntimeError: If API call fails, times out, or returns invalid response
+        ValueError: If prompt is empty or settings are invalid
+    """
+    if not prompt or not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError("Prompt cannot be empty")
+    
+    if temperature < 0.0 or temperature > 1.0:
+        raise ValueError(f"Temperature must be 0.0-1.0, got {temperature}")
+    
+    if max_tokens < 1:
+        raise ValueError(f"max_tokens must be >= 1, got {max_tokens}")
+    
+    try:
+        model = model or get_env("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+        api_key = get_env("ANTHROPIC_API_KEY")
+    except ValueError as e:
+        raise RuntimeError(f"Configuration error: {e}")
+    
+    if not api_key.strip():
+        raise RuntimeError("ANTHROPIC_API_KEY is empty")
+    
+    try:
+        url = "https://api.anthropic.com/v1/messages"
+        headers = {
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        }
+        
+        body = json.dumps({
             "model": model,
             "max_tokens": max_tokens,
-            "system": system_prompt,
-            "messages": [{"role": "user", "content": user_message}],
-        }).encode()
-
-        req = urllib.request.Request(
-            "https://api.anthropic.com/v1/messages",
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-            },
-        )
+            "temperature": temperature,
+            "messages": [{"role": "user", "content": prompt}],
+        }).encode("utf-8")
+        
+        req = Request(url, data=body, headers=headers, method="POST")
+        
         try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read())
-                return data["content"][0]["text"]
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
-            log("LLM", f"Anthropic API error: {exc}")
-            raise RuntimeError(f"LLM API call failed: {exc}") from exc
-
-    elif provider == "openai":
-        api_key = os.environ.get("OPENAI_API_KEY", "")
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY not set")
-
-        payload = json.dumps({
-            "model": model,
-            "max_tokens": max_tokens,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-        }).encode()
-
-        req = urllib.request.Request(
-            "https://api.openai.com/v1/chat/completions",
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}",
-            },
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read())
-                return data["choices"][0]["message"]["content"]
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
-            log("LLM", f"OpenAI API error: {exc}")
-            raise RuntimeError(f"LLM API call failed: {exc}") from exc
-
-    raise ValueError(f"Unknown provider: {provider}")
+            with urlopen(req, timeout=30) as response:
+                response_data = json.loads(response.read().decode("utf-8"))
+        except HTTPError as e:
+            error_body = e.read().decode("utf-8")
+            try:
+                error_detail = json.loads(error_body).get("error", {}).get("message", error_body)
+            except json.JSONDecodeError:
+                error_detail = error_body
+            raise RuntimeError(f"API returned {e.code}: {error_detail}")
+        except URLError as e:
+            raise RuntimeError(f"Network error calling LLM API: {e.reason}")
+        except TimeoutError:
+            raise RuntimeError("LLM API call timed out after 30 seconds")
+        
+        # Validate response structure
+        if "content" not in response_data or not response_data["content"]:
+            raise RuntimeError("API returned empty content")
+        
+        if "text" not in response_data["content"][0]:
+            raise RuntimeError(f"Unexpected API response format: {list(response_data.get('content', [{}])[0].keys())}")
+        
+        result = response_data["content"][0]["text"]
+        if not result or not isinstance(result, str):
+            raise RuntimeError("API returned non-string or empty text")
+        
+        return result.strip()
+        
+    except RuntimeError:
+        raise
+    except Exception as e:
+        raise RuntimeError(f"Unexpected error calling LLM API: {type(e).__name__}: {e}")
 
 
-# ── State Management ─────────────────────────────────────────────────────────
-
-def load_state() -> dict:
-    """Load agent state from memory/state.json."""
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
-    return {}
-
-
-def save_state(state: dict) -> None:
-    """Save agent state to memory/state.json."""
-    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    STATE_FILE.write_text(json.dumps(state, indent=2) + "\n")
-
-
-def update_stats(key: str, increment: int = 1) -> dict:
-    """Increment a stat counter and return updated state."""
-    state = load_state()
-    stats = state.setdefault("stats", {})
-    stats[key] = stats.get(key, 0) + increment
-    save_state(state)
-    return state
-
-
-def award_xp(amount: int) -> dict:
-    """Award XP and update level."""
-    state = load_state()
-    state["xp"] = state.get("xp", 0) + amount
-    state["level"] = get_level(state["xp"])
-    state["last_active"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    save_state(state)
-    return state
+def parse_json_response(response: str, agent_name: str = "Unknown") -> dict:
+    """
+    Parse and validate JSON from LLM response with error handling.
+    
+    Args:
+        response: LLM response text (should be JSON)
+        agent_name: Agent name for error messages
+        
+    Returns:
+        Parsed JSON dict
+        
+    Raises:
+        ValueError: If response is not valid JSON
+    """
+    if not response:
+        raise ValueError(f"[{agent_name}] Cannot parse empty response")
+    
+    try:
+        data = json.loads(response)
+        if not isinstance(data, dict):
+            raise ValueError(f"[{agent_name}] Expected JSON object, got {type(data).__name__}")
+        return data
+    except json.JSONDecodeError as e:
+        raise ValueError(f"[{agent_name}] Invalid JSON: {e.msg} at line {e.lineno}")
 
 
-# ── XP & Leveling ────────────────────────────────────────────────────────────
-
-XP_LEVELS = [
-    (0, "Unawakened"),
-    (50, "Novice"),
-    (150, "Apprentice"),
-    (300, "Journeyman"),
-    (500, "Adept"),
-    (800, "Expert"),
-    (1200, "Master"),
-    (1800, "Grandmaster"),
-    (2500, "Legend"),
-    (5000, "Mythic"),
-    (10000, "Transcendent"),
-]
-
-
-def get_level(xp: int) -> str:
-    """Get level name for a given XP amount."""
-    level = "Unawakened"
-    for threshold, name in XP_LEVELS:
-        if xp >= threshold:
-            level = name
-    return level
+def log_error(agent_name: str, error: Exception, context: str = "") -> None:
+    """
+    Log error to stderr with timestamp and context.
+    
+    Args:
+        agent_name: Name of the agent experiencing error
+        error: The exception that occurred
+        context: Additional context string
+    """
+    timestamp = datetime.utcnow().isoformat()
+    message = f"[{timestamp}] {agent_name} ERROR: {error}"
+    if context:
+        message += f" (context: {context})"
+    print(message, file=sys.stderr)
 
 
-def xp_bar(xp: int) -> str:
-    """Generate a visual XP progress bar."""
-    current_threshold = 0
-    next_threshold = 50
-
-    for threshold, _ in XP_LEVELS:
-        if threshold <= xp:
-            current_threshold = threshold
+def safe_get(data: dict, *keys, default=None):
+    """
+    Safely traverse nested dict with multiple keys.
+    
+    Args:
+        data: Dictionary to traverse
+        *keys: Keys to access in sequence
+        default: Default value if any key is missing
+        
+    Returns:
+        Value at nested key path or default
+    """
+    current = data
+    for key in keys:
+        if isinstance(current, dict):
+            current = current.get(key)
+            if current is None:
+                return default
         else:
-            next_threshold = threshold
-            break
-
-    if next_threshold == current_threshold:
-        return "██████████ MAX"
-
-    progress = xp - current_threshold
-    total = next_threshold - current_threshold
-    filled = int((progress / total) * 10)
-
-    bar = "█" * filled + "░" * (10 - filled)
-    return f"{bar} {xp} XP"
+            return default
+    return current
 
 
-# ── Memory Helpers ───────────────────────────────────────────────────────────
-
-def append_memory(category: str, filename: str, content: str) -> Path:
-    """Append content to a memory file with timestamp."""
-    target_dir = MEMORY_DIR / category
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target_file = target_dir / filename
-
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    entry = f"\n---\n**[{timestamp}]**\n\n{content}\n"
-
-    with open(target_file, "a") as f:
-        f.write(entry)
-
-    return target_file
-
-
-def read_prompt(name: str) -> str:
-    """Read a system prompt template."""
-    prompt_file = PROMPTS_DIR / f"{name}.md"
-    if not prompt_file.exists():
-        raise FileNotFoundError(f"Prompt not found: {prompt_file}")
-    return prompt_file.read_text()
-
-
-# ── GitHub API Helpers ───────────────────────────────────────────────────────
-
-def gh_post_comment(issue_number: int, body: str) -> None:
-    """Post a comment on an issue/PR via gh CLI."""
-    subprocess.run(
-        ["gh", "api",
-         f"repos/{os.environ['GITHUB_REPOSITORY']}/issues/{issue_number}/comments",
-         "-f", f"body={body}"],
-        check=True, capture_output=True,
-    )
-
-
-def gh_add_labels(issue_number: int, labels: list[str]) -> None:
-    """Add labels to an issue."""
-    subprocess.run(
-        ["gh", "issue", "edit", str(issue_number),
-         "--add-label", ",".join(labels)],
-        check=True, capture_output=True,
-    )
-
-
-def today() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
-
-
-def log(agent: str, message: str) -> None:
-    print(f"[🤖 {agent}] {message}", file=sys.stderr)
+def format_timestamp(dt: datetime = None) -> str:
+    """
+    Format datetime as ISO 8601 string.
+    
+    Args:
+        dt: Datetime object (defaults to now)
+        
+    Returns:
+        ISO 8601 formatted string
+    """
+    if dt is None:
+        dt = datetime.utcnow()
+    return dt.isoformat() + "Z"
