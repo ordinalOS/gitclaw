@@ -103,6 +103,16 @@ jobs:
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "Created PR #$PR_NUM on branch $BRANCH"
 
+      - name: Trigger Council Review
+        if: steps.check.outputs.enabled == 'true' && steps.apply.outputs.pr_number != '0' && steps.apply.outputs.pr_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ steps.apply.outputs.pr_number }}
+        run: |
+          echo "Dispatching Council of 7 for PR #$PR_NUM"
+          gh workflow run council-review.yml \
+            -f pr_number="$PR_NUM" || echo "Council dispatch failed — may need manual trigger"
+
       - name: Notify on issue (if triggered by /propose)
         if: steps.check.outputs.enabled == 'true' && inputs.issue_number != '0' && inputs.issue_number != ''
         env:
