@@ -1,5 +1,13 @@
 [
   {
+    "sha": "f9669ac",
+    "date": "2026-02-17",
+    "time": "15:11",
+    "message": "refactoring audit: delete 4 agents, merge 2, consolidate workflows, simplify config",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
     "sha": "8a5b5eb",
     "date": "2026-02-17",
     "time": "21:36",
