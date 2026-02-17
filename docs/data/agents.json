@@ -257,7 +257,7 @@
     "_key": "pages_builder",
     "name": "Pages Builder",
     "emoji": "\ud83d\udcfa",
-    "description": "Builds the Bloomberg-terminal GitHub Pages frontend from memory data",
+    "description": "Builds the GitHub Pages frontend from memory data",
     "trigger": "push",
     "schedule": "0 */4 * * *",
     "prompt_file": "null",

@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 126,
+  "xp": 136,
   "level": "Novice",
   "stats": {
     "issues_triaged": 0,
@@ -24,7 +24,8 @@
     "hn_scrapes": 3,
     "news_scrapes": 3,
     "crypto_analyses": 0,
-    "stock_analyses": 0
+    "stock_analyses": 0,
+    "pages_built": 2
   },
   "achievements": [],
   "last_active": "2026-02-17",
