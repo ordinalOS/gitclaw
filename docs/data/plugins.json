@@ -5,7 +5,15 @@
     "icon": "\ud83e\udd9e",
     "description": "Essential GitClaw agents \u2014 digest, quests, reviews, research",
     "category": "builtin",
-    "agents": "[morning_roast, quest_master, code_jester, wild_fact_finder,",
+    "agents": [
+      "morning_roast",
+      "quest_master",
+      "code_jester",
+      "wild_fact_finder",
+      "lore_keeper",
+      "hype_man",
+      "heartbeat"
+    ],
     "secrets": [
       "ANTHROPIC_API_KEY"
     ]
@@ -49,7 +57,18 @@
     "icon": "\ud83c\udfd7\ufe0f",
     "description": "Autonomous PRs reviewed by the Council of 7",
     "category": "automation",
-    "agents": "[architect, council_zuckerberg, council_wonderful, council_musk,",
+    "agents": [
+      "architect",
+      "council_zuckerberg",
+      "council_wonderful",
+      "council_musk",
+      "council_toly",
+      "council_satoshi",
+      "council_cia",
+      "council_cobain",
+      "proposal_lint",
+      "karen"
+    ],
     "secrets": [
       "ANTHROPIC_API_KEY"
     ]

@@ -61,8 +61,6 @@ jobs:
               "researches_completed": 0,
               "quests_completed": 0,
               "lore_entries": 0,
-              "dreams_interpreted": 0,
-              "fortunes_dispensed": 0,
               "roasts_delivered": 0,
               "comments_posted": 0,
               "commits_made": 0
@@ -98,13 +96,11 @@ jobs:
           Try these commands in any issue comment:
           - `/help` — See all available commands
           - `/research quantum computing` — Research a topic
-          - `/dream I was debugging in a forest` — Log a dream
           - `/roast scripts/llm.sh` — Roast a file
           - `/lore the beginning` — Start the chronicles
 
           ### Automatic Features
-          - **☕ Morning Roast** runs weekdays at 9 AM UTC
-          - **🔮 Fortune Cookie** runs daily at 8 AM UTC
+          - **☕ Morning Roast** runs weekdays at 9 AM UTC (with fortune of the day)
           - **⚔️ Quest Master** activates on new issues
           - **🃏 Code Jester** reviews new PRs
           - **🎉 Hype Man** celebrates closed issues

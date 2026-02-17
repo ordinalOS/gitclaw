@@ -105,11 +105,9 @@ def format_event_alert(event: dict) -> str:
 # ── Daily Digest ──────────────────────────────────────────────────────────────
 
 MEMORY_CATEGORIES = [
-    ("dreams", "🌙 Dreams"),
     ("lore", "📜 Lore"),
     ("research", "🔍 Research"),
     ("roasts", "🔥 Roasts"),
-    ("fortunes", "🔮 Fortunes"),
     ("hn", "📰 HN"),
     ("news", "🥷 News"),
     ("crypto", "💰 Crypto"),

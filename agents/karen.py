@@ -173,7 +173,7 @@ def check_memory_dirs() -> list:
     issues = []
 
     expected_dirs = [
-        "dreams", "lore", "research", "roasts", "fortunes", "quests",
+        "lore", "research", "roasts", "quests",
         "hn", "news", "crypto", "stocks", "proposals", "council",
     ]
 

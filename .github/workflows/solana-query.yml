@@ -1,102 +1,27 @@
 # ============================================================================
 # Solana Query — On-chain data fetcher (Dexscreener, Jupiter, RPC)
-# MODULAR PLUGIN: Only runs when Solana features are enabled.
-# Triggered by /sol command via command-router.
 # ============================================================================
 name: "🌐 Solana Query"
 
 on:
   workflow_call:
     inputs:
-      query_args:
-        required: true
-        type: string
-      issue_number:
-        required: true
-        type: string
+      query_args: { required: true, type: string }
+      issue_number: { required: true, type: string }
   workflow_dispatch:
     inputs:
-      query_args:
-        description: "Query (e.g., 'price SOL', 'balance <addr>', 'quote SOL USDC 1')"
-        required: true
-        type: string
-      issue_number:
-        description: "Issue number to post results to"
-        required: false
-        default: "0"
-        type: string
-
-permissions:
-  issues: write
-  contents: write
+      query_args: { description: "Query (price SOL, balance <addr>, quote SOL USDC 1)", required: true, type: string }
+      issue_number: { description: "Issue to post to (0 = stdout)", default: "0", type: string }
 
 jobs:
-  query:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check Solana is enabled
-        id: check
-        run: |
-          source scripts/solana-tools.sh
-          if check_solana_enabled; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Solana features not enabled. Add 'enable: solana' to agent.md"
-          fi
-
-      - name: Set up Python
-        if: steps.check.outputs.enabled == 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Run Solana Query
-        if: steps.check.outputs.enabled == 'true'
-        id: result
-        working-directory: agents
-        env:
-          QUERY_ARGS: ${{ inputs.query_args }}
-          ISSUE_NUMBER: ${{ inputs.issue_number }}
-          SOLANA_NETWORK: ${{ vars.SOLANA_NETWORK || 'mainnet-beta' }}
-          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL || '' }}
-          SOLANA_STYLE: ${{ vars.SOLANA_STYLE || 'degen' }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python3 solana_query.py
-
-      - name: Solana not enabled response
-        if: steps.check.outputs.enabled == 'false' && inputs.issue_number != '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUM: ${{ inputs.issue_number }}
-        run: |
-          gh api repos/${{ github.repository }}/issues/$ISSUE_NUM/comments \
-            -f body="## 🌐 Solana Plugin Not Enabled
-
-          To use Solana features, add this to your \`agent.md\`:
-          \`\`\`
-          enable: solana
-          \`\`\`
-
-          Then try again! See [SETUP.md](./SETUP.md) for details.
-
-          — 🌐 *Solana Query Agent*"
-
-      - name: Persist
-        if: steps.check.outputs.enabled == 'true'
-        env:
-          QUERY_ARGS: ${{ inputs.query_args }}
-        run: |
-          source scripts/git-persist.sh
-          persist_many "🌐 Solana query: $QUERY_ARGS" \
-            "memory/solana/" "memory/state.json"
+  run:
+    uses: ./.github/workflows/python-agent-runner.yml
+    with:
+      agent_script: "solana_query.py"
+      enable_pattern: "solana"
+      query_args: ${{ inputs.query_args }}
+      issue_number: ${{ inputs.issue_number || '0' }}
+      memory_dir: "memory/solana/"
+      persist_msg: "🌐 Solana query"
+      disabled_msg: "## 🌐 Solana Plugin Not Enabled\n\nAdd `enable: solana` to your `agent.md` and try again."
+    secrets: inherit

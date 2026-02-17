@@ -1,22 +1,38 @@
 # ============================================================================
-# Code Jester — PR review with theatrical commentary
+# Code Jester — PR review + /roast command (merged from Roast Battle)
 # Triggers on new PRs, delivers humor-infused code review.
+# Also handles /roast <file> via command router (workflow_call).
 # ============================================================================
 name: "🃏 Code Jester"
 
 on:
   pull_request:
     types: [opened, synchronize]
+  workflow_call:
+    inputs:
+      target:
+        required: false
+        type: string
+        default: ""
+      issue_number:
+        required: false
+        type: string
+        default: "0"
+      mode:
+        required: false
+        type: string
+        default: "roast"
 
 permissions:
   pull-requests: write
-  contents: read
+  issues: write
+  contents: write
 
 jobs:
+  # ─── PR Review Mode ──────────────────────────────────────────────────
   review:
     runs-on: ubuntu-latest
-    # Don't review the bot's own PRs
-    if: github.actor != 'gitclaw[bot]'
+    if: github.event_name == 'pull_request' && github.actor != 'gitclaw[bot]'
 
     steps:
       - name: Checkout repo
@@ -29,13 +45,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Get the diff
           DIFF=$(gh pr diff ${{ github.event.pull_request.number }} 2>/dev/null | head -500)
           echo "diff<<EOF" >> "$GITHUB_OUTPUT"
           echo "$DIFF" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
-          # Get changed files
           FILES=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path' | head -20)
           echo "files<<EOF" >> "$GITHUB_OUTPUT"
           echo "$FILES" >> "$GITHUB_OUTPUT"
@@ -92,3 +106,96 @@ jobs:
           gh pr review ${{ github.event.pull_request.number }} \
             --comment \
             --body "$REVIEW_BODY"
+
+  # ─── Roast Mode (/roast <file_or_topic>) ─────────────────────────────
+  roast:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (inputs.mode == 'roast' && inputs.target != '')
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Gather roast material
+        id: material
+        env:
+          ROAST_TARGET: ${{ inputs.target }}
+        run: |
+          CODE_CONTENT=""
+          if [ -f "$ROAST_TARGET" ]; then
+            CODE_CONTENT=$(head -100 "$ROAST_TARGET" 2>/dev/null || echo "File not readable")
+            echo "is_file=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_file=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "code<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$CODE_CONTENT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Fire up the roast
+        id: roast
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ROAST_TARGET: ${{ inputs.target }}
+          IS_FILE: ${{ steps.material.outputs.is_file }}
+          CODE_CONTENT: ${{ steps.material.outputs.code }}
+          ROAST_REQUESTER: ${{ github.actor }}
+        run: |
+          source scripts/utils.sh
+          source scripts/llm.sh
+
+          SYSTEM_PROMPT=$(cat templates/prompts/code-jester.md)
+
+          USER_MSG=$(cat <<MSG
+          ROAST MODE ACTIVATED.
+
+          Roast target: $ROAST_TARGET
+          Is it a file? $IS_FILE
+
+          Code content (if file):
+          $CODE_CONTENT
+
+          Roast requested by: $ROAST_REQUESTER
+
+          Deliver the roast using your Roast Mode format!
+          MSG
+          )
+
+          PROVIDER="${GITCLAW_PROVIDER:-anthropic}"
+          MODEL="${GITCLAW_MODEL:-claude-haiku-4-5-20251001}"
+
+          RESPONSE=$(call_llm "$PROVIDER" "$MODEL" "$SYSTEM_PROMPT" "$USER_MSG" 1500)
+
+          echo "roast<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$RESPONSE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Deliver the roast
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ROAST_BODY: ${{ steps.roast.outputs.roast }}
+          ISSUE_NUM: ${{ inputs.issue_number }}
+        run: |
+          ISSUE="$ISSUE_NUM"
+          if [ "$ISSUE" != "0" ] && [ -n "$ISSUE" ]; then
+            gh api repos/${{ github.repository }}/issues/$ISSUE/comments \
+              -f body="$ROAST_BODY"
+          fi
+
+      - name: Persist roast
+        env:
+          ROAST_CONTENT: ${{ steps.roast.outputs.roast }}
+          ROAST_TARGET: ${{ inputs.target }}
+        run: |
+          source scripts/git-persist.sh
+          update_state '.stats.roasts_delivered += 1 | .xp += 10'
+
+          SLUG=$(echo "$ROAST_TARGET" | tr '[:upper:]' '[:lower:]' | tr ' /' '-' | tr -cd 'a-z0-9-' | head -c 50)
+          mkdir -p memory/roasts
+          printf '%s\n' "$ROAST_CONTENT" > "memory/roasts/$(date -u +%Y-%m-%d)-roast-${SLUG}.md"
+
+          persist_many "🔥 Roast delivered: $ROAST_TARGET" \
+            "memory/roasts/" "memory/state.json"

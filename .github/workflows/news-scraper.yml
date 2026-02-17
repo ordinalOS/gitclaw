@@ -1,103 +1,28 @@
 # ============================================================================
-# News Scraper — GitClaw's stealthy news intelligence agent
-# Fetches headlines, analyzes with LLM, delivers ninja-style briefings.
-# Triggered by /news command via command-router, dispatch, or daily schedule.
+# News Scraper — Stealthy news intelligence agent
 # ============================================================================
-name: "News Scraper"
+name: "🥷 News Scraper"
 
 on:
   workflow_call:
     inputs:
-      query_args:
-        required: true
-        type: string
-      issue_number:
-        required: true
-        type: string
+      query_args: { required: true, type: string }
+      issue_number: { required: true, type: string }
   workflow_dispatch:
     inputs:
-      query_args:
-        description: "News topic (e.g., 'tech', 'markets', 'crypto', or any search term)"
-        required: false
-        default: "tech"
-        type: string
-      issue_number:
-        description: "Issue number to post results to (0 = stdout only)"
-        required: false
-        default: "0"
-        type: string
+      query_args: { description: "News topic (tech, markets, crypto, etc.)", default: "tech", type: string }
+      issue_number: { description: "Issue to post to (0 = stdout)", default: "0", type: string }
   schedule:
-    - cron: '30 7 * * *'  # 7:30 AM UTC daily
-
-permissions:
-  issues: write
-  contents: write
+    - cron: '30 7 * * *'
 
 jobs:
-  scrape:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check news-scraper is enabled
-        id: check
-        run: |
-          if grep -q "enable: news-scraper" agent.md 2>/dev/null; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "News Scraper not enabled. Add 'enable: news-scraper' to agent.md"
-          fi
-
-      - name: Set up Python
-        if: steps.check.outputs.enabled == 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Run News Scraper
-        if: steps.check.outputs.enabled == 'true'
-        working-directory: agents
-        env:
-          QUERY_ARGS: ${{ inputs.query_args || 'tech' }}
-          ISSUE_NUMBER: ${{ inputs.issue_number || '0' }}
-          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
-          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python3 news_scraper.py
-
-      - name: News Scraper not enabled response
-        if: steps.check.outputs.enabled == 'false' && inputs.issue_number != '0' && inputs.issue_number != ''
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUM: ${{ inputs.issue_number }}
-          REPO: ${{ github.repository }}
-        run: |
-          gh api "repos/$REPO/issues/$ISSUE_NUM/comments" \
-            -f body="## News Scraper -- Plugin Not Enabled
-
-          To use the News Ninja, add this to your \`agent.md\`:
-          \`\`\`
-          enable: news-scraper
-          \`\`\`
-
-          Then try again! See [SETUP.md](./SETUP.md) for details.
-
-          -- *The News Ninja awaits activation.*"
-
-      - name: Persist
-        if: steps.check.outputs.enabled == 'true'
-        env:
-          QUERY_ARGS: ${{ inputs.query_args || 'tech' }}
-        run: |
-          source scripts/git-persist.sh
-          persist_many "News Scraper: $QUERY_ARGS" \
-            "memory/news/" "memory/state.json"
+  run:
+    uses: ./.github/workflows/python-agent-runner.yml
+    with:
+      agent_script: "news_scraper.py"
+      enable_pattern: "news-scraper"
+      query_args: ${{ inputs.query_args || 'tech' }}
+      issue_number: ${{ inputs.issue_number || '0' }}
+      memory_dir: "memory/news/"
+      persist_msg: "🥷 News Scraper digest"
+    secrets: inherit

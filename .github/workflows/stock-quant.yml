@@ -1,98 +1,27 @@
 # ============================================================================
-# Stock Quant — Wall Street Wizard quantitative stock analysis
-# MODULAR PLUGIN: On-demand only, triggered by command-router or dispatch.
-# Fetches stock data, computes quant indicators, delivers wizard commentary.
+# Stock Wizard — Wall Street quantitative stock analysis
 # ============================================================================
 name: "🧙 Stock Wizard"
 
 on:
   workflow_call:
     inputs:
-      query_args:
-        required: true
-        type: string
-      issue_number:
-        required: true
-        type: string
+      query_args: { required: true, type: string }
+      issue_number: { required: true, type: string }
   workflow_dispatch:
     inputs:
-      query_args:
-        description: "Ticker or command (e.g., 'AAPL', 'compare AAPL MSFT', 'market')"
-        required: true
-        type: string
-      issue_number:
-        description: "Issue number to post results to"
-        required: false
-        default: "0"
-        type: string
-
-permissions:
-  issues: write
-  contents: write
+      query_args: { description: "Ticker or command (AAPL, compare AAPL MSFT, market)", required: true, type: string }
+      issue_number: { description: "Issue to post to (0 = stdout)", default: "0", type: string }
 
 jobs:
-  analyze:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check stock-quant is enabled
-        id: check
-        run: |
-          if grep -qi "stock-quant\|stock_quant\|stocks" agent.md 2>/dev/null; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Stock Quant not enabled. Add 'enable: stock-quant' to agent.md"
-          fi
-
-      - name: Set up Python
-        if: steps.check.outputs.enabled == 'true'
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Run Stock Quant
-        if: steps.check.outputs.enabled == 'true'
-        working-directory: agents
-        env:
-          QUERY_ARGS: ${{ inputs.query_args }}
-          ISSUE_NUMBER: ${{ inputs.issue_number }}
-          ALPHA_VANTAGE_KEY: ${{ secrets.ALPHA_VANTAGE_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python3 stock_quant.py
-
-      - name: Stock Quant not enabled response
-        if: steps.check.outputs.enabled == 'false' && inputs.issue_number != '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUM: ${{ inputs.issue_number }}
-        run: |
-          gh api repos/${{ github.repository }}/issues/$ISSUE_NUM/comments \
-            -f body="## 🧙 Stock Wizard Plugin Not Enabled
-
-          To use Stock Quant features, add this to your \`agent.md\`:
-          \`\`\`
-          enable: stock-quant
-          \`\`\`
-
-          Then try again! See [SETUP.md](./SETUP.md) for details.
-
-          — 🧙 *The Wall Street Wizard awaits your summoning.*"
-
-      - name: Persist
-        if: steps.check.outputs.enabled == 'true'
-        env:
-          QUERY_ARGS: ${{ inputs.query_args }}
-        run: |
-          source scripts/git-persist.sh
-          persist_many "🧙 Stock analysis: $QUERY_ARGS" \
-            "memory/stocks/" "memory/state.json"
+  run:
+    uses: ./.github/workflows/python-agent-runner.yml
+    with:
+      agent_script: "stock_quant.py"
+      enable_pattern: "stock-quant\\|stock_quant\\|stocks"
+      query_args: ${{ inputs.query_args }}
+      issue_number: ${{ inputs.issue_number || '0' }}
+      memory_dir: "memory/stocks/"
+      persist_msg: "🧙 Stock analysis"
+      disabled_msg: "## 🧙 Stock Wizard Not Enabled\n\nAdd `enable: stock-quant` to your `agent.md` and try again."
+    secrets: inherit

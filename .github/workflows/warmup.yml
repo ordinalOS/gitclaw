@@ -42,7 +42,6 @@ jobs:
           if [[ "$SCOPE" == "all" || "$SCOPE" == "core" ]]; then
             echo "Triggering core agents..."
             gh workflow run morning-roast.yml -R "$REPO" && echo "  ☕ Morning Roast" || true
-            gh workflow run fortune-cookie.yml -R "$REPO" && echo "  🔮 Fortune Cookie" || true
             gh workflow run heartbeat.yml -R "$REPO" && echo "  💓 Heartbeat" || true
             gh workflow run pages-builder.yml -R "$REPO" && echo "  📺 Pages Builder" || true
           fi
@@ -58,16 +57,9 @@ jobs:
               -f topic="the birth and awakening of GitClaw, a lobster-themed AI agent born in a git repo" \
               && echo "  📜 Lore: origin story" || true
 
-            gh workflow run dream-interpreter.yml -R "$REPO" \
-              -f description="floating through an infinite git commit history, each commit a doorway to a different universe of code" \
-              && echo "  🌙 Dream: git universe" || true
-
-            gh workflow run roast-battle.yml -R "$REPO" \
-              -f target="agents/pages_builder.py" \
-              && echo "  🔥 Roast: pages_builder.py" || true
-
-            gh workflow run meme-machine.yml -R "$REPO" \
-              && echo "  🎨 Meme Machine" || true
+            gh workflow run code-jester.yml -R "$REPO" \
+              -f target="agents/pages_builder.py" -f mode="roast" \
+              && echo "  🃏 Roast: pages_builder.py" || true
 
             gh workflow run karen.yml -R "$REPO" \
               && echo "  💅 Karen QA" || true

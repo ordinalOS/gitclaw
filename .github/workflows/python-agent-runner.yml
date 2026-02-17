@@ -1,0 +1,110 @@
+# ============================================================================
+# Python Agent Runner — Reusable workflow for Python-based agents.
+# Handles: checkout → enable check → setup python → run → persist.
+# Individual agent workflows become thin callers with their own triggers.
+# ============================================================================
+name: "Python Agent Runner"
+
+on:
+  workflow_call:
+    inputs:
+      agent_script:
+        description: "Python script to run (e.g., 'hn_scraper.py')"
+        required: true
+        type: string
+      enable_pattern:
+        description: "Grep pattern to check agent.md (e.g., 'hn-scraper')"
+        required: true
+        type: string
+      query_args:
+        description: "Query args passed to agent via QUERY_ARGS env var"
+        required: false
+        type: string
+        default: ""
+      issue_number:
+        description: "Issue number to post results to (0 = no post)"
+        required: false
+        type: string
+        default: "0"
+      memory_dir:
+        description: "Memory directory to persist (e.g., 'memory/hn/')"
+        required: true
+        type: string
+      persist_msg:
+        description: "Commit message for git-persist (e.g., '📰 HN digest')"
+        required: true
+        type: string
+      disabled_msg:
+        description: "Message posted when agent is disabled (empty = no post)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check agent is enabled
+        id: check
+        env:
+          PATTERN: ${{ inputs.enable_pattern }}
+        run: |
+          if grep -qi "$PATTERN" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Agent not enabled (pattern: $PATTERN)"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run agent
+        if: steps.check.outputs.enabled == 'true'
+        working-directory: agents
+        env:
+          QUERY_ARGS: ${{ inputs.query_args }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Plugin-specific keys (empty if not set)
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+          NEWSDATA_API_KEY: ${{ secrets.NEWSDATA_API_KEY }}
+          ALPHA_VANTAGE_KEY: ${{ secrets.ALPHA_VANTAGE_KEY }}
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+        run: |
+          python3 "${{ inputs.agent_script }}"
+
+      - name: Agent not enabled response
+        if: steps.check.outputs.enabled == 'false' && inputs.issue_number != '0' && inputs.issue_number != '' && inputs.disabled_msg != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUM: ${{ inputs.issue_number }}
+          DISABLED_MSG: ${{ inputs.disabled_msg }}
+        run: |
+          gh api "repos/${{ github.repository }}/issues/$ISSUE_NUM/comments" \
+            -f body="$DISABLED_MSG"
+
+      - name: Persist memory
+        if: steps.check.outputs.enabled == 'true'
+        env:
+          PERSIST_MSG: ${{ inputs.persist_msg }}
+          MEMORY_DIR: ${{ inputs.memory_dir }}
+        run: |
+          source scripts/git-persist.sh
+          persist_many "$PERSIST_MSG" "$MEMORY_DIR" "memory/state.json"

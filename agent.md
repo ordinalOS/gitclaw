@@ -17,11 +17,7 @@ enable: quest-master
 enable: code-jester
 enable: research
 enable: lore-keeper
-enable: dream-interpreter
-enable: fortune-cookie
 enable: hype-man
-enable: roast-battle
-enable: meme-machine
 
 ## Market & News Plugin
 enable: hn-scraper

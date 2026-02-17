@@ -69,7 +69,6 @@ Edit `config/personality.yml` and change `active_persona` to any preset, or cust
 Edit the cron expressions in the workflow files:
 
 - `morning-roast.yml` — Default: `0 9 * * 1-5` (9 AM UTC, weekdays)
-- `fortune-cookie.yml` — Default: `0 8 * * *` (8 AM UTC, daily)
 - `heartbeat.yml` — Default: `0 0 * * *` (midnight UTC, daily)
 
 ### Change LLM Model
@@ -128,14 +127,13 @@ limits:
 
 To minimize API costs:
 
-1. Use Claude Haiku (`claude-haiku-4-5-20251001`) for simple agents (fortune cookie, hype man)
-2. Reduce schedule frequency (e.g., weekly roasts instead of daily)
+1. Use Claude Haiku (`claude-haiku-4-5-20251001`) for simple agents (hype man, quest master)
+2. Reduce schedule frequency if needed
 3. Set strict rate limits in `config/settings.yml`
 4. Disable unused agents in `config/agents.yml`
 
 Free tier GitHub Actions gives you 2,000 minutes/month. GitClaw typically uses:
 - Morning Roast: ~2 min/run × 5 days = 10 min/week
-- Fortune Cookie: ~1 min/run × 7 days = 7 min/week
 - Quest/Review: ~1 min/run × varies
 - Commands: ~1 min/run × varies
 

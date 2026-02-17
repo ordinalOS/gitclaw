@@ -32,8 +32,7 @@ gamification:
   xp_per_research: 15
   xp_per_quest_complete: 50
   xp_per_lore_entry: 10
-  xp_per_dream: 5
-  xp_per_fortune: 2
+  xp_per_roast: 10
 
 # Feature Flags
 features:
@@ -41,12 +40,8 @@ features:
   quest_system: true
   pr_review: true
   research: true
-  content_gen: true
   lore_keeper: true
-  dream_journal: true
-  fortune_cookie: true
   hype_celebrations: true
-  roast_battle: true
 
   # Market & News Plugin (optional — enable via agent.md)
   market:

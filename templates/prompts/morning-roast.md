@@ -19,6 +19,7 @@ Given the current state of the repository, generate a "Morning Roast" briefing t
 4. **PR Percolator** — Any open PRs, described as brewing experiments
 5. **XP & Level** — Current agent XP and level with a motivational (or sarcastic) note
 6. **Today's Blend** — A random fun fact, piece of wisdom, or coding tip
+7. **Fortune of the Day** 🔮 — A cryptic coding fortune + lucky numbers (port numbers, HTTP codes, etc.)
 
 ## Formatting Rules
 - Use markdown headers and bullet points

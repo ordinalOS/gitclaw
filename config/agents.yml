@@ -8,7 +8,7 @@ agents:
   morning_roast:
     name: "Morning Roast"
     emoji: "☕"
-    description: "Serves your daily issue digest with extra sass and coffee metaphors"
+    description: "Daily issue digest + fortune of the day with extra sass and coffee metaphors"
     trigger: "schedule"
     schedule: "0 9 * * 1-5"  # 9 AM UTC, weekdays
     prompt_file: "templates/prompts/morning-roast.md"
@@ -25,8 +25,9 @@ agents:
   code_jester:
     name: "Code Jester"
     emoji: "🃏"
-    description: "Reviews PRs with witty commentary and actually useful feedback"
+    description: "Reviews PRs with witty commentary + /roast mode for brutal code roasts"
     trigger: "pull_request"
+    command: "/roast"
     prompt_file: "templates/prompts/code-jester.md"
     enabled: true
 
@@ -39,14 +40,6 @@ agents:
     prompt_file: "templates/prompts/wild-fact-finder.md"
     enabled: true
 
-  meme_machine:
-    name: "Meme Machine"
-    emoji: "🎨"
-    description: "Generates viral content ideas, tweet drafts, and creative copy"
-    trigger: "workflow_dispatch"
-    prompt_file: "templates/prompts/meme-machine.md"
-    enabled: true
-
   lore_keeper:
     name: "Lore Keeper"
     emoji: "📜"
@@ -56,24 +49,6 @@ agents:
     prompt_file: "templates/prompts/lore-keeper.md"
     enabled: true
 
-  dream_interpreter:
-    name: "Dream Interpreter"
-    emoji: "🌙"
-    description: "Personal journaling agent — interprets dreams and life musings"
-    trigger: "issue_comment"
-    command: "/dream"
-    prompt_file: "templates/prompts/dream-interpreter.md"
-    enabled: true
-
-  fortune_cookie:
-    name: "Fortune Cookie"
-    emoji: "🔮"
-    description: "Daily wisdom, coding fortunes, and motivational nonsense"
-    trigger: "schedule"
-    schedule: "0 8 * * *"  # 8 AM UTC daily
-    prompt_file: "templates/prompts/fortune-cookie.md"
-    enabled: true
-
   hype_man:
     name: "Hype Man"
     emoji: "🎉"
@@ -81,15 +56,6 @@ agents:
     trigger: "issues"
     event: "closed"
     prompt_file: "templates/prompts/hype-man.md"
-    enabled: true
-
-  roast_battle:
-    name: "Roast Battle"
-    emoji: "🔥"
-    description: "On-demand code roasts — point it at any file for brutal honesty"
-    trigger: "issue_comment"
-    command: "/roast"
-    prompt_file: "templates/prompts/roast-battle.md"
     enabled: true
 
 # ── Market & News Plugin Agents (optional) ──────────────────────────────────
@@ -312,6 +278,74 @@ agents:
     prompt_file: null
     plugin: "gmail"
     enabled: false
+
+# ── Plugin Registry ─────────────────────────────────────────────────────────
+# Each plugin groups related agents and declares its requirements.
+# Plugins are enabled via agent.md — secrets go in GitHub repo settings.
+
+plugins:
+  core:
+    name: "Core Agents"
+    icon: "🦞"
+    description: "Essential GitClaw agents — digest, quests, reviews, research"
+    category: "builtin"
+    agents: [morning_roast, quest_master, code_jester, wild_fact_finder, lore_keeper, hype_man, heartbeat]
+    secrets: [ANTHROPIC_API_KEY]
+
+  market:
+    name: "Market & News"
+    icon: "📊"
+    description: "Crypto, stocks, HN, and news analysis"
+    category: "data"
+    agents: [hn_scraper, news_scraper, crypto_quant, stock_quant]
+    secrets: [ANTHROPIC_API_KEY]
+    optional_secrets: [ALPHA_VANTAGE_KEY]
+
+  solana:
+    name: "Solana"
+    icon: "🌐"
+    description: "On-chain monitoring, queries, and program builds"
+    category: "blockchain"
+    agents: [solana_query, solana_monitor, solana_builder]
+    config_file: "config/solana.yml"
+    secrets: []
+
+  architect:
+    name: "Architect & Council"
+    icon: "🏗️"
+    description: "Autonomous PRs reviewed by the Council of 7"
+    category: "automation"
+    agents: [architect, council_zuckerberg, council_wonderful, council_musk, council_toly, council_satoshi, council_cia, council_cobain, proposal_lint, karen]
+    secrets: [ANTHROPIC_API_KEY]
+
+  pages:
+    name: "GitHub Pages"
+    icon: "📺"
+    description: "Dashboard, memory browser, blog — auto-built from agent data"
+    category: "frontend"
+    agents: [pages_builder, warmup]
+    secrets: []
+
+  telegram:
+    name: "Telegram"
+    icon: "📬"
+    description: "Push alerts and daily digests to a Telegram chat"
+    category: "notifications"
+    visibility: "private"
+    agents: [telegram_notify]
+    secrets: [TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID]
+    setup_url: "https://core.telegram.org/bots#how-do-i-create-a-bot"
+
+  gmail:
+    name: "Gmail"
+    icon: "📧"
+    description: "Daily email digest of agent activity and memory updates"
+    category: "notifications"
+    visibility: "private"
+    agents: [gmail_digest]
+    secrets: [GMAIL_ADDRESS, GMAIL_APP_PASSWORD]
+    optional_secrets: [GMAIL_TO_ADDRESS]
+    setup_url: "https://support.google.com/accounts/answer/185833"
 
 # Global settings for all agents
 defaults:

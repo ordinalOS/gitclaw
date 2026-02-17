@@ -28,8 +28,7 @@ XP_LEVELS = [
 # Map commit emojis to agent names for workflow run parsing
 EMOJI_AGENTS = {
     "☕": "Morning Roast", "⚔️": "Quest Master", "🃏": "Code Jester",
-    "🔍": "Fact Finder", "🎨": "Meme Machine", "📜": "Lore Keeper",
-    "🌙": "Dream", "🔮": "Fortune", "🎉": "Hype Man",
+    "🔍": "Fact Finder", "📜": "Lore Keeper", "🎉": "Hype Man",
     "🔥": "Roast", "📰": "HN Scraper", "🥷": "News Ninja",
     "📡": "Solana Monitor", "🌐": "Solana Query", "🔨": "Solana Builder",
     "📺": "Pages Builder", "💓": "Heartbeat", "🏗️": "Architect",
@@ -231,8 +230,8 @@ def load_agent_config() -> list:
 
 
 def load_plugin_config() -> list:
-    """Parse config/plugins.yml manually (no PyYAML dependency)."""
-    config_file = REPO_ROOT / "config" / "plugins.yml"
+    """Parse plugins block from config/agents.yml (no PyYAML dependency)."""
+    config_file = REPO_ROOT / "config" / "agents.yml"
     if not config_file.exists():
         return []
 
@@ -292,11 +291,9 @@ def load_plugin_config() -> list:
 def get_recent_activity(limit: int = 50) -> list:
     """Build a chronological activity feed from all memory categories."""
     categories = [
-        ("dreams", "Dream"),
         ("lore", "Lore"),
         ("research", "Research"),
         ("roasts", "Roast"),
-        ("fortunes", "Fortune"),
         ("hn", "HN Digest"),
         ("news", "News"),
         ("crypto", "Crypto"),
@@ -563,7 +560,7 @@ def inline_md(text: str) -> str:
 # ── Page Generators ──────────────────────────────────────────────────────────
 
 def generate_dashboard(state: dict, activity: list) -> str:
-    """Generate the newspaper-style dashboard with headlines, featured content, and GitHub stats."""
+    """Generate the NYT-style dashboard — workflow runs lead, clean article cards."""
     stats = state.get("stats", {})
     achievements = state.get("achievements", [])
     agents = load_agent_config()
@@ -576,124 +573,120 @@ def generate_dashboard(state: dict, activity: list) -> str:
     total_commits = stats.get("commits_made", 0)
     xp_pct = get_xp_progress_pct(xp)
     gh = get_github_info()
+    repo_url = get_repo_url()
 
-    # ── Quick Stats Cards (6 cards: XP, Commits, Agents, Streak, Issues, PRs) ──
-    quick_stats = f"""
-    <div class="stat-cards">
-        <div class="stat-card">
-            <div class="stat-value">{xp}</div>
-            <div class="stat-label">{e(level)}</div>
-            <div class="stat-bar"><div class="stat-bar-fill" style="width:{xp_pct}%"></div></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{total_commits}</div>
-            <div class="stat-label">Commits</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{active_agents}/{total_agents}</div>
-            <div class="stat-label">Active Agents</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{streak}d</div>
-            <div class="stat-label">Streak</div>
-        </div>
-        <div class="stat-card gh-stat">
-            <div class="stat-value">{e(str(gh['open_issues']))}</div>
-            <div class="stat-label">Open Issues</div>
-        </div>
-        <div class="stat-card gh-stat">
-            <div class="stat-value">{e(str(gh['open_prs']))}</div>
-            <div class="stat-label">Open PRs</div>
-        </div>
+    # ── Compact Ticker Bar (replaces 6 stat cards) ──
+    ticker = f"""
+    <div class="nyt-ticker">
+        <span class="ticker-item"><strong>{xp}</strong> XP</span>
+        <span class="ticker-sep">&middot;</span>
+        <span class="ticker-item"><strong>{e(level)}</strong></span>
+        <span class="ticker-sep">&middot;</span>
+        <span class="ticker-item"><strong>{total_commits}</strong> commits</span>
+        <span class="ticker-sep">&middot;</span>
+        <span class="ticker-item"><strong>{active_agents}/{total_agents}</strong> agents</span>
+        <span class="ticker-sep">&middot;</span>
+        <span class="ticker-item"><strong>{streak}d</strong> streak</span>
+        <span class="ticker-sep">&middot;</span>
+        <span class="ticker-item"><strong>{e(str(gh['open_issues']))}</strong> issues</span>
+        <span class="ticker-sep">&middot;</span>
+        <span class="ticker-item"><strong>{e(str(gh['open_prs']))}</strong> PRs</span>
     </div>"""
 
-    # ── Featured Content — top stories from each major category ──
+    # ── Workflow Runs as Lead Content (NYT article cards) ──
+    runs = get_workflow_runs(20)
+
+    # Lead story — hero card from the most recent run
+    hero_html = ""
+    remaining_runs = runs
+    if runs:
+        hero = runs[0]
+        # Strip 🧠 prefix for cleaner headline
+        headline = hero["message"].replace("\U0001f9e0", "").strip()
+        hero_html = f"""
+        <div class="nyt-hero">
+            <div class="nyt-section-label">{e(hero['agent'])}</div>
+            <h1 class="nyt-hero-headline">{e(headline)}</h1>
+            <div class="nyt-hero-meta">
+                <span>{e(hero['time'])}</span>
+                <span class="ticker-sep">&middot;</span>
+                <a href="{repo_url}/commit/{hero['sha']}" class="nyt-sha" target="_blank">{e(hero['sha'])}</a>
+            </div>
+        </div>"""
+        remaining_runs = runs[1:]
+
+    # Workflow run article cards — 2-column NYT layout
+    run_cards = ""
+    for run in remaining_runs[:12]:
+        headline = run["message"].replace("\U0001f9e0", "").strip()
+        run_cards += f"""
+        <div class="nyt-article">
+            <div class="nyt-article-section">{e(run['agent'])}</div>
+            <div class="nyt-article-headline">{e(headline)}</div>
+            <div class="nyt-article-meta">
+                <span>{e(run['time'])}</span>
+                <a href="{repo_url}/commit/{run['sha']}" class="nyt-sha" target="_blank">{e(run['sha'])}</a>
+            </div>
+        </div>"""
+
+    if not run_cards and not hero_html:
+        run_cards = '<div class="empty">No workflow runs yet. Push code or enable agents to get started.</div>'
+
+    # ── Featured Stories from Memory (sidebar) ──
     featured_categories = [
-        ("dreams", "Dream"), ("lore", "Lore"), ("research", "Research"),
-        ("council", "Council"), ("fortunes", "Fortune"), ("roasts", "Roast"),
+        ("lore", "Lore"), ("research", "Research"),
+        ("council", "Council"), ("roasts", "Roast"),
     ]
-    featured_cards = ""
+    sidebar_stories = ""
     for cat, label in featured_categories:
         entries = load_memory_files(cat)
         if entries:
-            entry = entries[0]  # Most recent
-            preview = entry["content"][:150].replace("\n", " ").strip()
-            featured_cards += f"""
-            <div class="featured-card">
-                <div class="featured-card-meta">
-                    <span class="badge">{e(label)}</span>
-                    <span class="tertiary">{e(entry['date'])}</span>
-                </div>
-                <div class="featured-card-title">{e(entry['title'][:80])}</div>
-                <div class="featured-card-preview">{e(preview)}</div>
+            entry = entries[0]
+            preview = entry["content"][:120].replace("\n", " ").strip()
+            sidebar_stories += f"""
+            <div class="nyt-sidebar-story">
+                <div class="nyt-article-section">{e(label)}</div>
+                <div class="nyt-sidebar-title">{e(entry['title'][:60])}</div>
+                <div class="nyt-sidebar-preview">{e(preview)}</div>
+                <div class="nyt-article-meta"><span>{e(entry['date'])}</span></div>
             </div>"""
 
-    featured_html = ""
-    if featured_cards:
-        featured_html = f"""
-        <div class="panel full-width">
-            <h2 class="panel-title">Top Stories</h2>
-            <div class="featured-grid">{featured_cards}</div>
-        </div>"""
-
-    # ── Headlines — Activity feed with content previews ──
+    # ── Activity Headlines (compact list below) ──
     headlines = ""
-    for act in activity[:15]:
-        preview = act.get("preview", "")
-        preview_html = f'<div class="headline-preview">{e(preview[:120])}</div>' if preview else ""
+    for act in activity[:10]:
         headlines += f"""
-        <div class="headline-card">
-            <div class="headline-meta">
-                <span class="badge">{e(act['label'])}</span>
-                <span class="tertiary">{e(act['date'])}</span>
-            </div>
-            <div class="headline-title">{e(act['title'])}</div>
-            {preview_html}
+        <div class="nyt-headline-row">
+            <span class="nyt-headline-label">{e(act['label'])}</span>
+            <span class="nyt-headline-text">{e(act['title'][:60])}</span>
+            <span class="tertiary">{e(act['date'])}</span>
         </div>"""
 
-    # ── Workflow Runs ──
-    runs = get_workflow_runs(12)
-    runs_rows = ""
-    if runs:
-        for run in runs:
-            runs_rows += (
-                f"<tr>"
-                f"<td>{e(run['agent'])}</td>"
-                f"<td class='tertiary'>{e(run['time'])}</td>"
-                f"<td><span class='status-active' style='font-size:12px'>Done</span></td>"
-                f"</tr>\n"
-            )
-    else:
-        runs_rows = '<tr><td colspan="3" class="tertiary" style="text-align:center;padding:16px">No workflow runs yet</td></tr>'
-
-    # ── Agent Stats (non-zero only) ──
+    # ── Bottom Stats ──
     non_zero = [(k, v) for k, v in sorted(stats.items()) if v > 0]
     stats_cells = ""
     for key, val in non_zero:
         label = key.replace("_", " ").title()
         stats_cells += f"<tr><td>{e(label)}</td><td class='num'>{val}</td></tr>\n"
 
-    # ── Achievements ──
     ach_html = (" ".join(f'<span class="badge">{e(a)}</span>' for a in achievements)
                 if achievements else '<span class="tertiary">None yet</span>')
 
     body = f"""
-    {quick_stats}
-    {featured_html}
-    <div class="grid-2">
-        <div class="panel">
-            <h2 class="panel-title">Headlines</h2>
-            {headlines or '<div class="empty">No activity yet</div>'}
+    {ticker}
+    {hero_html}
+    <div class="nyt-layout">
+        <div class="nyt-main-col">
+            <div class="nyt-section-header">Workflow Runs</div>
+            <div class="nyt-article-grid">{run_cards}</div>
         </div>
-        <div class="panel">
-            <h2 class="panel-title">Workflow Runs</h2>
-            <div class="table-scroll">
-            <table class="data-table">
-                <thead><tr><th>Agent</th><th>Time</th><th>Status</th></tr></thead>
-                <tbody>{runs_rows}</tbody>
-            </table>
-            </div>
+        <div class="nyt-sidebar">
+            <div class="nyt-section-header">Top Stories</div>
+            {sidebar_stories or '<div class="empty">No stories yet</div>'}
         </div>
+    </div>
+    <div class="panel full-width" style="margin-top:20px">
+        <h2 class="panel-title">Headlines</h2>
+        {headlines or '<div class="empty">No activity yet</div>'}
     </div>
     <div class="grid-2" style="margin-top:20px">
         <div class="panel">
@@ -725,15 +718,15 @@ def generate_dashboard(state: dict, activity: list) -> str:
 def generate_memory_browser(state: dict) -> str:
     """Generate the memory browser page with network graph and rich tabbed views."""
     categories = [
-        ("dreams", "Dreams", "#a78bfa"),
         ("lore", "Lore", "#60a5fa"),
         ("research", "Research", "#34d399"),
         ("roasts", "Roasts", "#f87171"),
-        ("fortunes", "Fortunes", "#fbbf24"),
         ("hn", "HN", "#fb923c"),
         ("news", "News", "#818cf8"),
         ("crypto", "Crypto", "#2dd4bf"),
         ("stocks", "Stocks", "#f472b6"),
+        ("council", "Council", "#a78bfa"),
+        ("proposals", "Proposals", "#fbbf24"),
     ]
 
     # Build graph data: nodes = categories, edges = co-occurrence on same date
@@ -1350,7 +1343,6 @@ def generate_blog(state: dict) -> str:
     """Generate blog index from lore and research entries."""
     lore = load_memory_files("lore")
     research = load_memory_files("research")
-    dreams = load_memory_files("dreams")
 
     posts = []
     for entry in lore:
@@ -1358,9 +1350,6 @@ def generate_blog(state: dict) -> str:
         posts.append(entry)
     for entry in research:
         entry["type"] = "Research"
-        posts.append(entry)
-    for entry in dreams:
-        entry["type"] = "Dream"
         posts.append(entry)
 
     posts.sort(key=lambda x: x.get("date", ""), reverse=True)
@@ -1386,7 +1375,7 @@ def generate_blog(state: dict) -> str:
                 </div>
             </div>"""
     else:
-        posts_html = '<div class="empty">No posts yet. Create lore, research, or dreams to populate the blog.</div>'
+        posts_html = '<div class="empty">No posts yet. Create lore or research to populate the blog.</div>'
 
     body = f"""
     <div class="panel full-width">
@@ -1414,7 +1403,7 @@ def generate_about_page(state: dict) -> str:
     has_agent_md = (REPO_ROOT / "agent.md").exists()
     has_memory = any(
         (MEMORY_DIR / d).is_dir() and any((MEMORY_DIR / d).glob("*"))
-        for d in ["dreams", "lore", "research", "fortunes"]
+        for d in ["lore", "research", "roasts"]
         if (MEMORY_DIR / d).is_dir()
     )
     has_pages = DOCS_DIR.exists() and (DOCS_DIR / "index.html").exists()

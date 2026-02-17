@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 241,
+  "xp": 251,
   "level": "Apprentice",
   "stats": {
     "issues_triaged": 0,
@@ -25,7 +25,7 @@
     "news_scrapes": 3,
     "crypto_analyses": 0,
     "stock_analyses": 0,
-    "pages_built": 17,
+    "pages_built": 19,
     "council_reviews": 2
   },
   "achievements": [],

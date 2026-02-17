@@ -1,7 +1,7 @@
 # ============================================================================
 # Command Router — GitClaw's nerve center
 # Routes slash commands from issue comments to the right agent.
-# Triggered by: /research, /lore, /dream, /roast, /help
+# Triggered by: /research, /lore, /roast, /help
 # ============================================================================
 name: "🦞 Command Router"
 
@@ -61,24 +61,15 @@ jobs:
       issue_number: ${{ github.event.issue.number }}
     secrets: inherit
 
-  # ─── Dream Interpreter Agent ───────────────────────────────────────
-  dream:
-    needs: route
-    if: needs.route.outputs.command == 'dream'
-    uses: ./.github/workflows/dream-interpreter.yml
-    with:
-      description: ${{ needs.route.outputs.args }}
-      issue_number: ${{ github.event.issue.number }}
-    secrets: inherit
-
-  # ─── Roast Battle Agent ────────────────────────────────────────────
+  # ─── Code Jester — Roast Mode ─────────────────────────────────────
   roast:
     needs: route
     if: needs.route.outputs.command == 'roast'
-    uses: ./.github/workflows/roast-battle.yml
+    uses: ./.github/workflows/code-jester.yml
     with:
       target: ${{ needs.route.outputs.args }}
       issue_number: ${{ github.event.issue.number }}
+      mode: roast
     secrets: inherit
 
   # ─── HN Scraper Agent ────────────────────────────────────────────
@@ -178,8 +169,7 @@ jobs:
           |---------|-------|-------------|
           | `/research <topic>` | 🔍 Wild Fact Finder | Research any topic with entertaining flair |
           | `/lore <topic>` | 📜 Lore Keeper | Add an entry to the repo's knowledge chronicles |
-          | `/dream <description>` | 🌙 Dream Interpreter | Log and interpret a dream |
-          | `/roast <file_or_topic>` | 🔥 Roast Battle | Get a brutally honest code roast |
+          | `/roast <file_or_topic>` | 🃏 Code Jester | Get a brutally honest code roast |
           | `/propose [hint]` | 🏗️ Architect | Propose a code improvement PR |
           | `/karen` | 💅 Karen | QA audit — find bugs, empty values, broken things |
           | `/help` | 🦞 GitClaw | Show this help message |
@@ -198,10 +188,9 @@ jobs:
           | `/build-sbf [path]` | 🔨 Solana Builder | Build a Solana program |
 
           **Automatic Agents** (no command needed):
-          - ☕ **Morning Roast** — Daily issue digest (weekdays 9 AM UTC)
+          - ☕ **Morning Roast** — Daily issue digest + fortune (weekdays 9 AM UTC)
           - ⚔️ **Quest Master** — Auto-gamifies new issues
-          - 🃏 **Code Jester** — Auto-reviews PRs
-          - 🔮 **Fortune Cookie** — Daily coding wisdom (8 AM UTC)
+          - 🃏 **Code Jester** — Auto-reviews PRs + `/roast` mode
           - 🎉 **Hype Man** — Celebrates closed issues/merged PRs
           - 📰 **HN Scraper** — Daily HN digest (7 AM UTC, if enabled)
           - 🥷 **News Scraper** — Daily news briefing (7:30 AM UTC, if enabled)

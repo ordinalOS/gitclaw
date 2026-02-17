@@ -3,7 +3,7 @@
     "_key": "morning_roast",
     "name": "Morning Roast",
     "emoji": "\u2615",
-    "description": "Serves your daily issue digest with extra sass and coffee metaphors",
+    "description": "Daily issue digest + fortune of the day with extra sass and coffee metaphors",
     "trigger": "schedule",
     "schedule": "\"0 9 * * 1-5\"  # 9 AM UTC, weekdays",
     "prompt_file": "templates/prompts/morning-roast.md",
@@ -22,8 +22,9 @@
     "_key": "code_jester",
     "name": "Code Jester",
     "emoji": "\ud83c\udccf",
-    "description": "Reviews PRs with witty commentary and actually useful feedback",
+    "description": "Reviews PRs with witty commentary + /roast mode for brutal code roasts",
     "trigger": "pull_request",
+    "command": "/roast",
     "prompt_file": "templates/prompts/code-jester.md",
     "enabled": true
   },
@@ -38,15 +39,6 @@
     "enabled": true
   },
   {
-    "_key": "meme_machine",
-    "name": "Meme Machine",
-    "emoji": "\ud83c\udfa8",
-    "description": "Generates viral content ideas, tweet drafts, and creative copy",
-    "trigger": "workflow_dispatch",
-    "prompt_file": "templates/prompts/meme-machine.md",
-    "enabled": true
-  },
-  {
     "_key": "lore_keeper",
     "name": "Lore Keeper",
     "emoji": "\ud83d\udcdc",
@@ -57,26 +49,6 @@
     "enabled": true
   },
   {
-    "_key": "dream_interpreter",
-    "name": "Dream Interpreter",
-    "emoji": "\ud83c\udf19",
-    "description": "Personal journaling agent \u2014 interprets dreams and life musings",
-    "trigger": "issue_comment",
-    "command": "/dream",
-    "prompt_file": "templates/prompts/dream-interpreter.md",
-    "enabled": true
-  },
-  {
-    "_key": "fortune_cookie",
-    "name": "Fortune Cookie",
-    "emoji": "\ud83d\udd2e",
-    "description": "Daily wisdom, coding fortunes, and motivational nonsense",
-    "trigger": "schedule",
-    "schedule": "\"0 8 * * *\"  # 8 AM UTC daily",
-    "prompt_file": "templates/prompts/fortune-cookie.md",
-    "enabled": true
-  },
-  {
     "_key": "hype_man",
     "name": "Hype Man",
     "emoji": "\ud83c\udf89",
@@ -84,16 +56,6 @@
     "trigger": "issues",
     "event": "closed",
     "prompt_file": "templates/prompts/hype-man.md",
-    "enabled": true
-  },
-  {
-    "_key": "roast_battle",
-    "name": "Roast Battle",
-    "emoji": "\ud83d\udd25",
-    "description": "On-demand code roasts \u2014 point it at any file for brutal honesty",
-    "trigger": "issue_comment",
-    "command": "/roast",
-    "prompt_file": "templates/prompts/roast-battle.md",
     "enabled": true
   },
   {

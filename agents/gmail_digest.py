@@ -55,11 +55,9 @@ def send_email(subject: str, html_body: str) -> bool:
 # ── Digest Builder ────────────────────────────────────────────────────────────
 
 MEMORY_CATEGORIES = [
-    ("dreams", "Dreams", "🌙"),
     ("lore", "Lore", "📜"),
     ("research", "Research", "🔍"),
     ("roasts", "Roasts", "🔥"),
-    ("fortunes", "Fortunes", "🔮"),
     ("hn", "HN Digest", "📰"),
     ("news", "News", "🥷"),
     ("crypto", "Crypto", "💰"),

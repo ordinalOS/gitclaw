@@ -65,7 +65,65 @@ def analyze_diff_stats(diff: str) -> dict:
     return stats
 
 
-def main():
+def read_file_content(file_path: str) -> str:
+    """Read a file from the repo for roasting."""
+    try:
+        repo_root = os.environ.get("GITHUB_WORKSPACE", ".")
+        full_path = os.path.join(repo_root, file_path)
+        with open(full_path) as f:
+            content = f.read()
+        # Truncate for token budget
+        if len(content) > 3000:
+            content = content[:3000] + "\n\n... [truncated for brevity] ..."
+        return content
+    except (OSError, IOError):
+        return "(Could not read file)"
+
+
+def run_roast(target: str, requester: str):
+    """Roast mode: /roast <file_or_topic>."""
+    log("Code Jester", f"Roast mode: {target} (requested by {requester})")
+
+    system_prompt = read_prompt("code-jester")
+
+    # Try reading the target as a file
+    code_content = read_file_content(target) if target else ""
+    is_file = code_content != "(Could not read file)" and code_content
+
+    user_message = f"""ROAST MODE ACTIVATED.
+
+Roast target: {target}
+
+Is it a file? {"Yes" if is_file else "No"}
+
+{"Code content:" + chr(10) + code_content if is_file else "This is a topic/concept roast."}
+
+Roast requested by: {requester}
+
+Deliver the roast using your Roast Mode format!"""
+
+    try:
+        response = call_llm(system_prompt, user_message, max_tokens=1500)
+    except Exception as e:
+        log("Code Jester", f"Roast LLM call failed: {e}")
+        response = f"""## 🔥 The Jester Tried to Roast...
+
+*drops microphone*
+
+I wanted to roast `{target}` but my comedy circuits overheated (API error).
+
+Come back later — I'll have fresh material.
+
+— 🔥 *The Roast has been postponed. The code survives. For now.*"""
+
+    update_stats("roasts_delivered")
+    award_xp(10)
+
+    print(response)
+
+
+def run_review():
+    """Standard PR review mode."""
     pr_number = int(os.environ.get("PR_NUMBER", "0"))
     pr_title = os.environ.get("PR_TITLE", "Untitled PR")
     pr_body = os.environ.get("PR_BODY", "")
@@ -118,6 +176,17 @@ I shall return with a proper review when the stars align.
     award_xp(25)
 
     print(response)
+
+
+def main():
+    mode = os.environ.get("JESTER_MODE", "review")
+
+    if mode == "roast":
+        target = os.environ.get("ROAST_TARGET", "")
+        requester = os.environ.get("ROAST_REQUESTER", "unknown")
+        run_roast(target, requester)
+    else:
+        run_review()
 
 
 if __name__ == "__main__":
