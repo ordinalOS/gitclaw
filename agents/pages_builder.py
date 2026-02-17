@@ -102,13 +102,24 @@ def load_agent_config() -> list:
             continue
 
         # Property (4-space indent under agent, or 2-space under top-level)
-        kv_match = re.match(r'\s+(\w+):\s*"?([^"]*)"?\s*$', line)
+        kv_match = re.match(r'\s+(\w+):\s*(.*)', line)
         if kv_match and current:
-            key, val = kv_match.group(1), kv_match.group(2).strip()
-            if val.lower() == "true":
+            key, raw_val = kv_match.group(1), kv_match.group(2).strip()
+            # Strip inline comments (e.g. "false  # Enable via agent.md")
+            if raw_val and not raw_val.startswith('"'):
+                raw_val = raw_val.split("#")[0].strip()
+            # Strip quotes
+            if raw_val.startswith('"') and raw_val.endswith('"'):
+                raw_val = raw_val[1:-1]
+            # Type coercion
+            if raw_val.lower() == "true":
                 val = True
-            elif val.lower() == "false":
+            elif raw_val.lower() == "false":
                 val = False
+            elif raw_val.lower() == "null" or raw_val == "":
+                val = None
+            else:
+                val = raw_val
             current[key] = val
 
     if current:
@@ -165,7 +176,7 @@ def e(text) -> str:
     return html.escape(str(text)) if text else ""
 
 
-def nav_html(active: str) -> str:
+def nav_html(active: str, subdir: bool = False) -> str:
     """Generate the navigation bar."""
     pages = [
         ("index.html", "Dashboard"),
@@ -175,10 +186,11 @@ def nav_html(active: str) -> str:
         ("debug.html", "Debug"),
         ("blog/index.html", "Blog"),
     ]
+    prefix = "../" if subdir else ""
     links = []
     for href, label in pages:
         cls = ' class="active"' if label.lower() == active.lower() else ""
-        links.append(f'<a href="{href}"{cls}>{label}</a>')
+        links.append(f'<a href="{prefix}{href}"{cls}>{label}</a>')
     return "\n".join(links)
 
 
@@ -200,8 +212,10 @@ def header_bar(state: dict) -> str:
     )
 
 
-def page_wrapper(title: str, active: str, state: dict, body: str) -> str:
+def page_wrapper(title: str, active: str, state: dict, body: str, subdir: bool = False) -> str:
     """Wrap page body in full HTML document."""
+    prefix = "../" if subdir else ""
+    favicon = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>"
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -209,11 +223,12 @@ def page_wrapper(title: str, active: str, state: dict, body: str) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="120">
     <title>GitClaw | {e(title)}</title>
-    <link rel="stylesheet" href="{"" if "/" not in active else "../"}assets/style.css">
+    <link rel="icon" href="{favicon}">
+    <link rel="stylesheet" href="{prefix}assets/style.css">
 </head>
 <body>
     {header_bar(state)}
-    <nav class="nav">{nav_html(active)}</nav>
+    <nav class="nav">{nav_html(active, subdir)}</nav>
     <main class="main">
         {body}
     </main>
@@ -221,7 +236,7 @@ def page_wrapper(title: str, active: str, state: dict, body: str) -> str:
         <span>GitClaw Agent System | 100% GitHub Actions | Zero Infrastructure</span>
         <span id="clock"></span>
     </footer>
-    <script src="{"" if "/" not in active else "../"}assets/app.js"></script>
+    <script src="{prefix}assets/app.js"></script>
 </body>
 </html>"""
 
@@ -497,51 +512,109 @@ def generate_council_log(state: dict) -> str:
     return page_wrapper("Council", "council", state, body)
 
 
+def humanize_cron(cron: str) -> str:
+    """Convert a cron expression to a human-readable schedule."""
+    if not cron:
+        return ""
+    parts = cron.split()
+    if len(parts) < 5:
+        return cron
+
+    minute, hour, dom, month, dow = parts[:5]
+
+    # Common patterns
+    if hour.startswith("*/"):
+        return f"Every {hour[2:]}h"
+    if dow == "1-5":
+        return f"Weekdays {hour}:{minute.zfill(2)} UTC"
+    if dow == "1":
+        return f"Mondays {hour}:{minute.zfill(2)} UTC"
+    if dom == "*" and month == "*" and dow == "*":
+        return f"Daily {hour}:{minute.zfill(2)} UTC"
+    return cron
+
+
 def generate_agents_page(state: dict) -> str:
-    """Generate the agent status grid."""
+    """Generate the agent status grid with category grouping."""
     agents = load_agent_config()
 
-    cards = ""
-    for agent in agents:
-        name = agent.get("name", agent.get("_key", "Unknown"))
-        desc = agent.get("description", "")
-        enabled = agent.get("enabled", False)
-        trigger = agent.get("trigger", "")
-        schedule = agent.get("schedule", "")
-        command = agent.get("command", "")
-        plugin = agent.get("plugin", "")
+    # Group agents by plugin/category
+    groups = [
+        ("Core", [a for a in agents if not a.get("plugin")]),
+        ("Market & News", [a for a in agents if a.get("plugin") == "market"]),
+        ("Solana", [a for a in agents if a.get("plugin") == "solana"]),
+        ("Architect & Council", [a for a in agents if a.get("plugin") in ("architect", "council", "pages")]),
+    ]
 
-        # Generate initials from agent name (e.g. "Morning Roast" → "MR")
-        initials = "".join(w[0] for w in name.split()[:2]).upper() if name else "?"
+    sections = ""
+    total = len(agents)
+    active = sum(1 for a in agents if a.get("enabled"))
 
-        status_cls = "status-active" if enabled else "status-disabled"
-        status_txt = "Active" if enabled else "Disabled"
-        plugin_badge = f'<span class="badge">{e(plugin)}</span>' if plugin else ""
+    for group_name, group_agents in groups:
+        if not group_agents:
+            continue
 
-        trigger_info = e(trigger)
-        if schedule:
-            trigger_info += f" ({e(schedule)})"
-        if command:
-            trigger_info += f" | {e(command)}"
+        cards = ""
+        for agent in group_agents:
+            name = agent.get("name", agent.get("_key", "Unknown"))
+            desc = agent.get("description", "")
+            enabled = agent.get("enabled", False)
+            trigger = agent.get("trigger", "")
+            schedule = agent.get("schedule", "")
+            command = agent.get("command", "")
+            prompt_file = agent.get("prompt_file")
 
-        cards += f"""
-        <div class="agent-card {"" if enabled else "disabled"}">
-            <div class="agent-header">
-                <span class="agent-icon">{initials}</span>
-                <span class="agent-name">{e(name)}</span>
-                {plugin_badge}
-            </div>
-            <div class="agent-desc">{e(desc)}</div>
-            <div class="agent-meta">
-                <span class="{status_cls}">{status_txt}</span>
-                <span class="tertiary">{trigger_info}</span>
-            </div>
+            # Generate initials from agent name
+            initials = "".join(w[0] for w in name.split()[:2]).upper() if name else "?"
+
+            status_cls = "status-active" if enabled else "status-disabled"
+            status_txt = "Active" if enabled else "Disabled"
+
+            # Command badge
+            cmd_html = f'<span class="badge">{e(command)}</span>' if command else ""
+
+            # Schedule label
+            schedule_html = ""
+            if schedule:
+                human = humanize_cron(schedule)
+                schedule_html = f'<span class="tertiary">{e(human)}</span>'
+
+            # Trigger type
+            trigger_html = f'<span class="tertiary">{e(trigger)}</span>' if trigger else ""
+
+            # Prompt file path
+            prompt_html = ""
+            if prompt_file:
+                prompt_html = f'<div class="tertiary" style="font-size:11px;margin-top:4px">{e(prompt_file)}</div>'
+
+            cards += f"""
+            <div class="agent-card {"" if enabled else "disabled"}">
+                <div class="agent-header">
+                    <span class="agent-icon">{initials}</span>
+                    <span class="agent-name">{e(name)}</span>
+                    {cmd_html}
+                </div>
+                <div class="agent-desc">{e(desc)}</div>
+                <div class="agent-meta">
+                    <span class="{status_cls}">{status_txt}</span>
+                    {schedule_html}
+                    {trigger_html}
+                </div>
+                {prompt_html}
+            </div>"""
+
+        group_count = len(group_agents)
+        group_active = sum(1 for a in group_agents if a.get("enabled"))
+        sections += f"""
+        <div class="agent-group">
+            <h3 class="agent-group-title">{e(group_name)} <span class="tertiary">({group_active}/{group_count})</span></h3>
+            <div class="agent-grid">{cards}</div>
         </div>"""
 
     body = f"""
     <div class="panel full-width">
-        <h2 class="panel-title">Agent Status</h2>
-        <div class="agent-grid">{cards}</div>
+        <h2 class="panel-title">Agent Status <span class="tertiary" style="text-transform:none;font-weight:400">{active} of {total} active</span></h2>
+        {sections}
     </div>"""
 
     return page_wrapper("Agents", "agents", state, body)
@@ -646,7 +719,7 @@ def generate_blog(state: dict) -> str:
         {posts_html}
     </div>"""
 
-    return page_wrapper("Blog", "blog", state, body)
+    return page_wrapper("Blog", "blog", state, body, subdir=True)
 
 
 # ── Site Builder ─────────────────────────────────────────────────────────────

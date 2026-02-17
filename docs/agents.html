@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="120">
     <title>GitClaw | Agents</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦞</text></svg>">
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><span class="header-title">GitClaw</span><div class="header-meta"><span>Level Novice</span><span>XP 136</span><span>Streak 4d</span></div></div>
+    <div class="header-bar"><span class="header-title">GitClaw</span><div class="header-meta"><span>Level Novice</span><span>XP 141</span><span>Streak 4d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html">Memory</a>
 <a href="council.html">Council</a>
@@ -18,344 +19,430 @@
     <main class="main">
         
     <div class="panel full-width">
-        <h2 class="panel-title">Agent Status</h2>
-        <div class="agent-grid">
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">MR</span>
-                <span class="agent-name">Morning Roast</span>
+        <h2 class="panel-title">Agent Status <span class="tertiary" style="text-transform:none;font-weight:400">21 of 29 active</span></h2>
+        
+        <div class="agent-group">
+            <h3 class="agent-group-title">Core <span class="tertiary">(11/11)</span></h3>
+            <div class="agent-grid">
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">MR</span>
+                    <span class="agent-name">Morning Roast</span>
+                    
+                </div>
+                <div class="agent-desc">Serves your daily issue digest with extra sass and coffee metaphors</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    <span class="tertiary">&quot;0 9 * * 1-5&quot;  # 9 AM UTC, weekdays</span>
+                    <span class="tertiary">schedule</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/morning-roast.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">QM</span>
+                    <span class="agent-name">Quest Master</span>
+                    
+                </div>
+                <div class="agent-desc">Turns boring issues into epic RPG quests with XP rewards</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">issues</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/quest-master.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">CJ</span>
+                    <span class="agent-name">Code Jester</span>
+                    
+                </div>
+                <div class="agent-desc">Reviews PRs with witty commentary and actually useful feedback</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/code-jester.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">WF</span>
+                    <span class="agent-name">Wild Fact Finder</span>
+                    <span class="badge">/research</span>
+                </div>
+                <div class="agent-desc">Researches anything you ask with entertaining tangents and sources</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/wild-fact-finder.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">MM</span>
+                    <span class="agent-name">Meme Machine</span>
+                    
+                </div>
+                <div class="agent-desc">Generates viral content ideas, tweet drafts, and creative copy</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">workflow_dispatch</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/meme-machine.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">LK</span>
+                    <span class="agent-name">Lore Keeper</span>
+                    <span class="badge">/lore</span>
+                </div>
+                <div class="agent-desc">Curates your repo&#x27;s knowledge base with dramatic narrative flair</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/lore-keeper.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">DI</span>
+                    <span class="agent-name">Dream Interpreter</span>
+                    <span class="badge">/dream</span>
+                </div>
+                <div class="agent-desc">Personal journaling agent — interprets dreams and life musings</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/dream-interpreter.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">FC</span>
+                    <span class="agent-name">Fortune Cookie</span>
+                    
+                </div>
+                <div class="agent-desc">Daily wisdom, coding fortunes, and motivational nonsense</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    <span class="tertiary">&quot;0 8 * * *&quot;  # 8 AM UTC daily</span>
+                    <span class="tertiary">schedule</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/fortune-cookie.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">HM</span>
+                    <span class="agent-name">Hype Man</span>
+                    
+                </div>
+                <div class="agent-desc">Celebrates milestones, merged PRs, and closed issues with fanfare</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">issues</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/hype-man.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">RB</span>
+                    <span class="agent-name">Roast Battle</span>
+                    <span class="badge">/roast</span>
+                </div>
+                <div class="agent-desc">On-demand code roasts — point it at any file for brutal honesty</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/roast-battle.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">H</span>
+                    <span class="agent-name">Heartbeat</span>
+                    
+                </div>
+                <div class="agent-desc">Vital signs monitor — updates agent state and maintains streaks</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    <span class="tertiary">Daily 0:00 UTC</span>
+                    <span class="tertiary">schedule</span>
+                </div>
+                
+            </div></div>
+        </div>
+        <div class="agent-group">
+            <h3 class="agent-group-title">Market &amp; News <span class="tertiary">(0/4)</span></h3>
+            <div class="agent-grid">
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">HS</span>
+                    <span class="agent-name">HN Scraper</span>
+                    <span class="badge">/hn</span>
+                </div>
+                <div class="agent-desc">Scrapes and analyzes Hacker News stories with hype scores</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    <span class="tertiary">&quot;0 7 * * *&quot;  # 7 AM UTC daily</span>
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/hn-scraper.md</div>
+            </div>
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">NS</span>
+                    <span class="agent-name">News Scraper</span>
+                    <span class="badge">/news</span>
+                </div>
+                <div class="agent-desc">Fetches and analyzes global news with ninja-style delivery</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    <span class="tertiary">&quot;30 7 * * *&quot;  # 7:30 AM UTC daily</span>
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/news-scraper.md</div>
+            </div>
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">CO</span>
+                    <span class="agent-name">Crypto Oracle</span>
+                    <span class="badge">/crypto</span>
+                </div>
+                <div class="agent-desc">Crypto market analysis with quant indicators (RSI, SMA, volatility)</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/crypto-quant.md</div>
+            </div>
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">SW</span>
+                    <span class="agent-name">Stock Wizard</span>
+                    <span class="badge">/stock</span>
+                </div>
+                <div class="agent-desc">Stock market analysis with quant indicators and wizard flair</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/stock-quant.md</div>
+            </div></div>
+        </div>
+        <div class="agent-group">
+            <h3 class="agent-group-title">Solana <span class="tertiary">(0/3)</span></h3>
+            <div class="agent-grid">
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">SQ</span>
+                    <span class="agent-name">Solana Query</span>
+                    <span class="badge">/sol</span>
+                </div>
+                <div class="agent-desc">On-chain data from Dexscreener, Jupiter, and Solana RPC</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/solana-query.md</div>
+            </div>
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">SM</span>
+                    <span class="agent-name">Solana Monitor</span>
+                    
+                </div>
+                <div class="agent-desc">Scheduled wallet balance and token price monitoring</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    <span class="tertiary">Every 6h</span>
+                    <span class="tertiary">schedule</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/solana-monitor.md</div>
+            </div>
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">SB</span>
+                    <span class="agent-name">Solana Builder</span>
+                    <span class="badge">/build-sbf</span>
+                </div>
+                <div class="agent-desc">Verifiable Solana program builds via cargo-build-sbf / Anchor</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/solana-builder.md</div>
+            </div></div>
+        </div>
+        <div class="agent-group">
+            <h3 class="agent-group-title">Architect &amp; Council <span class="tertiary">(10/11)</span></h3>
+            <div class="agent-grid">
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">A</span>
+                    <span class="agent-name">Architect</span>
+                    <span class="badge">/propose</span>
+                </div>
+                <div class="agent-desc">Autonomously analyzes the repo and proposes code improvements as PRs</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    <span class="tertiary">Daily 6:00 UTC</span>
+                    <span class="tertiary">schedule</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/architect.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">CZ</span>
+                    <span class="agent-name">Council: Zuckerberg</span>
+                    
+                </div>
+                <div class="agent-desc">Move fast and break things — velocity-focused council reviewer</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/council-zuckerberg.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">CM</span>
+                    <span class="agent-name">Council: Mr. Wonderful</span>
+                    
+                </div>
+                <div class="agent-desc">ROI-obsessed Shark Tank dealmaker council reviewer</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/council-wonderful.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">CM</span>
+                    <span class="agent-name">Council: Musk</span>
+                    
+                </div>
+                <div class="agent-desc">First principles, 10x ambition, contrarian council reviewer</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/council-musk.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">CT</span>
+                    <span class="agent-name">Council: Toly</span>
+                    
+                </div>
+                <div class="agent-desc">Throughput-obsessed, parallel execution, crypto-native council reviewer</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/council-toly.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">CS</span>
+                    <span class="agent-name">Council: Satoshi</span>
+                    
+                </div>
+                <div class="agent-desc">Minimalist, trustless, privacy-focused council reviewer</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/council-satoshi.md</div>
+            </div>
+            <div class="agent-card disabled">
+                <div class="agent-header">
+                    <span class="agent-icon">CC</span>
+                    <span class="agent-name">Council: CIA</span>
+                    
+                </div>
+                <div class="agent-desc">Classified briefing format, OPSEC-focused council reviewer</div>
+                <div class="agent-meta">
+                    <span class="status-disabled">Disabled</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/council-cia.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">CC</span>
+                    <span class="agent-name">Council: Cobain</span>
+                    
+                </div>
+                <div class="agent-desc">Anti-establishment, raw authenticity, anti-bloat council reviewer</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/council-cobain.md</div>
+            </div>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">PB</span>
+                    <span class="agent-name">Pages Builder</span>
+                    
+                </div>
+                <div class="agent-desc">Builds the GitHub Pages frontend from memory data</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    <span class="tertiary">Every 4h</span>
+                    <span class="tertiary">push</span>
+                </div>
                 
             </div>
-            <div class="agent-desc">Serves your daily issue digest with extra sass and coffee metaphors</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">schedule</span>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">K</span>
+                    <span class="agent-name">Karen</span>
+                    <span class="badge">/karen</span>
+                </div>
+                <div class="agent-desc">QA compliance officer — audits memory, finds bugs, reviews PRs, files complaints</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    <span class="tertiary">Mondays 5:00 UTC</span>
+                    <span class="tertiary">issue_comment</span>
+                </div>
+                <div class="tertiary" style="font-size:11px;margin-top:4px">templates/prompts/karen.md</div>
             </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">QM</span>
-                <span class="agent-name">Quest Master</span>
+            <div class="agent-card ">
+                <div class="agent-header">
+                    <span class="agent-icon">PL</span>
+                    <span class="agent-name">Proposal Lint</span>
+                    
+                </div>
+                <div class="agent-desc">Syntax gate for Architect PRs — validates Python and YAML</div>
+                <div class="agent-meta">
+                    <span class="status-active">Active</span>
+                    
+                    <span class="tertiary">pull_request</span>
+                </div>
                 
-            </div>
-            <div class="agent-desc">Turns boring issues into epic RPG quests with XP rewards</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">issues</span>
-            </div>
+            </div></div>
         </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">CJ</span>
-                <span class="agent-name">Code Jester</span>
-                
-            </div>
-            <div class="agent-desc">Reviews PRs with witty commentary and actually useful feedback</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">WF</span>
-                <span class="agent-name">Wild Fact Finder</span>
-                
-            </div>
-            <div class="agent-desc">Researches anything you ask with entertaining tangents and sources</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">issue_comment | /research</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">MM</span>
-                <span class="agent-name">Meme Machine</span>
-                
-            </div>
-            <div class="agent-desc">Generates viral content ideas, tweet drafts, and creative copy</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">workflow_dispatch</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">LK</span>
-                <span class="agent-name">Lore Keeper</span>
-                
-            </div>
-            <div class="agent-desc">Curates your repo&#x27;s knowledge base with dramatic narrative flair</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">issue_comment | /lore</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">DI</span>
-                <span class="agent-name">Dream Interpreter</span>
-                
-            </div>
-            <div class="agent-desc">Personal journaling agent — interprets dreams and life musings</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">issue_comment | /dream</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">FC</span>
-                <span class="agent-name">Fortune Cookie</span>
-                
-            </div>
-            <div class="agent-desc">Daily wisdom, coding fortunes, and motivational nonsense</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">schedule</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">HM</span>
-                <span class="agent-name">Hype Man</span>
-                
-            </div>
-            <div class="agent-desc">Celebrates milestones, merged PRs, and closed issues with fanfare</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">issues</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">RB</span>
-                <span class="agent-name">Roast Battle</span>
-                
-            </div>
-            <div class="agent-desc">On-demand code roasts — point it at any file for brutal honesty</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">issue_comment | /roast</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">HS</span>
-                <span class="agent-name">HN Scraper</span>
-                <span class="badge">market</span>
-            </div>
-            <div class="agent-desc">Scrapes and analyzes Hacker News stories with hype scores</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">issue_comment | /hn</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">NS</span>
-                <span class="agent-name">News Scraper</span>
-                <span class="badge">market</span>
-            </div>
-            <div class="agent-desc">Fetches and analyzes global news with ninja-style delivery</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">issue_comment | /news</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CO</span>
-                <span class="agent-name">Crypto Oracle</span>
-                <span class="badge">market</span>
-            </div>
-            <div class="agent-desc">Crypto market analysis with quant indicators (RSI, SMA, volatility)</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">issue_comment | /crypto</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">SW</span>
-                <span class="agent-name">Stock Wizard</span>
-                <span class="badge">market</span>
-            </div>
-            <div class="agent-desc">Stock market analysis with quant indicators and wizard flair</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">issue_comment | /stock</span>
-            </div>
-        </div>
-        <div class="agent-card ">
-            <div class="agent-header">
-                <span class="agent-icon">SQ</span>
-                <span class="agent-name">Solana Query</span>
-                <span class="badge">solana</span>
-            </div>
-            <div class="agent-desc">On-chain data from Dexscreener, Jupiter, and Solana RPC</div>
-            <div class="agent-meta">
-                <span class="status-active">Active</span>
-                <span class="tertiary">issue_comment | /sol</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">SM</span>
-                <span class="agent-name">Solana Monitor</span>
-                <span class="badge">solana</span>
-            </div>
-            <div class="agent-desc">Scheduled wallet balance and token price monitoring</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">schedule (0 */6 * * *)</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">SB</span>
-                <span class="agent-name">Solana Builder</span>
-                <span class="badge">solana</span>
-            </div>
-            <div class="agent-desc">Verifiable Solana program builds via cargo-build-sbf / Anchor</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">issue_comment | /build-sbf</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">A</span>
-                <span class="agent-name">Architect</span>
-                <span class="badge">architect</span>
-            </div>
-            <div class="agent-desc">Autonomously analyzes the repo and proposes code improvements as PRs</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">schedule (0 6 * * *) | /propose</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CZ</span>
-                <span class="agent-name">Council: Zuckerberg</span>
-                <span class="badge">council</span>
-            </div>
-            <div class="agent-desc">Move fast and break things — velocity-focused council reviewer</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CM</span>
-                <span class="agent-name">Council: Mr. Wonderful</span>
-                <span class="badge">council</span>
-            </div>
-            <div class="agent-desc">ROI-obsessed Shark Tank dealmaker council reviewer</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CM</span>
-                <span class="agent-name">Council: Musk</span>
-                <span class="badge">council</span>
-            </div>
-            <div class="agent-desc">First principles, 10x ambition, contrarian council reviewer</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CT</span>
-                <span class="agent-name">Council: Toly</span>
-                <span class="badge">council</span>
-            </div>
-            <div class="agent-desc">Throughput-obsessed, parallel execution, crypto-native council reviewer</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CS</span>
-                <span class="agent-name">Council: Satoshi</span>
-                <span class="badge">council</span>
-            </div>
-            <div class="agent-desc">Minimalist, trustless, privacy-focused council reviewer</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CC</span>
-                <span class="agent-name">Council: CIA</span>
-                <span class="badge">council</span>
-            </div>
-            <div class="agent-desc">Classified briefing format, OPSEC-focused council reviewer</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">CC</span>
-                <span class="agent-name">Council: Cobain</span>
-                <span class="badge">council</span>
-            </div>
-            <div class="agent-desc">Anti-establishment, raw authenticity, anti-bloat council reviewer</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">PB</span>
-                <span class="agent-name">Pages Builder</span>
-                <span class="badge">pages</span>
-            </div>
-            <div class="agent-desc">Builds the GitHub Pages frontend from memory data</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">push (0 */4 * * *)</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">K</span>
-                <span class="agent-name">Karen</span>
-                <span class="badge">architect</span>
-            </div>
-            <div class="agent-desc">QA compliance officer — audits memory, finds bugs, reviews PRs, files complaints</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">issue_comment (0 5 * * 1) | /karen</span>
-            </div>
-        </div>
-        <div class="agent-card disabled">
-            <div class="agent-header">
-                <span class="agent-icon">PL</span>
-                <span class="agent-name">Proposal Lint</span>
-                <span class="badge">architect</span>
-            </div>
-            <div class="agent-desc">Syntax gate for Architect PRs — validates Python and YAML</div>
-            <div class="agent-meta">
-                <span class="status-disabled">Disabled</span>
-                <span class="tertiary">pull_request</span>
-            </div>
-        </div></div>
     </div>
     </main>
     <footer class="footer">

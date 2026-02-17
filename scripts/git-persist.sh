@@ -110,7 +110,8 @@ update_state() {
 
   local updated
   updated=$(jq "$jq_expr" "$state_file")
-  echo "$updated" > "$state_file"
+  echo "$updated" > "${state_file}.tmp"
+  mv "${state_file}.tmp" "$state_file"
 
   log_info "State updated: $jq_expr"
 }

@@ -8,6 +8,7 @@ import json
 import os
 import subprocess
 import sys
+import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -59,9 +60,13 @@ def call_llm(
                 "anthropic-version": "2023-06-01",
             },
         )
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read())
-            return data["content"][0]["text"]
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read())
+                return data["content"][0]["text"]
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+            log("LLM", f"Anthropic API error: {exc}")
+            raise RuntimeError(f"LLM API call failed: {exc}") from exc
 
     elif provider == "openai":
         api_key = os.environ.get("OPENAI_API_KEY", "")
@@ -85,9 +90,13 @@ def call_llm(
                 "Authorization": f"Bearer {api_key}",
             },
         )
-        with urllib.request.urlopen(req) as resp:
-            data = json.loads(resp.read())
-            return data["choices"][0]["message"]["content"]
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read())
+                return data["choices"][0]["message"]["content"]
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+            log("LLM", f"OpenAI API error: {exc}")
+            raise RuntimeError(f"LLM API call failed: {exc}") from exc
 
     raise ValueError(f"Unknown provider: {provider}")
 

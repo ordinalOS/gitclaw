@@ -5,6 +5,7 @@
     "emoji": "\u2615",
     "description": "Serves your daily issue digest with extra sass and coffee metaphors",
     "trigger": "schedule",
+    "schedule": "\"0 9 * * 1-5\"  # 9 AM UTC, weekdays",
     "prompt_file": "templates/prompts/morning-roast.md",
     "enabled": true
   },
@@ -71,6 +72,7 @@
     "emoji": "\ud83d\udd2e",
     "description": "Daily wisdom, coding fortunes, and motivational nonsense",
     "trigger": "schedule",
+    "schedule": "\"0 8 * * *\"  # 8 AM UTC daily",
     "prompt_file": "templates/prompts/fortune-cookie.md",
     "enabled": true
   },
@@ -101,6 +103,7 @@
     "description": "Scrapes and analyzes Hacker News stories with hype scores",
     "trigger": "issue_comment",
     "command": "/hn",
+    "schedule": "\"0 7 * * *\"  # 7 AM UTC daily",
     "prompt_file": "templates/prompts/hn-scraper.md",
     "plugin": "market",
     "enabled": false
@@ -112,6 +115,7 @@
     "description": "Fetches and analyzes global news with ninja-style delivery",
     "trigger": "issue_comment",
     "command": "/news",
+    "schedule": "\"30 7 * * *\"  # 7:30 AM UTC daily",
     "prompt_file": "templates/prompts/news-scraper.md",
     "plugin": "market",
     "enabled": false
@@ -147,7 +151,7 @@
     "command": "/sol",
     "prompt_file": "templates/prompts/solana-query.md",
     "plugin": "solana",
-    "enabled": "false  # Enable via agent.md"
+    "enabled": false
   },
   {
     "_key": "solana_monitor",
@@ -181,7 +185,7 @@
     "command": "/propose",
     "prompt_file": "templates/prompts/architect.md",
     "plugin": "architect",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "council_zuckerberg",
@@ -191,7 +195,7 @@
     "trigger": "pull_request",
     "prompt_file": "templates/prompts/council-zuckerberg.md",
     "plugin": "council",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "council_wonderful",
@@ -201,7 +205,7 @@
     "trigger": "pull_request",
     "prompt_file": "templates/prompts/council-wonderful.md",
     "plugin": "council",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "council_musk",
@@ -211,7 +215,7 @@
     "trigger": "pull_request",
     "prompt_file": "templates/prompts/council-musk.md",
     "plugin": "council",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "council_toly",
@@ -221,7 +225,7 @@
     "trigger": "pull_request",
     "prompt_file": "templates/prompts/council-toly.md",
     "plugin": "council",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "council_satoshi",
@@ -231,7 +235,7 @@
     "trigger": "pull_request",
     "prompt_file": "templates/prompts/council-satoshi.md",
     "plugin": "council",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "council_cia",
@@ -251,7 +255,7 @@
     "trigger": "pull_request",
     "prompt_file": "templates/prompts/council-cobain.md",
     "plugin": "council",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "pages_builder",
@@ -260,9 +264,9 @@
     "description": "Builds the GitHub Pages frontend from memory data",
     "trigger": "push",
     "schedule": "0 */4 * * *",
-    "prompt_file": "null",
+    "prompt_file": null,
     "plugin": "pages",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "karen",
@@ -274,7 +278,7 @@
     "schedule": "0 5 * * 1",
     "prompt_file": "templates/prompts/karen.md",
     "plugin": "architect",
-    "enabled": false
+    "enabled": true
   },
   {
     "_key": "proposal_lint",
@@ -282,8 +286,17 @@
     "emoji": "\ud83d\udd0d",
     "description": "Syntax gate for Architect PRs \u2014 validates Python and YAML",
     "trigger": "pull_request",
-    "prompt_file": "null",
+    "prompt_file": null,
     "plugin": "architect",
-    "enabled": false
+    "enabled": true
+  },
+  {
+    "_key": "heartbeat",
+    "name": "Heartbeat",
+    "description": "Vital signs monitor \u2014 updates agent state and maintains streaks",
+    "trigger": "schedule",
+    "schedule": "0 0 * * *",
+    "prompt_file": null,
+    "enabled": true
   }
 ]

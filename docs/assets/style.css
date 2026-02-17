@@ -340,6 +340,25 @@ body {
 
 /* ── Agent Grid ───────────────────────────────────────────────────────────── */
 
+.agent-group {
+  margin-bottom: 24px;
+}
+
+.agent-group:last-child {
+  margin-bottom: 0;
+}
+
+.agent-group-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-light);
+}
+
 .agent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

@@ -179,7 +179,7 @@ agents:
     command: "/propose"
     prompt_file: "templates/prompts/architect.md"
     plugin: "architect"
-    enabled: false
+    enabled: true
 
   council_zuckerberg:
     name: "Council: Zuckerberg"
@@ -188,7 +188,7 @@ agents:
     trigger: "pull_request"
     prompt_file: "templates/prompts/council-zuckerberg.md"
     plugin: "council"
-    enabled: false
+    enabled: true
 
   council_wonderful:
     name: "Council: Mr. Wonderful"
@@ -197,7 +197,7 @@ agents:
     trigger: "pull_request"
     prompt_file: "templates/prompts/council-wonderful.md"
     plugin: "council"
-    enabled: false
+    enabled: true
 
   council_musk:
     name: "Council: Musk"
@@ -206,7 +206,7 @@ agents:
     trigger: "pull_request"
     prompt_file: "templates/prompts/council-musk.md"
     plugin: "council"
-    enabled: false
+    enabled: true
 
   council_toly:
     name: "Council: Toly"
@@ -215,7 +215,7 @@ agents:
     trigger: "pull_request"
     prompt_file: "templates/prompts/council-toly.md"
     plugin: "council"
-    enabled: false
+    enabled: true
 
   council_satoshi:
     name: "Council: Satoshi"
@@ -224,7 +224,7 @@ agents:
     trigger: "pull_request"
     prompt_file: "templates/prompts/council-satoshi.md"
     plugin: "council"
-    enabled: false
+    enabled: true
 
   council_cia:
     name: "Council: CIA"
@@ -242,7 +242,7 @@ agents:
     trigger: "pull_request"
     prompt_file: "templates/prompts/council-cobain.md"
     plugin: "council"
-    enabled: false
+    enabled: true
 
   pages_builder:
     name: "Pages Builder"
@@ -252,7 +252,7 @@ agents:
     schedule: "0 */4 * * *"
     prompt_file: null
     plugin: "pages"
-    enabled: false
+    enabled: true
 
   karen:
     name: "Karen"
@@ -263,7 +263,7 @@ agents:
     schedule: "0 5 * * 1"
     prompt_file: "templates/prompts/karen.md"
     plugin: "architect"
-    enabled: false
+    enabled: true
 
   proposal_lint:
     name: "Proposal Lint"
@@ -272,7 +272,15 @@ agents:
     trigger: "pull_request"
     prompt_file: null
     plugin: "architect"
-    enabled: false
+    enabled: true
+
+  heartbeat:
+    name: "Heartbeat"
+    description: "Vital signs monitor — updates agent state and maintains streaks"
+    trigger: "schedule"
+    schedule: "0 0 * * *"
+    prompt_file: null
+    enabled: true
 
 # Global settings for all agents
 defaults:
