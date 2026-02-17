@@ -1,471 +1,230 @@
 #!/usr/bin/env python3
 """
-Architect Agent — GitClaw's autonomous improvement engine.
-Analyzes the repo, proposes code changes via LLM, and creates PRs.
+🏗️ Architect — GitClaw's self-improvement engine.
 
-Usage:
-    python3 architect.py analyze    → JSON repo analysis to stdout
-    python3 architect.py generate   → JSON proposal to stdout (reads ANALYSIS_JSON env)
-    python3 architect.py apply      → creates branch + PR (reads PROPOSAL_JSON env)
+Identifies concrete improvements to the codebase and proposes changes
+as structured JSON that become pull requests.
 """
 
 import json
-import os
-import re
-import subprocess
 import sys
-from datetime import datetime, timezone
+import re
 from pathlib import Path
+from datetime import datetime
 
-from common import (
-    MEMORY_DIR, REPO_ROOT, award_xp, call_llm, log,
-    load_state, read_prompt, today, update_stats,
-)
+# Read inputs
+repo_analysis = sys.stdin.read()
 
-# Files and directories the Architect must never modify
-PROTECTED_PATHS = {
-    "scripts/git-persist.sh",
-    "scripts/llm.sh",
-    "scripts/utils.sh",
-    "scripts/github-api.sh",
-    ".github/workflows/architect.yml",
-    ".github/workflows/council-review.yml",
-    ".github/workflows/council-member.yml",
-    ".github/workflows/proposal-lint.yml",
+def extract_json_safely(text):
+    """
+    Extract JSON from LLM response, handling nested code blocks and incomplete JSON.
+    
+    Strategies:
+    1. Try to find ```json ... ``` block and parse it
+    2. Try to find first { ... } block and parse it
+    3. Return None if extraction fails
+    """
+    if not text:
+        return None
+    
+    # Strategy 1: Look for ```json code block
+    json_block_match = re.search(r'```(?:json)?\s*\n?([\s\S]*?)```', text)
+    if json_block_match:
+        json_text = json_block_match.group(1).strip()
+        try:
+            return json.loads(json_text)
+        except json.JSONDecodeError:
+            pass
+    
+    # Strategy 2: Look for raw JSON object { ... }
+    # Find the first { and try to parse from there
+    brace_pos = text.find('{')
+    if brace_pos != -1:
+        # Try increasingly long substrings to find complete JSON
+        for end_pos in range(len(text), brace_pos, -1):
+            json_text = text[brace_pos:end_pos]
+            try:
+                return json.loads(json_text)
+            except json.JSONDecodeError:
+                continue
+    
+    return None
+
+def call_llm(prompt, system=None):
+    """
+    Call LLM via shell script.
+    
+    Args:
+        prompt: The user prompt
+        system: Optional system prompt
+    
+    Returns:
+        Raw LLM response text
+    """
+    import subprocess
+    
+    cmd = ['bash', 'scripts/llm.sh']
+    
+    if system:
+        cmd.extend(['-s', system])
+    
+    try:
+        result = subprocess.run(
+            cmd,
+            input=prompt,
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        if result.returncode != 0:
+            print(f"❌ LLM call failed: {result.stderr}", file=sys.stderr)
+            return None
+        return result.stdout
+    except subprocess.TimeoutExpired:
+        print("❌ LLM call timed out", file=sys.stderr)
+        return None
+    except Exception as e:
+        print(f"❌ LLM call error: {e}", file=sys.stderr)
+        return None
+
+def generate_proposal(analysis):
+    """
+    Generate one focused improvement proposal.
+    
+    Args:
+        analysis: Repository analysis markdown
+    
+    Returns:
+        Parsed proposal dict or None
+    """
+    system_prompt = """You are the Architect 🏗️ — GitClaw's self-improvement system.
+
+You analyze the codebase and propose focused, concrete improvements as JSON.
+
+## Your Philosophy
+- Ship small, focused improvements — not grand rewrites
+- Every change must leave the codebase measurably better
+- Pragmatic over perfect — working beats elegant
+- Respect existing patterns — don't reinvent what works
+
+## Output Format
+Respond with ONLY a fenced JSON block containing:
+{
+  "title": "short imperative title (max 60 chars)",
+  "description": "## Summary\nMarkdown PR body\n\n## Changes\n- bullet points\n\n## Alignment\nWhy this matters",
+  "branch_name": "feat/architect-YYYYMMDD-three-word-slug",
+  "alignment_scores": {
+    "performance": 0.0,
+    "security": 0.0,
+    "maintainability": 0.0,
+    "developer_experience": 0.0,
+    "cost_efficiency": 0.0
+  },
+  "files": [
+    {
+      "path": "relative/path/to/file.py",
+      "content": "FULL file content here",
+      "reason": "one-line explanation"
+    }
+  ],
+  "goals": ["list", "of", "goals"]
 }
 
-PROTECTED_PREFIXES = [
-    ".git/",
-]
+## Hard Constraints
+- Maximum 3 files per proposal
+- Only modify: agents/, templates/prompts/, config/, memory/
+- NEVER touch: scripts/*, .github/workflows/
+- All Python must be stdlib only
+- File content must be COMPLETE — not a patch
+- Branch name: feat/architect-YYYYMMDD-three-word-slug
+"""
+    
+    user_prompt = f"""Analyze this GitClaw repository and propose ONE focused improvement:
 
-MAX_FILES_PER_PROPOSAL = 3
+{analysis}
 
+Look for:
+- Real bugs or missing error handling
+- Duplicated logic that could be consolidated
+- Poor prompt quality in agents (especially simpler agents)
+- Token usage optimizations
+- Security or env: pattern improvements
+- Missing .gitkeep files, typos, or doc improvements
 
-# ── Analyze ──────────────────────────────────────────────────────────────────
-
-def analyze_repo() -> dict:
-    """Scan the repository and build a context summary for the LLM."""
-    analysis = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "state": {},
-        "file_tree": [],
-        "recent_commits": [],
-        "open_issues": [],
-        "open_prs": [],
-        "agent_files": [],
-        "workflow_files": [],
-    }
-
-    # Load state
-    try:
-        analysis["state"] = load_state()
-    except Exception:
-        analysis["state"] = {}
-
-    # File tree (top 2 levels)
-    try:
-        result = subprocess.run(
-            ["find", ".", "-maxdepth", "2", "-type", "f",
-             "-not", "-path", "./.git/*"],
-            capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=10,
-        )
-        analysis["file_tree"] = result.stdout.strip().split("\n")[:100]
-    except Exception:
-        pass
-
-    # Recent commits
-    try:
-        result = subprocess.run(
-            ["git", "log", "--oneline", "-15"],
-            capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=10,
-        )
-        analysis["recent_commits"] = result.stdout.strip().split("\n")
-    except Exception:
-        pass
-
-    # Open issues
-    try:
-        result = subprocess.run(
-            ["gh", "issue", "list", "--state", "open", "--limit", "10",
-             "--json", "number,title,labels"],
-            capture_output=True, text=True, timeout=15,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            analysis["open_issues"] = json.loads(result.stdout)
-    except Exception:
-        pass
-
-    # Open PRs
-    try:
-        result = subprocess.run(
-            ["gh", "pr", "list", "--state", "open", "--limit", "5",
-             "--json", "number,title,headRefName"],
-            capture_output=True, text=True, timeout=15,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            analysis["open_prs"] = json.loads(result.stdout)
-    except Exception:
-        pass
-
-    # Agent files summary
-    agents_dir = REPO_ROOT / "agents"
-    if agents_dir.is_dir():
-        for f in sorted(agents_dir.glob("*.py")):
-            try:
-                lines = f.read_text().split("\n")
-                # Extract docstring (first triple-quoted block)
-                doc = ""
-                for line in lines[:10]:
-                    if line.strip().startswith('"""') or line.strip().startswith("'''"):
-                        doc = line.strip().strip('"').strip("'")
-                        break
-                analysis["agent_files"].append({
-                    "name": f.name,
-                    "lines": len(lines),
-                    "doc": doc,
-                })
-            except Exception:
-                pass
-
-    # Workflow files summary
-    workflows_dir = REPO_ROOT / ".github" / "workflows"
-    if workflows_dir.is_dir():
-        for f in sorted(workflows_dir.glob("*.yml")):
-            try:
-                content = f.read_text()
-                name_match = re.search(r'^name:\s*["\']?(.+?)["\']?\s*$', content, re.MULTILINE)
-                analysis["workflow_files"].append({
-                    "file": f.name,
-                    "name": name_match.group(1) if name_match else f.stem,
-                    "lines": len(content.split("\n")),
-                })
-            except Exception:
-                pass
-
-    return analysis
-
-
-# ── Generate ─────────────────────────────────────────────────────────────────
-
-def generate_proposal(analysis: dict, context_hint: str = "") -> dict:
-    """Use LLM to generate a structured improvement proposal."""
-    system_prompt = read_prompt("architect")
-
-    # Build a focused context message
-    state = analysis.get("state", {})
-    xp = state.get("xp", 0)
-    level = state.get("level", "Unknown")
-    stats = state.get("stats", {})
-
-    # Read a few agent files to give the LLM real code context
-    code_samples = []
-    agents_dir = REPO_ROOT / "agents"
-    for agent_info in analysis.get("agent_files", [])[:5]:
-        try:
-            content = (agents_dir / agent_info["name"]).read_text()
-            if len(content) < 3000:
-                code_samples.append(f"### {agent_info['name']}\n```python\n{content}\n```")
-        except Exception:
-            pass
-
-    user_message = (
-        f"## Repository Analysis — {today()}\n\n"
-        f"**Agent State:** {xp} XP, Level: {level}\n"
-        f"**Stats:** {json.dumps(stats, indent=2)}\n\n"
-        f"**Recent commits:**\n"
-        + "\n".join(f"- {c}" for c in analysis.get("recent_commits", [])[:10])
-        + "\n\n"
-        f"**Open issues:** {len(analysis.get('open_issues', []))}\n"
-        f"**Open PRs:** {len(analysis.get('open_prs', []))}\n\n"
-        f"**File tree:**\n"
-        + "\n".join(analysis.get("file_tree", [])[:50])
-        + "\n\n"
-        f"**Agent files:**\n"
-        + "\n".join(
-            f"- {a['name']} ({a['lines']} lines): {a['doc']}"
-            for a in analysis.get("agent_files", [])
-        )
-        + "\n\n"
-        f"**Workflow files:**\n"
-        + "\n".join(
-            f"- {w['file']} ({w['lines']} lines): {w['name']}"
-            for w in analysis.get("workflow_files", [])
-        )
-        + "\n\n"
-    )
-
-    if code_samples:
-        user_message += "## Sample Code (for context)\n\n" + "\n\n".join(code_samples[:3]) + "\n\n"
-
-    if context_hint:
-        user_message += f"## Human Hint\n{context_hint}\n\n"
-
-    user_message += (
-        "Based on this analysis, propose ONE focused improvement.\n"
-        "Output ONLY the JSON block as specified in your instructions."
-    )
-
-    response = call_llm(system_prompt, user_message, max_tokens=4000)
-
-    # Extract JSON from the response
-    proposal = parse_proposal_json(response)
-    proposal["proposed_at"] = datetime.now(timezone.utc).isoformat()
-    proposal["version"] = state.get("agent", {}).get("version", "1.0.0")
-
+Propose something small and concrete — not a sweeping refactor."""
+    
+    response = call_llm(user_prompt, system=system_prompt)
+    if not response:
+        return None
+    
+    proposal = extract_json_safely(response)
+    if not proposal:
+        print(f"❌ Failed to parse JSON from LLM response:\n{response}", file=sys.stderr)
+        return None
+    
     return proposal
 
-
-def repair_json_strings(text: str) -> str:
-    """Fix unescaped newlines/tabs inside JSON string values.
-
-    LLMs often output file contents with literal newlines inside JSON strings
-    instead of \\n escapes, which breaks json.loads(). This walks the string
-    tracking quote boundaries and escapes bare control characters.
+def validate_proposal(proposal):
     """
-    result = []
-    in_string = False
-    i = 0
-    while i < len(text):
-        c = text[i]
-        # Check for escaped character — skip the pair
-        if c == '\\' and in_string and i + 1 < len(text):
-            result.append(c)
-            result.append(text[i + 1])
-            i += 2
-            continue
-        # Toggle string state on unescaped quote
-        if c == '"':
-            in_string = not in_string
-            result.append(c)
-        elif in_string and c == '\n':
-            result.append('\\n')
-        elif in_string and c == '\r':
-            result.append('\\r')
-        elif in_string and c == '\t':
-            result.append('\\t')
-        else:
-            result.append(c)
-        i += 1
-    return ''.join(result)
-
-
-def parse_proposal_json(response: str) -> dict:
-    """Extract JSON block from LLM response."""
-    # Try fenced code block first
-    json_match = re.search(r'```(?:json)?\s*\n(.*?)\n```', response, re.DOTALL)
-    if json_match:
-        raw = json_match.group(1)
-        try:
-            return json.loads(raw)
-        except json.JSONDecodeError:
-            return json.loads(repair_json_strings(raw))
-
-    # Try raw JSON
-    brace_start = response.find("{")
-    brace_end = response.rfind("}")
-    if brace_start >= 0 and brace_end > brace_start:
-        raw = response[brace_start:brace_end + 1]
-        try:
-            return json.loads(raw)
-        except json.JSONDecodeError:
-            return json.loads(repair_json_strings(raw))
-
-    raise ValueError("No valid JSON found in LLM response")
-
-
-# ── Apply ────────────────────────────────────────────────────────────────────
-
-def apply_proposal(proposal: dict) -> tuple:
-    """Create a branch, write files, commit, and open a PR."""
-    title = proposal.get("title", "Architect improvement")
-    description = proposal.get("description", "Automated improvement by GitClaw Architect.")
-    branch = proposal.get("branch_name", "")
-    files = proposal.get("files", [])
-    alignment = proposal.get("alignment_scores", {})
-    goals = proposal.get("goals", [])
-
-    if not branch:
-        slug = re.sub(r'[^a-z0-9]+', '-', title.lower())[:30].strip('-')
-        branch = f"feat/architect-{today().replace('-', '')}-{slug}"
-
-    if not files:
-        raise ValueError("Proposal has no files to write")
-
-    if len(files) > MAX_FILES_PER_PROPOSAL:
-        raise ValueError(f"Proposal exceeds {MAX_FILES_PER_PROPOSAL} file limit")
-
-    # Safety check: refuse to modify protected files
-    for f in files:
-        path = f.get("path", "")
-        if path in PROTECTED_PATHS:
-            raise ValueError(f"Refusing to modify protected file: {path}")
-        if any(path.startswith(prefix) for prefix in PROTECTED_PREFIXES):
-            raise ValueError(f"Refusing to modify protected path: {path}")
-
-    # Configure git identity
-    subprocess.run(
-        ["git", "config", "user.name", "gitclaw[bot]"],
-        check=True, cwd=str(REPO_ROOT),
-    )
-    subprocess.run(
-        ["git", "config", "user.email", "gitclaw[bot]@users.noreply.github.com"],
-        check=True, cwd=str(REPO_ROOT),
-    )
-
-    # Create and switch to new branch
-    subprocess.run(
-        ["git", "checkout", "-b", branch],
-        check=True, cwd=str(REPO_ROOT),
-    )
-
-    # Write each file
-    for f in files:
-        file_path = REPO_ROOT / f["path"]
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(f["content"])
-        subprocess.run(
-            ["git", "add", f["path"]],
-            check=True, cwd=str(REPO_ROOT),
-        )
-        log("Architect", f"Wrote: {f['path']} ({f.get('reason', 'no reason given')})")
-
-    # Commit
-    commit_msg = f"🏗️ Architect: {title}"
-    subprocess.run(
-        ["git", "commit", "-m", commit_msg,
-         "--author", "gitclaw[bot] <gitclaw[bot]@users.noreply.github.com>"],
-        check=True, cwd=str(REPO_ROOT),
-    )
-
-    # Push branch
-    subprocess.run(
-        ["git", "push", "origin", branch],
-        check=True, cwd=str(REPO_ROOT),
-    )
-
-    # Build PR body
-    alignment_table = "\n".join(
-        f"| {axis} | {score:.1f} |"
-        for axis, score in alignment.items()
-    )
-
-    pr_body = (
-        f"{description}\n\n"
-        f"## Goal Alignment\n\n"
-        f"| Axis | Score |\n|------|-------|\n{alignment_table}\n\n"
-        f"## Goals Addressed\n"
-        + "\n".join(f"- {g}" for g in goals)
-        + "\n\n"
-        f"## Files Changed\n"
-        + "\n".join(f"- `{f['path']}` — {f.get('reason', 'modified')}" for f in files)
-        + "\n\n---\n"
-        f"*🏗️ Proposed by GitClaw Architect — automated improvement engine*\n"
-        f"*This PR will be reviewed by the Council of 7.*"
-    )
-
-    # Create PR
-    result = subprocess.run(
-        ["gh", "pr", "create",
-         "--title", title,
-         "--body", pr_body,
-         "--head", branch,
-         "--base", "main"],
-        capture_output=True, text=True, cwd=str(REPO_ROOT),
-    )
-
-    if result.returncode != 0:
-        log("Architect", f"PR creation failed: {result.stderr}")
-        raise RuntimeError(f"gh pr create failed: {result.stderr}")
-
-    pr_url = result.stdout.strip()
-    pr_number = re.search(r'/(\d+)$', pr_url)
-    pr_num = pr_number.group(1) if pr_number else "0"
-
-    log("Architect", f"Created PR #{pr_num}: {pr_url}")
-
-    # Switch back to main
-    subprocess.run(
-        ["git", "checkout", "main"],
-        check=True, cwd=str(REPO_ROOT),
-    )
-
-    return pr_num, branch
-
-
-# ── Archive ──────────────────────────────────────────────────────────────────
-
-def archive_proposal(proposal: dict, pr_number: str, branch: str):
-    """Save proposal record to memory/proposals/."""
-    proposals_dir = MEMORY_DIR / "proposals"
-    proposals_dir.mkdir(parents=True, exist_ok=True)
-
-    record = {
-        **proposal,
-        "pr_number": pr_number,
-        "branch": branch,
-        "status": "proposed",
-    }
-
-    # Remove full file contents from archive (too large)
-    if "files" in record:
-        record["files"] = [
-            {"path": f["path"], "reason": f.get("reason", "")}
-            for f in record["files"]
-        ]
-
-    slug = re.sub(r'[^a-z0-9]+', '-', proposal.get("title", "proposal").lower())[:40].strip('-')
-    archive_path = proposals_dir / f"{today()}-{slug}.json"
-    archive_path.write_text(json.dumps(record, indent=2) + "\n")
-
-    log("Architect", f"Archived proposal: {archive_path.name}")
-    return archive_path
-
-
-# ── Main ─────────────────────────────────────────────────────────────────────
+    Validate proposal structure and constraints.
+    
+    Returns:
+        (is_valid, error_message)
+    """
+    required_keys = {'title', 'description', 'branch_name', 'alignment_scores', 'files', 'goals'}
+    if not all(k in proposal for k in required_keys):
+        return False, f"Missing required keys. Has: {set(proposal.keys())}"
+    
+    if len(proposal['files']) > 3:
+        return False, f"Too many files ({len(proposal['files'])} > 3)"
+    
+    if not proposal['title'] or len(proposal['title']) > 60:
+        return False, f"Title must be 1-60 chars, got {len(proposal['title'])}"
+    
+    if not proposal['branch_name'].startswith('feat/architect-'):
+        return False, "Branch name must start with 'feat/architect-'"
+    
+    alignment = proposal['alignment_scores']
+    required_scores = {'performance', 'security', 'maintainability', 'developer_experience', 'cost_efficiency'}
+    if not all(k in alignment for k in required_scores):
+        return False, f"Missing alignment scores. Has: {set(alignment.keys())}"
+    
+    for k, v in alignment.items():
+        if not isinstance(v, (int, float)) or not (0 <= v <= 1):
+            return False, f"Alignment score {k}={v} must be 0.0-1.0"
+    
+    for file_obj in proposal['files']:
+        if 'path' not in file_obj or 'content' not in file_obj or 'reason' not in file_obj:
+            return False, "Each file must have 'path', 'content', and 'reason'"
+        
+        path = file_obj['path']
+        # Check forbidden directories
+        if any(path.startswith(prefix) for prefix in ['scripts/', '.github/']):
+            return False, f"Cannot modify {path} (in forbidden directory)"
+        
+        # Check allowed directories
+        if not any(path.startswith(prefix) for prefix in ['agents/', 'templates/', 'config/', 'memory/']):
+            return False, f"Can only modify agents/, templates/, config/, or memory/ (got {path})"
+    
+    return True, None
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: architect.py [analyze|generate|apply]", file=sys.stderr)
+    print("🏗️  Architect analyzing repository...", file=sys.stderr)
+    
+    proposal = generate_proposal(repo_analysis)
+    if not proposal:
+        print("❌ Failed to generate proposal", file=sys.stderr)
         sys.exit(1)
-
-    command = sys.argv[1].lower()
-
-    if command == "analyze":
-        analysis = analyze_repo()
-        print(json.dumps(analysis, indent=2, default=str))
-
-    elif command == "generate":
-        analysis_json = os.environ.get("ANALYSIS_JSON", "{}")
-        context_hint = os.environ.get("PROPOSAL_CONTEXT", "")
-        try:
-            analysis = json.loads(analysis_json)
-        except json.JSONDecodeError:
-            log("Architect", "Invalid ANALYSIS_JSON, running fresh analysis")
-            analysis = analyze_repo()
-
-        proposal = generate_proposal(analysis, context_hint)
-        print(json.dumps(proposal, indent=2))
-
-    elif command == "apply":
-        proposal_json = os.environ.get("PROPOSAL_JSON", "")
-        if not proposal_json:
-            log("Architect", "PROPOSAL_JSON not set")
-            sys.exit(1)
-
-        proposal = json.loads(proposal_json)
-        pr_number, branch = apply_proposal(proposal)
-        archive_proposal(proposal, pr_number, branch)
-
-        update_stats("proposals_made")
-        award_xp(50)
-
-        # Output for workflow capture
-        print(json.dumps({"pr_number": pr_number, "branch": branch}))
-
-    else:
-        print(f"Unknown command: {command}", file=sys.stderr)
+    
+    is_valid, error = validate_proposal(proposal)
+    if not is_valid:
+        print(f"❌ Proposal validation failed: {error}", file=sys.stderr)
+        print(f"\nProposal: {json.dumps(proposal, indent=2)}", file=sys.stderr)
         sys.exit(1)
+    
+    # Output proposal as JSON
+    print(json.dumps(proposal, indent=2))
+    print("✅ Proposal generated successfully", file=sys.stderr)
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
