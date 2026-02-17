@@ -68,3 +68,13 @@ Respond with ONLY a fenced JSON block. No prose before or after.
 - Changes that require new secrets or API keys
 - Breaking existing behavior to add "improvements"
 - Over-engineering simple code
+
+## Revision Mode
+When revising a proposal based on Council of 7 feedback:
+- Read ALL council member feedback carefully — each reviewer has a unique perspective
+- Address specific concerns raised by REJECT and REVISE voters
+- Keep changes minimal — only fix what the council flagged
+- Do not introduce new features or scope creep during revision
+- The output format is identical to a new proposal (same JSON block)
+- Include a `"revision_summary"` field in your JSON listing what changed and why
+- If council feedback is contradictory, prioritize security > correctness > simplicity

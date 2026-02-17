@@ -16,6 +16,14 @@ on:
         required: false
         type: string
         default: "0"
+      revision_pr:
+        required: false
+        type: string
+        default: "0"
+      revision_branch:
+        required: false
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
       proposal_context:
@@ -23,10 +31,21 @@ on:
         required: false
         type: string
         default: ""
+      revision_pr:
+        description: "PR number to revise (0 = new proposal)"
+        required: false
+        type: string
+        default: "0"
+      revision_branch:
+        description: "Branch of PR to revise"
+        required: false
+        type: string
+        default: ""
   schedule:
     - cron: '0 6 * * *'  # Daily at 6 AM UTC
 
 permissions:
+  actions: write
   issues: write
   pull-requests: write
   contents: write
@@ -59,7 +78,7 @@ jobs:
           python-version: '3.12'
 
       - name: Analyze repository
-        if: steps.check.outputs.enabled == 'true'
+        if: steps.check.outputs.enabled == 'true' && (inputs.revision_pr == '0' || inputs.revision_pr == '')
         id: analyze
         run: |
           cd agents
@@ -70,7 +89,7 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Generate proposal
-        if: steps.check.outputs.enabled == 'true'
+        if: steps.check.outputs.enabled == 'true' && (inputs.revision_pr == '0' || inputs.revision_pr == '')
         id: generate
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -87,7 +106,7 @@ jobs:
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Apply proposal and create PR
-        if: steps.check.outputs.enabled == 'true'
+        if: steps.check.outputs.enabled == 'true' && (inputs.revision_pr == '0' || inputs.revision_pr == '')
         id: apply
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -103,15 +122,41 @@ jobs:
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "Created PR #$PR_NUM on branch $BRANCH"
 
+      - name: Revise existing proposal
+        if: steps.check.outputs.enabled == 'true' && inputs.revision_pr != '0' && inputs.revision_pr != ''
+        id: revise
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITCLAW_MODEL: "claude-sonnet-4-5-20250929"
+          REVISION_PR: ${{ inputs.revision_pr }}
+          REVISION_BRANCH: ${{ inputs.revision_branch }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          cd agents
+          RESULT=$(python3 architect.py revise)
+          PR_NUM=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('pr_number','0'))")
+          echo "pr_number=$PR_NUM" >> "$GITHUB_OUTPUT"
+          echo "Revised PR #$PR_NUM"
+
       - name: Trigger Council Review
-        if: steps.check.outputs.enabled == 'true' && steps.apply.outputs.pr_number != '0' && steps.apply.outputs.pr_number != ''
+        if: steps.check.outputs.enabled == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUM: ${{ steps.apply.outputs.pr_number }}
+          PR_NUM_NEW: ${{ steps.apply.outputs.pr_number }}
+          PR_NUM_REV: ${{ steps.revise.outputs.pr_number }}
         run: |
-          echo "Dispatching Council of 7 for PR #$PR_NUM"
-          gh workflow run council-review.yml \
-            -f pr_number="$PR_NUM" || echo "Council dispatch failed — may need manual trigger"
+          # Prefer revision PR number, fall back to new proposal PR number
+          PR_NUM="${PR_NUM_REV:-$PR_NUM_NEW}"
+          PR_NUM="${PR_NUM:-0}"
+          if [ "$PR_NUM" != "0" ] && [ -n "$PR_NUM" ]; then
+            echo "Dispatching Council of 7 for PR #$PR_NUM"
+            gh workflow run council-review.yml \
+              -f pr_number="$PR_NUM" || echo "Council dispatch failed — may need manual trigger"
+          else
+            echo "No PR to review — skipping council dispatch"
+          fi
 
       - name: Notify on issue (if triggered by /propose)
         if: steps.check.outputs.enabled == 'true' && inputs.issue_number != '0' && inputs.issue_number != ''

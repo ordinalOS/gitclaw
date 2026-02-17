@@ -16,6 +16,7 @@ on:
         type: string
 
 permissions:
+  actions: write
   issues: write
   pull-requests: write
   contents: write
@@ -226,6 +227,32 @@ jobs:
             gh pr merge "$PR_NUM" --merge || echo "Auto-merge failed — may need manual merge"
           elif [ "$REJECTS" -ge 4 ]; then
             gh pr close "$PR_NUM" || echo "PR close failed"
+          else
+            # REVISE — check revision count before dispatching Architect
+            REVISION_COUNT=$(echo "$COMMENTS" | grep -c "## 🏗️ Revision" || true)
+            echo "Revision count so far: $REVISION_COUNT"
+            if [ "$REVISION_COUNT" -lt 2 ]; then
+              BRANCH=$(gh pr view "$PR_NUM" --json headRefName --jq '.headRefName' 2>/dev/null || echo "")
+              if [ -n "$BRANCH" ]; then
+                echo "Dispatching Architect revision for PR #$PR_NUM on branch $BRANCH"
+                gh workflow run architect.yml \
+                  -f revision_pr="$PR_NUM" \
+                  -f revision_branch="$BRANCH" \
+                || echo "Architect revision dispatch failed"
+              else
+                echo "Could not determine branch for PR #$PR_NUM"
+              fi
+            else
+              echo "Max revisions ($REVISION_COUNT) reached — closing PR"
+              gh pr close "$PR_NUM" \
+                -c "## ⚖️ Council — Max Revisions Exceeded
+
+          This PR has been through $REVISION_COUNT revision cycles without reaching consensus.
+          Closing to prevent infinite loops.
+
+          — ⚖️ *GitClaw Council of 7*" \
+              || echo "PR close failed"
+            fi
           fi
 
       - name: Archive tally

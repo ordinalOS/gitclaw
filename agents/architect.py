@@ -2,11 +2,13 @@
 """
 Architect Agent — GitClaw's autonomous improvement engine.
 Analyzes the repo, proposes code changes via LLM, and creates PRs.
+Can also revise existing proposals based on Council of 7 feedback.
 
 Usage:
     python3 architect.py analyze    → JSON repo analysis to stdout
     python3 architect.py generate   → JSON proposal to stdout (reads ANALYSIS_JSON env)
     python3 architect.py apply      → creates branch + PR (reads PROPOSAL_JSON env)
+    python3 architect.py revise     → revises existing PR (reads REVISION_PR, REVISION_BRANCH env)
 """
 
 import json
@@ -392,6 +394,197 @@ def apply_proposal(proposal: dict) -> tuple:
     return pr_num, branch
 
 
+# ── Revise ────────────────────────────────────────────────────────────────────
+
+MAX_REVISIONS = 2
+
+
+def fetch_council_feedback(pr_number: str) -> list[str]:
+    """Fetch council review comments from a PR, focusing on REVISE/REJECT votes."""
+    try:
+        # Use JSON output to properly separate multi-line comments
+        result = subprocess.run(
+            ["gh", "api", f"repos/{os.environ.get('GITHUB_REPOSITORY', '')}/issues/{pr_number}/comments",
+             "--jq", "[.[] | .body]"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=15,
+        )
+        if result.returncode != 0 or not result.stdout.strip():
+            return []
+    except Exception as e:
+        log("Architect", f"Failed to fetch PR comments: {e}")
+        return []
+
+    try:
+        comments = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return []
+
+    # Keep comments that contain council votes (REVISE or REJECT)
+    feedback = []
+    for comment in comments:
+        if "VOTE: REVISE" in comment or "VOTE: REJECT" in comment:
+            feedback.append(comment)
+    return feedback
+
+
+def fetch_pr_diff(pr_number: str) -> str:
+    """Fetch the current diff of a PR."""
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "diff", pr_number],
+            capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=15,
+        )
+        if result.returncode == 0:
+            return result.stdout[:4000]  # Truncate to avoid token blowout
+    except Exception as e:
+        log("Architect", f"Failed to fetch PR diff: {e}")
+    return ""
+
+
+def find_proposal_record(pr_number: str) -> dict:
+    """Load the archived proposal JSON for this PR from memory/proposals/."""
+    proposals_dir = MEMORY_DIR / "proposals"
+    if not proposals_dir.is_dir():
+        return {}
+
+    for f in sorted(proposals_dir.glob("*.json"), reverse=True):
+        try:
+            record = json.loads(f.read_text())
+            if str(record.get("pr_number", "")) == str(pr_number):
+                return record
+        except (json.JSONDecodeError, Exception):
+            continue
+    return {}
+
+
+def revise_proposal(pr_number: str, branch: str) -> tuple:
+    """Fetch council feedback, generate revised files via LLM, push to existing branch."""
+    log("Architect", f"Revising PR #{pr_number} on branch {branch}")
+
+    # Gather context
+    feedback = fetch_council_feedback(pr_number)
+    if not feedback:
+        log("Architect", "No council feedback found — nothing to revise")
+        raise RuntimeError("No council feedback found for revision")
+
+    diff = fetch_pr_diff(pr_number)
+    original = find_proposal_record(pr_number)
+    system_prompt = read_prompt("architect")
+
+    # Build the revision prompt
+    feedback_text = "\n\n---\n\n".join(feedback[:7])  # At most 7 council members
+    original_title = original.get("title", "Unknown proposal")
+    original_desc = original.get("description", "")
+
+    user_message = (
+        f"## Revision Request — PR #{pr_number}\n\n"
+        f"### Original Proposal\n"
+        f"**Title:** {original_title}\n"
+        f"**Description:** {original_desc}\n\n"
+        f"### Current Diff\n```diff\n{diff}\n```\n\n"
+        f"### Council Feedback (REVISE/REJECT votes)\n{feedback_text}\n\n"
+        f"---\n\n"
+        f"The Council of 7 voted to REVISE this proposal. "
+        f"Read their feedback carefully and generate a revised version.\n"
+        f"Address the specific concerns raised by each reviewer.\n"
+        f"Output ONLY the JSON block as specified in your instructions.\n"
+        f"Include a \"revision_summary\" field explaining what you changed and why."
+    )
+
+    response = call_llm(system_prompt, user_message, max_tokens=4000)
+    proposal = parse_proposal_json(response)
+
+    files = proposal.get("files", [])
+    if not files:
+        raise ValueError("Revised proposal has no files")
+
+    if len(files) > MAX_FILES_PER_PROPOSAL:
+        raise ValueError(f"Revised proposal exceeds {MAX_FILES_PER_PROPOSAL} file limit")
+
+    # Safety check
+    for f in files:
+        path = f.get("path", "")
+        if path in PROTECTED_PATHS:
+            raise ValueError(f"Refusing to modify protected file: {path}")
+        if any(path.startswith(prefix) for prefix in PROTECTED_PREFIXES):
+            raise ValueError(f"Refusing to modify protected path: {path}")
+
+    # Configure git identity
+    subprocess.run(
+        ["git", "config", "user.name", "gitclaw[bot]"],
+        check=True, cwd=str(REPO_ROOT), stdout=sys.stderr,
+    )
+    subprocess.run(
+        ["git", "config", "user.email", "gitclaw[bot]@users.noreply.github.com"],
+        check=True, cwd=str(REPO_ROOT), stdout=sys.stderr,
+    )
+
+    # Fetch and checkout the existing branch
+    subprocess.run(
+        ["git", "fetch", "origin", branch],
+        check=True, cwd=str(REPO_ROOT), stdout=sys.stderr, stderr=sys.stderr,
+    )
+    subprocess.run(
+        ["git", "checkout", branch],
+        check=True, cwd=str(REPO_ROOT), stdout=sys.stderr, stderr=sys.stderr,
+    )
+
+    # Write revised files
+    for f in files:
+        file_path = REPO_ROOT / f["path"]
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(f["content"])
+        subprocess.run(
+            ["git", "add", f["path"]],
+            check=True, cwd=str(REPO_ROOT), stdout=sys.stderr,
+        )
+        log("Architect", f"Revised: {f['path']} ({f.get('reason', 'revised')})")
+
+    # Commit revision
+    revision_summary = proposal.get("revision_summary", "Addressed council feedback")
+    title = proposal.get("title", original_title)
+    commit_msg = f"🏗️ Architect revision: {title}"
+    subprocess.run(
+        ["git", "commit", "-m", commit_msg,
+         "--author", "gitclaw[bot] <gitclaw[bot]@users.noreply.github.com>",
+         "--allow-empty"],
+        check=True, cwd=str(REPO_ROOT), stdout=sys.stderr, stderr=sys.stderr,
+    )
+
+    # Push to existing branch (updates the PR automatically)
+    subprocess.run(
+        ["git", "push", "origin", branch],
+        check=True, cwd=str(REPO_ROOT), stdout=sys.stderr, stderr=sys.stderr,
+    )
+
+    # Post a revision comment on the PR (also serves as revision counter)
+    files_summary = "\n".join(f"- `{f['path']}` — {f.get('reason', 'revised')}" for f in files)
+    comment_body = (
+        f"## 🏗️ Revision — Architect Response\n\n"
+        f"**Summary:** {revision_summary}\n\n"
+        f"### Files Updated\n{files_summary}\n\n"
+        f"The Council of 7 will re-review this revision.\n\n"
+        f"— 🏗️ *The Architect*"
+    )
+    try:
+        subprocess.run(
+            ["gh", "api", f"repos/{os.environ.get('GITHUB_REPOSITORY', '')}/issues/{pr_number}/comments",
+             "-f", f"body={comment_body}"],
+            check=True, cwd=str(REPO_ROOT), stdout=sys.stderr, stderr=sys.stderr,
+        )
+    except Exception as e:
+        log("Architect", f"Failed to post revision comment: {e}")
+
+    # Switch back to main
+    subprocess.run(
+        ["git", "checkout", "main"],
+        check=True, cwd=str(REPO_ROOT), stdout=sys.stderr, stderr=sys.stderr,
+    )
+
+    log("Architect", f"Revision pushed to {branch} for PR #{pr_number}")
+    return pr_number, branch
+
+
 # ── Archive ──────────────────────────────────────────────────────────────────
 
 def archive_proposal(proposal: dict, pr_number: str, branch: str):
@@ -425,7 +618,7 @@ def archive_proposal(proposal: dict, pr_number: str, branch: str):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: architect.py [analyze|generate|apply]", file=sys.stderr)
+        print("Usage: architect.py [analyze|generate|apply|revise]", file=sys.stderr)
         sys.exit(1)
 
     command = sys.argv[1].lower()
@@ -458,6 +651,21 @@ def main():
 
         update_stats("proposals_made")
         award_xp(50)
+
+        # Output for workflow capture
+        print(json.dumps({"pr_number": pr_number, "branch": branch}))
+
+    elif command == "revise":
+        revision_pr = os.environ.get("REVISION_PR", "0")
+        revision_branch = os.environ.get("REVISION_BRANCH", "")
+        if not revision_pr or revision_pr == "0" or not revision_branch:
+            log("Architect", "REVISION_PR and REVISION_BRANCH must be set")
+            sys.exit(1)
+
+        pr_number, branch = revise_proposal(revision_pr, revision_branch)
+
+        update_stats("proposals_revised")
+        award_xp(30)
 
         # Output for workflow capture
         print(json.dumps({"pr_number": pr_number, "branch": branch}))
