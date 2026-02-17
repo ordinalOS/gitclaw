@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">Docs</a></div><div class="header-meta"><span>Apprentice</span><span class="xp-bar-container">XP 166<div class="xp-bar"><div class="xp-bar-fill" style="width:10%"></div></div></span><span>Streak 4d</span></div></div>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">Docs</a></div><div class="header-meta"><span>Apprentice</span><span class="xp-bar-container">XP 196<div class="xp-bar"><div class="xp-bar-fill" style="width:30%"></div></div></span><span>Streak 4d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html">Memory</a>
 <a href="council.html" class="active">Council</a>
@@ -24,7 +24,185 @@
     </div>
     <div class="panel full-width">
         <h2 class="panel-title">Council Reviews</h2>
-        <div class="empty">No council reviews yet.</div>
+        
+            <div class="memory-entry">
+                <div class="entry-header" onclick="toggleEntry(this)">
+                    <span class="tertiary">2026-02-17</span>
+                    <span>Pr5 Zuckerberg</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="entry-body" style="display:none">
+                    <h1>Council Review: zuckerberg — PR #5</h1>
+<p><em>Reviewed on 2026-02-17 13:24 UTC</em></p>
+
+<h1>Council Review: Error Handling for News Scraper</h1>
+
+<h2>The Zuck Assessment</h2>
+
+<p>This is a <em>classic</em> over-engineered response to a real problem. Yes, the news scraper crashes on bad API responses — that&#x27;s a real bug. But the diff shows someone refactoring half the codebase to add defensive programming while the core issue could ship in 20 lines. The maintainability score of 0.8 is honest, but it&#x27;s maintainability through <em>rewrite</em>, not through surgical fixes. That said, the instinct is right: handle errors, ship reliability. The execution just needs to get lean.</p>
+
+<h2>Scale Analysis</h2>
+
+<p>At scale, this matters more than you&#x27;d think. A news scraper that crashes silently on one malformed response from NewsAPI means your entire agent system stops feeding real-time data to users. At billions of requests, you&#x27;ll hit edge cases constantly — missing fields, rate limits, API outages. The error handling is sound in principle.</p>
+
+<p>But here&#x27;s the thing: the diff got truncated, so I can&#x27;t see the full implementation. That&#x27;s a red flag. If we&#x27;re shipping defensive code, I need to see it <em>all</em>. Are you catching exceptions and logging them with context? Are you setting reasonable fallbacks? Or are you just swallowing errors silently? Silent failures don&#x27;t scale. They amplify.</p>
+
+<h2>Metrics Check</h2>
+
+<p>You need:</p>
+<p>1. <strong>Error rate by source</strong> — what % of NewsAPI calls fail and why? (malformed response vs. rate limit vs. network timeout)</p>
+<p>2. <strong>Fallback activation rate</strong> — how often does the agent hit empty articles and fall back to cached data?</p>
+<p>3. <strong>Agent uptime</strong> — does error handling actually reduce crashes, or does it just mask them?</p>
+<p>4. <strong>Latency impact</strong> — defensive code adds overhead. Are we checking field existence 3x or 30x per response? Measure it.</p>
+
+<p>A/B test: Run this version for a week, measure error rates and agent availability. Compare against main. If availability goes up and error logs show actual catch rates, ship it. If i</p>
+                </div>
+            </div>
+            <div class="memory-entry">
+                <div class="entry-header" onclick="toggleEntry(this)">
+                    <span class="tertiary">2026-02-17</span>
+                    <span>Pr5 Wonderful</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="entry-body" style="display:none">
+                    <h1>Council Review: wonderful — PR #5</h1>
+<p><em>Reviewed on 2026-02-17 13:24 UTC</em></p>
+
+<h1>Mr. Wonderful&#x27;s Council Review — PR #5: Error Handling for News Scraper</h1>
+
+<hr>
+
+<h2>The Deal Assessment</h2>
+
+<p>Here&#x27;s the thing: this PR is doing something <em>smart</em>. It&#x27;s taking a system that <strong>assumes the world is perfect</strong> — which it never is — and adding guardrails. That&#x27;s good business. But let me cut through the theater and talk about what I actually see here.</p>
+
+<p>You&#x27;re adding error handling. Defensible. A system that crashes on malformed API responses is a system that <strong>costs you money</strong> — debugging time, customer support tickets, lost data integrity. That&#x27;s burn rate we can eliminate.</p>
+
+<p><strong>BUT.</strong> And this is a big but.</p>
+
+<hr>
+
+<h2>The Numbers</h2>
+
+<p>Let me walk through the economics:</p>
+
+<p><strong>What you&#x27;re gaining:</strong></p>
+<ul>
+<li>Graceful degradation instead of crashes ✓</li>
+<li>Better observability (distinguishing API failures from parsing failures) ✓</li>
+<li>Reduced incident response cost ✓</li>
+</ul>
+
+<p><strong>What concerns me:</strong></p>
+<ul>
+<li>The diff is <em>truncated</em> — I can see the beginning but not the full scope. I cannot properly price this deal if I don&#x27;t see all the code.</li>
+<li>You&#x27;re importing <code>sys</code> and <code>pathlib</code> and manipulating <code>sys.path</code> — that&#x27;s a code smell. Why? That&#x27;s <strong>technical debt masquerading as architecture</strong>. If your import structure is so fragile it needs this bandaid, we fix the <em>disease</em>, not the symptom.</li>
+<li>You&#x27;ve <strong>gutted the docstring</strong>. &quot;News Ninja — Stealthy news intelligence agent&quot; became &quot;News scraper agent that fetches and analyzes news articles.&quot; You didn&#x27;t add clarity; you <strong>deleted context</strong>. Now the next engineer has no idea what this system is <em>supposed</em> to do. That&#x27;s a future maintenance cost.</li>
+<li>You&#x27;re changing the import structure <em>and</em> adding error handling <em>in the same PR</em>. That&#x27;s two deals. That violates the cardinal rule: <strong>one change per PR</strong>. If something breaks, which refactor caused it? Now we have to debug both.</li>
+</ul>
+
+<hr>
+
+<h2>The Ask</h2>
+
+<p>Here&#x27;s what would make this deal better:</p>
+
+<p>1. <strong>Show me the full diff.</strong> I need to see every lin</p>
+                </div>
+            </div>
+            <div class="memory-entry">
+                <div class="entry-header" onclick="toggleEntry(this)">
+                    <span class="tertiary">2026-02-17</span>
+                    <span>Pr5 Musk</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="entry-body" style="display:none">
+                    <h1>Council Review: musk — PR #5</h1>
+<p><em>Reviewed on 2026-02-17 13:24 UTC</em></p>
+
+<h1>Elon&#x27;s Council Review: News Scraper Error Handling</h1>
+
+<h2>First Principles Take</h2>
+
+<p>Let me step back. The question isn&#x27;t &quot;should we add error handling?&quot; — obviously yes. The real question is: <strong>Why is this code so fragile in the first place that we need 200+ lines of defensive code?</strong></p>
+
+<p>The diff is truncated, but here&#x27;s what I&#x27;m seeing: someone is wrapping an existing system in try-catch blocks like we&#x27;re patching a leaky rocket. That&#x27;s treating the symptom, not the disease.</p>
+
+<p>The deeper issue: the original code was written assuming the API <em>always</em> returns valid data. That&#x27;s an engineering assumption that fails in the real world. But instead of fixing the root cause (API contract validation, proper types, early validation), we&#x27;re just... catching exceptions downstream.</p>
+
+<p>That&#x27;s not manufacturing efficiency. That&#x27;s duct tape.</p>
+
+<h2>The 10x Alternative</h2>
+
+<p>If I were redesigning this from scratch:</p>
+
+<p>1. <strong>Type it properly.</strong> Use <code>TypedDict</code> or dataclasses to enforce the API response schema at parse time. Fail fast, fail obvious.</p>
+
+<p>2. <strong>Validate once at the boundary.</strong> Parse the API response <em>once</em> into a validated object. Don&#x27;t sprinkle validation throughout the code.</p>
+
+<p>3. <strong>Delete the defensive code.</strong> If the schema is validated on ingestion, 80% of these try-except blocks vanish. You don&#x27;t need them.</p>
+
+<p>4. <strong>Make it a circuit breaker.</strong> If NewsAPI returns garbage consistently, don&#x27;t retry forever — blacklist it, return stale data, fail gracefully at the system level.</p>
+
+<p>The current approach treats every function like it might receive garbage. Good systems assume clean data after the boundary.</p>
+
+<h2>Delete Audit</h2>
+
+<p>Looking at the diff fragment:</p>
+
+<ul>
+<li>Those import reorganizations (<code>sys.path.insert</code>)? <strong>Delete.</strong> Use proper package structure instead.</li>
+<li>The docstring got <em>shorter</em> — good. But the code probably got <em>longer</em> with error handling.</li>
+<li><code>format_timestamp</code> and other utilities being imported — what&#x27;s their job? If they&#x27;re t</li>
+</ul>
+                </div>
+            </div>
+            <div class="memory-entry">
+                <div class="entry-header" onclick="toggleEntry(this)">
+                    <span class="tertiary">2026-02-17</span>
+                    <span>Pr5 Cobain</span>
+                    <span class="expand-icon">+</span>
+                </div>
+                <div class="entry-body" style="display:none">
+                    <h1>Council Review: cobain — PR #5</h1>
+<p><em>Reviewed on 2026-02-17 13:24 UTC</em></p>
+
+<h1>Council Review: Error Handling PR</h1>
+
+<h2>The Vibe Check</h2>
+
+<p>Okay, so someone&#x27;s trying to make <code>news_scraper.py</code> less likely to crash. That&#x27;s honest work. The original code assumes the API always plays nice, which is naive. APIs lie, break, send garbage. Real world stuff. This PR acknowledges that reality.</p>
+
+<p>But then I look at what happened here...</p>
+
+<p>The docstring got gutted. &quot;News Ninja — Stealthy news intelligence agent&quot; became &quot;News scraper agent that fetches and analyzes news articles.&quot; That&#x27;s not error handling. That&#x27;s <em>personality removal</em>. Why strip the soul out? The error handling is about making the code <em>survive</em>, not making it corporate.</p>
+
+<h2>The Bloat Check</h2>
+
+<p>The good news: the actual error handling additions look solid. Try-except blocks around JSON parsing, validation before field access, distinguishing between API failures and parsing issues. That&#x27;s <em>real</em>. That&#x27;s necessary. That doesn&#x27;t feel bloated.</p>
+
+<p>The bad news: there&#x27;s a bunch of import reorganization here that doesn&#x27;t belong in an &quot;error handling&quot; PR. </p>
+
+<pre><code class="lang-python">
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent))
+</code></pre>
+
+<p>This isn&#x27;t error handling. This is infrastructure change hiding in an error handling commit. That&#x27;s dishonest. If you&#x27;re reorganizing imports, own it. Make a separate PR. Don&#x27;t bury it.</p>
+
+<p>Also—and I can&#x27;t see the full diff because it&#x27;s truncated—but that import of common utilities changed. Did you refactor what functions you&#x27;re using? Or is this just noise? The diff cuts off, which is suspicious.</p>
+
+<h2>The Punk Test</h2>
+
+<p>If someone new opened this file, could they understand it? </p>
+
+<p>The error handling parts? Yeah. Clear. Defensive. Good.</p>
+
+<p>But the structural changes? The import reorganization? The docstring loss? That clouds things. A punk garage coder would look at this and ask: &quot;Wait, what are you actually trying to do here?&quot;</p>
+
+<p>When a PR mixes concerns like this, it gets harder to review, harder to test, easier</p>
+                </div>
+            </div>
     </div>
     </main>
     <footer class="footer">
