@@ -72,6 +72,7 @@
     "icon": "\ud83d\udcec",
     "description": "Push alerts and daily digests to a Telegram chat",
     "category": "notifications",
+    "visibility": "private",
     "agents": [
       "telegram_notify"
     ],
@@ -87,6 +88,7 @@
     "icon": "\ud83d\udce7",
     "description": "Daily email digest of agent activity and memory updates",
     "category": "notifications",
+    "visibility": "private",
     "agents": [
       "gmail_digest"
     ],

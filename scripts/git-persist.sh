@@ -53,9 +53,13 @@ persist() {
     fi
     log_warn "Push attempt $i/$retries failed, rebasing and retrying..."
     if ! git pull --rebase origin "$branch" 2>/dev/null; then
-      # Rebase conflict — abort and retry with merge
-      git rebase --abort 2>/dev/null || true
-      git pull origin "$branch" --no-edit 2>/dev/null || true
+      # Rebase conflict — auto-resolve state.json by re-applying update
+      git checkout --theirs memory/state.json 2>/dev/null || true
+      git add memory/state.json 2>/dev/null || true
+      GIT_EDITOR=true git rebase --continue 2>/dev/null || {
+        git rebase --abort 2>/dev/null || true
+        git pull origin "$branch" --no-edit 2>/dev/null || true
+      }
     fi
     sleep "$((i * 2 + RANDOM % 3))"
   done
@@ -102,8 +106,12 @@ persist_many() {
     fi
     log_warn "Batch push attempt $i/$retries failed, retrying..."
     if ! git pull --rebase origin main 2>/dev/null; then
-      git rebase --abort 2>/dev/null || true
-      git pull origin main --no-edit 2>/dev/null || true
+      git checkout --theirs memory/state.json 2>/dev/null || true
+      git add memory/state.json 2>/dev/null || true
+      GIT_EDITOR=true git rebase --continue 2>/dev/null || {
+        git rebase --abort 2>/dev/null || true
+        git pull origin main --no-edit 2>/dev/null || true
+      }
     fi
     sleep "$((i * 2 + RANDOM % 3))"
   done

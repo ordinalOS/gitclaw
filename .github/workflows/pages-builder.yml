@@ -69,9 +69,16 @@ jobs:
             git commit -m "🧠 📺 Pages rebuild — $(date -u +%Y-%m-%dT%H:%MZ)" \
               --author="gitclaw[bot] <gitclaw[bot]@users.noreply.github.com>"
 
-            # Push with retry
+            # Push with retry (auto-resolve state.json conflicts)
             for i in 1 2 3; do
-              git pull --rebase origin main 2>/dev/null || true
+              if ! git pull --rebase origin main 2>/dev/null; then
+                git checkout --theirs memory/state.json 2>/dev/null || true
+                git add memory/state.json 2>/dev/null || true
+                GIT_EDITOR=true git rebase --continue 2>/dev/null || {
+                  git rebase --abort 2>/dev/null || true
+                  git pull origin main --no-edit 2>/dev/null || true
+                }
+              fi
               if git push origin main; then
                 echo "Pages pushed successfully"
                 break

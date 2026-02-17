@@ -1,5 +1,21 @@
 [
   {
+    "sha": "1904d19",
+    "date": "2026-02-17",
+    "time": "13:25",
+    "message": "newspaper-style dashboard overhaul: content previews, about page, changelog",
+    "author": "nightfallsnet",
+    "is_agent": false
+  },
+  {
+    "sha": "3f64a0f",
+    "date": "2026-02-17",
+    "time": "20:42",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T20:42Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "5c51991",
     "date": "2026-02-17",
     "time": "12:41",

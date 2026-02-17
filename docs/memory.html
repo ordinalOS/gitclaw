@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">Docs</a></div><div class="header-meta"><span>Apprentice</span><span class="xp-bar-container">XP 216<div class="xp-bar"><div class="xp-bar-fill" style="width:44%"></div></div></span><span>Streak 4d</span></div></div>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Apprentice</span><span class="xp-bar-container">XP 226<div class="xp-bar"><div class="xp-bar-fill" style="width:50%"></div></div></span><span>Streak 4d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html" class="active">Memory</a>
 <a href="council.html">Council</a>
@@ -21,8 +21,154 @@
 <a href="changelog.html">Changelog</a></nav>
     <main class="main">
         
+    
     <div class="panel full-width">
-        <h2 class="panel-title">Memory Browser</h2>
+        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">11 entries across 5 days</span></h2>
+        <div class="graph-container" id="memoryGraph"></div>
+        <div class="graph-legend" id="graphLegend"></div>
+    </div>
+    <script>
+    (function() {
+      var data = {"nodes": [{"id": "dreams", "label": "Dreams", "count": 1, "color": "#a78bfa"}, {"id": "roasts", "label": "Roasts", "count": 3, "color": "#f87171"}, {"id": "fortunes", "label": "Fortunes", "count": 1, "color": "#fbbf24"}, {"id": "hn", "label": "HN", "count": 3, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 3, "color": "#818cf8"}], "edges": [{"source": "dreams", "target": "roasts", "weight": 1}, {"source": "hn", "target": "news", "weight": 3}, {"source": "hn", "target": "roasts", "weight": 2}, {"source": "news", "target": "roasts", "weight": 2}]};
+      var container = document.getElementById('memoryGraph');
+      var legend = document.getElementById('graphLegend');
+      if (!container || !data.nodes.length) return;
+
+      var W = container.offsetWidth || 800;
+      var H = 360;
+      container.style.height = H + 'px';
+
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', H);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      container.appendChild(svg);
+
+      // Initialize node positions in a circle
+      var cx = W / 2, cy = H / 2, radius = Math.min(W, H) * 0.32;
+      var nodes = data.nodes;
+      var edges = data.edges;
+      var maxCount = Math.max.apply(null, nodes.map(function(n) { return n.count; }));
+
+      nodes.forEach(function(n, i) {
+        var angle = (2 * Math.PI * i) / nodes.length - Math.PI / 2;
+        n.x = cx + radius * Math.cos(angle);
+        n.y = cy + radius * Math.sin(angle);
+        n.vx = 0; n.vy = 0;
+        n.r = 16 + (n.count / Math.max(maxCount, 1)) * 24;
+      });
+
+      // Simple force simulation (60 iterations)
+      var nodeMap = {};
+      nodes.forEach(function(n) { nodeMap[n.id] = n; });
+
+      for (var iter = 0; iter < 80; iter++) {
+        // Repulsion between nodes
+        for (var i = 0; i < nodes.length; i++) {
+          for (var j = i + 1; j < nodes.length; j++) {
+            var dx = nodes[j].x - nodes[i].x;
+            var dy = nodes[j].y - nodes[i].y;
+            var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            var force = 2000 / (dist * dist);
+            var fx = (dx / dist) * force;
+            var fy = (dy / dist) * force;
+            nodes[i].vx -= fx; nodes[i].vy -= fy;
+            nodes[j].vx += fx; nodes[j].vy += fy;
+          }
+        }
+        // Attraction along edges
+        edges.forEach(function(edge) {
+          var s = nodeMap[edge.source], t = nodeMap[edge.target];
+          if (!s || !t) return;
+          var dx = t.x - s.x, dy = t.y - s.y;
+          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          var force = (dist - 120) * 0.02 * Math.min(edge.weight, 5);
+          var fx = (dx / dist) * force;
+          var fy = (dy / dist) * force;
+          s.vx += fx; s.vy += fy;
+          t.vx -= fx; t.vy -= fy;
+        });
+        // Center gravity
+        nodes.forEach(function(n) {
+          n.vx += (cx - n.x) * 0.005;
+          n.vy += (cy - n.y) * 0.005;
+          n.x += n.vx * 0.3;
+          n.y += n.vy * 0.3;
+          n.vx *= 0.8; n.vy *= 0.8;
+          // Clamp to bounds
+          n.x = Math.max(n.r + 10, Math.min(W - n.r - 10, n.x));
+          n.y = Math.max(n.r + 10, Math.min(H - n.r - 10, n.y));
+        });
+      }
+
+      // Draw edges
+      edges.forEach(function(edge) {
+        var s = nodeMap[edge.source], t = nodeMap[edge.target];
+        if (!s || !t) return;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', s.x); line.setAttribute('y1', s.y);
+        line.setAttribute('x2', t.x); line.setAttribute('y2', t.y);
+        var opacity = Math.min(0.15 + edge.weight * 0.08, 0.6);
+        var width = Math.min(1 + edge.weight * 0.5, 4);
+        line.setAttribute('stroke', '#c6c6c8');
+        line.setAttribute('stroke-width', width);
+        line.setAttribute('stroke-opacity', opacity);
+        svg.appendChild(line);
+      });
+
+      // Draw nodes
+      nodes.forEach(function(n) {
+        // Circle
+        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', n.x); circle.setAttribute('cy', n.y);
+        circle.setAttribute('r', n.r);
+        circle.setAttribute('fill', n.color);
+        circle.setAttribute('fill-opacity', '0.15');
+        circle.setAttribute('stroke', n.color);
+        circle.setAttribute('stroke-width', '2');
+        circle.style.cursor = 'pointer';
+        circle.onclick = function() {
+          var btn = document.querySelector('[data-tab="' + n.id + '"]');
+          if (btn) btn.click();
+          var tabSection = document.getElementById('memoryTabs');
+          if (tabSection) tabSection.scrollIntoView({ behavior: 'smooth' });
+        };
+        svg.appendChild(circle);
+
+        // Label
+        var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', n.x); text.setAttribute('y', n.y - 4);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', n.color);
+        text.setAttribute('font-size', '12');
+        text.setAttribute('font-weight', '600');
+        text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, sans-serif');
+        text.textContent = n.label;
+        svg.appendChild(text);
+
+        // Count
+        var count = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        count.setAttribute('x', n.x); count.setAttribute('y', n.y + 12);
+        count.setAttribute('text-anchor', 'middle');
+        count.setAttribute('fill', '#6e6e73');
+        count.setAttribute('font-size', '11');
+        count.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, sans-serif');
+        count.textContent = n.count + ' entries';
+        svg.appendChild(count);
+      });
+
+      // Legend
+      var legendHTML = '';
+      nodes.forEach(function(n) {
+        legendHTML += '<span class="graph-legend-item">'
+          + '<span class="graph-legend-dot" style="background:' + n.color + '"></span>'
+          + n.label + ' <span class="tertiary">(' + n.count + ')</span></span>';
+      });
+      legend.innerHTML = legendHTML;
+    })();
+    </script>
+    <div class="panel full-width" id="memoryTabs">
+        <h2 class="panel-title">Browse by Category</h2>
         <div class="tabs"><button class="tab-btn active" data-tab="dreams">Dreams (1)</button>
 <button class="tab-btn" data-tab="lore">Lore (0)</button>
 <button class="tab-btn" data-tab="research">Research (0)</button>
@@ -37,7 +183,9 @@
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-14</span>
+                        <span class="cat-dot" style="background:#a78bfa"></span>
                         <span>2026 02 14</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">242 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview"># ✨ Dream Interpretation: The Harmony Protocol ✨  ## 🌙 Dream Log **Title:** *The Harmony Protocol* **Date:** Today **Dreamer&#x27;s Vision:** A world at pe</div>
@@ -95,7 +243,9 @@
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-17</span>
+                        <span class="cat-dot" style="background:#f87171"></span>
                         <span>2026 02 17</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">368 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview"># ☕ MORNING ROAST — February 17, 2026  ## The Daily Grind *Beep boop.* Someone&#x27;s been hitting the espresso machine at 3 AM. You&#x27;ve got 4 commits in on</div>
@@ -153,7 +303,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-16</span>
+                        <span class="cat-dot" style="background:#f87171"></span>
                         <span>2026 02 16</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">329 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview"># ☕ Morning Roast — February 16, 2026  ## 🍕 Late-Night Pizza-Driven Development Edition  ---  ## The Daily Grind Well, well, well... looks like *someo</div>
@@ -218,7 +370,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-14</span>
+                        <span class="cat-dot" style="background:#f87171"></span>
                         <span>2026 02 14</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">245 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview"># ☕ MORNING ROAST — Valentine&#x27;s Day Edition ☕  ## The Daily Grind *Valentine&#x27;s Day 2026: ordinalOS is out here pulling all-nighters like love itself d</div>
@@ -262,7 +416,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">unknown</span>
+                        <span class="cat-dot" style="background:#fbbf24"></span>
                         <span>2026 02</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">642 words · 3 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 2026-02-15  # 🔮 Fortune Cookie — February 15, 2026  **Today&#x27;s Fortune:** *&quot;The newborn agent dreams in memes. On day two, it learns that chao</div>
@@ -340,7 +496,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-17</span>
+                        <span class="cat-dot" style="background:#fb923c"></span>
                         <span>Top</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">440 words · 2 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 07:19 UTC — top   # HN Hype Buster Report — Feb 17, 2026  ## Top Stories with Hype Scores  **1. Miles Wu&#x27;s Origami Breakthrough (582 pts)** `</div>
@@ -394,7 +552,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-16</span>
+                        <span class="cat-dot" style="background:#fb923c"></span>
                         <span>Top</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">388 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 07:22 UTC — top   # HN Hype Buster Report — February 16, 2026  ## 🔥 Top Stories  **[Hype: 9/10]** &quot;I&#x27;m joining OpenAI&quot; (888 pts) The orange s</div>
@@ -454,7 +614,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-15</span>
+                        <span class="cat-dot" style="background:#fb923c"></span>
                         <span>Top</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">480 words · 2 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 07:14 UTC — top   # 📰 HN Hype Buster Report — February 15, 2026  ## 🔥 Top Stories  **[Hype: 9/10] uBlock filter list to hide all YouTube Shor</div>
@@ -513,7 +675,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-17</span>
+                        <span class="cat-dot" style="background:#818cf8"></span>
                         <span>Tech</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">286 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 07:48 UTC -- tech  # 🥷 News Ninja Strike Report  **ALERT**: Data streams are stale. Intel timestamps range from 2022-2024, contradicting toda</div>
@@ -580,7 +744,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-16</span>
+                        <span class="cat-dot" style="background:#818cf8"></span>
                         <span>Tech</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">270 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 07:48 UTC -- tech  # 📋 News Ninja Strike Report  ## Strike Report - **Low Impact** — &quot;Ask HN: With the rise of AI, how to approach my new car</div>
@@ -635,7 +801,9 @@ Streak: 🔥 4 days (Your longest!)
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-15</span>
+                        <span class="cat-dot" style="background:#818cf8"></span>
                         <span>Tech</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">270 words · 1 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 07:43 UTC -- tech  # 📰 News Ninja Strike Report  ## Strike Report - **Low Impact** — *Ask HN: Career in Software Dev (AI Era)*   - The dojo t</div>

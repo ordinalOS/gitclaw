@@ -437,7 +437,7 @@ def header_bar(state: dict) -> str:
         f'<div class="header-left">'
         f'<span class="alive-dot {alive_cls}"></span>'
         f'<span class="header-title">\U0001f99e GitClaw</span>'
-        f'<a href="{repo_url}" class="header-link" target="_blank">Docs</a>'
+        f'<a href="{repo_url}" class="header-link" target="_blank">GitHub</a>'
         f'</div>'
         f'<div class="header-meta">'
         f'<span>{e(level)}</span>'
@@ -723,24 +723,213 @@ def generate_dashboard(state: dict, activity: list) -> str:
 
 
 def generate_memory_browser(state: dict) -> str:
-    """Generate the memory browser page with tabs."""
+    """Generate the memory browser page with network graph and rich tabbed views."""
     categories = [
-        ("dreams", "Dreams"),
-        ("lore", "Lore"),
-        ("research", "Research"),
-        ("roasts", "Roasts"),
-        ("fortunes", "Fortunes"),
-        ("hn", "HN"),
-        ("news", "News"),
-        ("crypto", "Crypto"),
-        ("stocks", "Stocks"),
+        ("dreams", "Dreams", "#a78bfa"),
+        ("lore", "Lore", "#60a5fa"),
+        ("research", "Research", "#34d399"),
+        ("roasts", "Roasts", "#f87171"),
+        ("fortunes", "Fortunes", "#fbbf24"),
+        ("hn", "HN", "#fb923c"),
+        ("news", "News", "#818cf8"),
+        ("crypto", "Crypto", "#2dd4bf"),
+        ("stocks", "Stocks", "#f472b6"),
     ]
 
+    # Build graph data: nodes = categories, edges = co-occurrence on same date
+    all_entries = {}
+    cat_counts = {}
+    date_cats = {}  # date -> set of categories that have entries on that date
+
+    for cat, label, color in categories:
+        entries = load_memory_files(cat)
+        all_entries[cat] = entries
+        cat_counts[cat] = len(entries)
+        for entry in entries:
+            d = entry.get("date", "")
+            if d:
+                if d not in date_cats:
+                    date_cats[d] = set()
+                date_cats[d].add(cat)
+
+    # Build edges: categories that share dates
+    edge_weights = {}
+    for d, cats in date_cats.items():
+        cat_list = sorted(cats)
+        for i in range(len(cat_list)):
+            for j in range(i + 1, len(cat_list)):
+                pair = (cat_list[i], cat_list[j])
+                edge_weights[pair] = edge_weights.get(pair, 0) + 1
+
+    # Serialize graph data as JSON for the JS renderer
+    graph_nodes = []
+    for cat, label, color in categories:
+        count = cat_counts.get(cat, 0)
+        if count > 0:
+            graph_nodes.append({"id": cat, "label": label, "count": count, "color": color})
+
+    graph_edges = []
+    for (a, b), weight in edge_weights.items():
+        graph_edges.append({"source": a, "target": b, "weight": weight})
+
+    graph_json = json.dumps({"nodes": graph_nodes, "edges": graph_edges})
+
+    # ── Network Graph ──
+    total_entries = sum(cat_counts.values())
+    total_dates = len(date_cats)
+    graph_html = f"""
+    <div class="panel full-width">
+        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">{total_entries} entries across {total_dates} days</span></h2>
+        <div class="graph-container" id="memoryGraph"></div>
+        <div class="graph-legend" id="graphLegend"></div>
+    </div>
+    <script>
+    (function() {{
+      var data = {graph_json};
+      var container = document.getElementById('memoryGraph');
+      var legend = document.getElementById('graphLegend');
+      if (!container || !data.nodes.length) return;
+
+      var W = container.offsetWidth || 800;
+      var H = 360;
+      container.style.height = H + 'px';
+
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', H);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      container.appendChild(svg);
+
+      // Initialize node positions in a circle
+      var cx = W / 2, cy = H / 2, radius = Math.min(W, H) * 0.32;
+      var nodes = data.nodes;
+      var edges = data.edges;
+      var maxCount = Math.max.apply(null, nodes.map(function(n) {{ return n.count; }}));
+
+      nodes.forEach(function(n, i) {{
+        var angle = (2 * Math.PI * i) / nodes.length - Math.PI / 2;
+        n.x = cx + radius * Math.cos(angle);
+        n.y = cy + radius * Math.sin(angle);
+        n.vx = 0; n.vy = 0;
+        n.r = 16 + (n.count / Math.max(maxCount, 1)) * 24;
+      }});
+
+      // Simple force simulation (60 iterations)
+      var nodeMap = {{}};
+      nodes.forEach(function(n) {{ nodeMap[n.id] = n; }});
+
+      for (var iter = 0; iter < 80; iter++) {{
+        // Repulsion between nodes
+        for (var i = 0; i < nodes.length; i++) {{
+          for (var j = i + 1; j < nodes.length; j++) {{
+            var dx = nodes[j].x - nodes[i].x;
+            var dy = nodes[j].y - nodes[i].y;
+            var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            var force = 2000 / (dist * dist);
+            var fx = (dx / dist) * force;
+            var fy = (dy / dist) * force;
+            nodes[i].vx -= fx; nodes[i].vy -= fy;
+            nodes[j].vx += fx; nodes[j].vy += fy;
+          }}
+        }}
+        // Attraction along edges
+        edges.forEach(function(edge) {{
+          var s = nodeMap[edge.source], t = nodeMap[edge.target];
+          if (!s || !t) return;
+          var dx = t.x - s.x, dy = t.y - s.y;
+          var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+          var force = (dist - 120) * 0.02 * Math.min(edge.weight, 5);
+          var fx = (dx / dist) * force;
+          var fy = (dy / dist) * force;
+          s.vx += fx; s.vy += fy;
+          t.vx -= fx; t.vy -= fy;
+        }});
+        // Center gravity
+        nodes.forEach(function(n) {{
+          n.vx += (cx - n.x) * 0.005;
+          n.vy += (cy - n.y) * 0.005;
+          n.x += n.vx * 0.3;
+          n.y += n.vy * 0.3;
+          n.vx *= 0.8; n.vy *= 0.8;
+          // Clamp to bounds
+          n.x = Math.max(n.r + 10, Math.min(W - n.r - 10, n.x));
+          n.y = Math.max(n.r + 10, Math.min(H - n.r - 10, n.y));
+        }});
+      }}
+
+      // Draw edges
+      edges.forEach(function(edge) {{
+        var s = nodeMap[edge.source], t = nodeMap[edge.target];
+        if (!s || !t) return;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', s.x); line.setAttribute('y1', s.y);
+        line.setAttribute('x2', t.x); line.setAttribute('y2', t.y);
+        var opacity = Math.min(0.15 + edge.weight * 0.08, 0.6);
+        var width = Math.min(1 + edge.weight * 0.5, 4);
+        line.setAttribute('stroke', '#c6c6c8');
+        line.setAttribute('stroke-width', width);
+        line.setAttribute('stroke-opacity', opacity);
+        svg.appendChild(line);
+      }});
+
+      // Draw nodes
+      nodes.forEach(function(n) {{
+        // Circle
+        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', n.x); circle.setAttribute('cy', n.y);
+        circle.setAttribute('r', n.r);
+        circle.setAttribute('fill', n.color);
+        circle.setAttribute('fill-opacity', '0.15');
+        circle.setAttribute('stroke', n.color);
+        circle.setAttribute('stroke-width', '2');
+        circle.style.cursor = 'pointer';
+        circle.onclick = function() {{
+          var btn = document.querySelector('[data-tab="' + n.id + '"]');
+          if (btn) btn.click();
+          var tabSection = document.getElementById('memoryTabs');
+          if (tabSection) tabSection.scrollIntoView({{ behavior: 'smooth' }});
+        }};
+        svg.appendChild(circle);
+
+        // Label
+        var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', n.x); text.setAttribute('y', n.y - 4);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', n.color);
+        text.setAttribute('font-size', '12');
+        text.setAttribute('font-weight', '600');
+        text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, sans-serif');
+        text.textContent = n.label;
+        svg.appendChild(text);
+
+        // Count
+        var count = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        count.setAttribute('x', n.x); count.setAttribute('y', n.y + 12);
+        count.setAttribute('text-anchor', 'middle');
+        count.setAttribute('fill', '#6e6e73');
+        count.setAttribute('font-size', '11');
+        count.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, sans-serif');
+        count.textContent = n.count + ' entries';
+        svg.appendChild(count);
+      }});
+
+      // Legend
+      var legendHTML = '';
+      nodes.forEach(function(n) {{
+        legendHTML += '<span class="graph-legend-item">'
+          + '<span class="graph-legend-dot" style="background:' + n.color + '"></span>'
+          + n.label + ' <span class="tertiary">(' + n.count + ')</span></span>';
+      }});
+      legend.innerHTML = legendHTML;
+    }})();
+    </script>"""
+
+    # ── Tabbed Content with rich data ──
     tabs_html = ""
     panels_html = ""
 
-    for i, (cat, label) in enumerate(categories):
-        entries = load_memory_files(cat)
+    for i, (cat, label, color) in enumerate(categories):
+        entries = all_entries.get(cat, [])
         active = " active" if i == 0 else ""
 
         tabs_html += f'<button class="tab-btn{active}" data-tab="{cat}">{label} ({len(entries)})</button>\n'
@@ -750,15 +939,18 @@ def generate_memory_browser(state: dict) -> str:
             for entry in entries[:20]:
                 content_html = md_to_html(entry["content"][:2000])
                 preview = entry["content"][:150].replace("\n", " ").strip()
-                preview_html = f'<div class="entry-preview">{e(preview)}</div>' if preview else ""
+                word_count = len(entry["content"].split())
+                read_time = max(1, word_count // 200)
                 entries_html += f"""
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">{e(entry['date'])}</span>
+                        <span class="cat-dot" style="background:{color}"></span>
                         <span>{e(entry['title'][:80])}</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">{word_count} words · {read_time} min</span>
                         <span class="expand-icon">+</span>
                     </div>
-                    {preview_html}
+                    <div class="entry-preview">{e(preview)}</div>
                     <div class="entry-body" style="display:none">
                         {content_html}
                     </div>
@@ -769,8 +961,9 @@ def generate_memory_browser(state: dict) -> str:
         panels_html += f'<div class="tab-panel{active}" id="tab-{cat}">{entries_html}</div>\n'
 
     body = f"""
-    <div class="panel full-width">
-        <h2 class="panel-title">Memory Browser</h2>
+    {graph_html}
+    <div class="panel full-width" id="memoryTabs">
+        <h2 class="panel-title">Browse by Category</h2>
         <div class="tabs">{tabs_html}</div>
         <div class="tab-content">{panels_html}</div>
     </div>"""
@@ -1060,11 +1253,18 @@ def generate_plugins_page(state: dict) -> str:
         if setup_url:
             setup_html = f'<a class="plugin-link" href="{e(setup_url)}" target="_blank">Setup Guide ↗</a>'
 
+        # Visibility badge
+        visibility = plugin.get("visibility", "public")
+        vis_html = ""
+        if visibility == "private":
+            vis_html = '<span class="vis-badge vis-private">Private Only</span>'
+
         cards += f"""
         <div class="plugin-card {card_cls}">
           <div class="plugin-header">
             <span class="plugin-icon">{icon}</span>
             <span class="plugin-name">{name}</span>
+            {vis_html}
             <span class="plugin-status {status_cls}">{status_label}</span>
           </div>
           <div class="plugin-desc">{desc}</div>

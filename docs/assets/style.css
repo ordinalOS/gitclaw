@@ -921,6 +921,21 @@ body {
   text-decoration: underline;
 }
 
+.vis-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 980px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vis-private {
+  background: rgba(255, 59, 48, 0.08);
+  color: #ff3b30;
+  border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
 .setup-box {
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
@@ -1351,4 +1366,47 @@ body {
   .arch-box {
     max-width: 100%;
   }
+}
+
+/* ── Network Graph (Memory) ──────────────────────────────────────────────── */
+
+.graph-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.graph-container svg {
+  display: block;
+}
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 12px;
+}
+
+.graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.graph-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cat-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
