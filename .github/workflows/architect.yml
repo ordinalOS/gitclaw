@@ -1,0 +1,151 @@
+# ============================================================================
+# Architect Agent — GitClaw's autonomous improvement engine.
+# Analyzes the repo, generates improvement proposals, and creates PRs.
+# The Council of 7 then reviews and votes on each proposal.
+# ============================================================================
+name: "🏗️ Architect"
+
+on:
+  workflow_call:
+    inputs:
+      proposal_context:
+        required: false
+        type: string
+        default: ""
+      issue_number:
+        required: false
+        type: string
+        default: "0"
+  workflow_dispatch:
+    inputs:
+      proposal_context:
+        description: "Hint for what to improve (optional)"
+        required: false
+        type: string
+        default: ""
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: write
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Check if enabled
+        id: check
+        run: |
+          if grep -q "enable: architect" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Architect not enabled in agent.md"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Analyze repository
+        if: steps.check.outputs.enabled == 'true'
+        id: analyze
+        run: |
+          cd agents
+          ANALYSIS=$(python3 architect.py analyze)
+
+          echo "analysis<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$ANALYSIS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Generate proposal
+        if: steps.check.outputs.enabled == 'true'
+        id: generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANALYSIS_JSON: ${{ steps.analyze.outputs.analysis }}
+          PROPOSAL_CONTEXT: ${{ inputs.proposal_context }}
+        run: |
+          cd agents
+          PROPOSAL=$(python3 architect.py generate)
+
+          echo "proposal<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$PROPOSAL" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Apply proposal and create PR
+        if: steps.check.outputs.enabled == 'true'
+        id: apply
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROPOSAL_JSON: ${{ steps.generate.outputs.proposal }}
+        run: |
+          cd agents
+          RESULT=$(python3 architect.py apply)
+
+          PR_NUM=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('pr_number','0'))")
+          BRANCH=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('branch',''))")
+
+          echo "pr_number=$PR_NUM" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "Created PR #$PR_NUM on branch $BRANCH"
+
+      - name: Notify on issue (if triggered by /propose)
+        if: steps.check.outputs.enabled == 'true' && inputs.issue_number != '0' && inputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUM: ${{ inputs.issue_number }}
+          PR_NUM: ${{ steps.apply.outputs.pr_number }}
+          BRANCH: ${{ steps.apply.outputs.branch }}
+        run: |
+          MSG="## 🏗️ Architect Proposal Created
+
+          I've analyzed the repo and created a PR for review:
+
+          - **PR:** #$PR_NUM
+          - **Branch:** \`$BRANCH\`
+
+          The Council of 7 will now review and vote on this proposal.
+
+          — 🏗️ *The Architect*"
+
+          gh api repos/${{ github.repository }}/issues/$ISSUE_NUM/comments \
+            -f body="$MSG"
+
+      - name: Persist state (back on main)
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          git checkout main 2>/dev/null || true
+          source scripts/git-persist.sh
+          persist "memory/state.json" "🏗️ Architect proposal logged"
+
+      - name: Post disabled notice
+        if: steps.check.outputs.enabled == 'false' && inputs.issue_number != '0' && inputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUM: ${{ inputs.issue_number }}
+        run: |
+          MSG="## 🏗️ Architect Not Enabled
+
+          The Architect agent is not currently enabled. To enable it, add this line to \`agent.md\`:
+
+          \`\`\`
+          enable: architect
+          \`\`\`
+
+          — 🏗️ *The Architect*"
+
+          gh api repos/${{ github.repository }}/issues/$ISSUE_NUM/comments \
+            -f body="$MSG"

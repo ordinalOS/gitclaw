@@ -62,3 +62,39 @@ features:
     query: false                 # /sol price, balance, quote, network
     monitor: false               # Scheduled wallet/price monitoring
     builder: false               # SBF verifiable builds
+
+  # Architect & Council Plugin (optional — enable via agent.md)
+  architect:
+    enabled: false               # Autonomous PR creation
+    schedule: "0 6 * * *"        # Daily at 6 AM UTC
+    max_files_per_proposal: 3    # Max files changed per PR
+    goal_axes:
+      - performance
+      - security
+      - maintainability
+      - developer_experience
+      - cost_efficiency
+
+  council:
+    enabled: false               # Council of 7 PR review
+    approve_threshold: 4         # Votes needed to auto-merge
+    reject_threshold: 4          # Votes needed to auto-close
+    members:
+      - zuckerberg
+      - wonderful
+      - musk
+      - toly
+      - satoshi
+      - cia
+      - cobain
+
+  pages:
+    enabled: false               # GitHub Pages site builder
+    source: "docs/"              # Pages source directory
+    refresh_interval: 4          # Rebuild every N hours
+
+# Architect & Council XP Awards
+  xp_per_proposal: 50
+  xp_per_council_review: 10
+  xp_per_council_tally: 20
+  xp_per_page_build: 5

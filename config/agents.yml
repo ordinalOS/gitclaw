@@ -168,6 +168,101 @@ agents:
     plugin: "solana"
     enabled: false
 
+# ── Architect & Council Plugin Agents (optional) ──────────────────────────
+
+  architect:
+    name: "Architect"
+    emoji: "🏗️"
+    description: "Autonomously analyzes the repo and proposes code improvements as PRs"
+    trigger: "schedule"
+    schedule: "0 6 * * *"
+    command: "/propose"
+    prompt_file: "templates/prompts/architect.md"
+    plugin: "architect"
+    enabled: false
+
+  council_zuckerberg:
+    name: "Council: Zuckerberg"
+    emoji: "👓"
+    description: "Move fast and break things — velocity-focused council reviewer"
+    trigger: "pull_request"
+    prompt_file: "templates/prompts/council-zuckerberg.md"
+    plugin: "council"
+    enabled: false
+
+  council_wonderful:
+    name: "Council: Mr. Wonderful"
+    emoji: "💰"
+    description: "ROI-obsessed Shark Tank dealmaker council reviewer"
+    trigger: "pull_request"
+    prompt_file: "templates/prompts/council-wonderful.md"
+    plugin: "council"
+    enabled: false
+
+  council_musk:
+    name: "Council: Musk"
+    emoji: "🚀"
+    description: "First principles, 10x ambition, contrarian council reviewer"
+    trigger: "pull_request"
+    prompt_file: "templates/prompts/council-musk.md"
+    plugin: "council"
+    enabled: false
+
+  council_toly:
+    name: "Council: Toly"
+    emoji: "⚡"
+    description: "Throughput-obsessed, parallel execution, crypto-native council reviewer"
+    trigger: "pull_request"
+    prompt_file: "templates/prompts/council-toly.md"
+    plugin: "council"
+    enabled: false
+
+  council_satoshi:
+    name: "Council: Satoshi"
+    emoji: "₿"
+    description: "Minimalist, trustless, privacy-focused council reviewer"
+    trigger: "pull_request"
+    prompt_file: "templates/prompts/council-satoshi.md"
+    plugin: "council"
+    enabled: false
+
+  council_cia:
+    name: "Council: CIA"
+    emoji: "🕵️"
+    description: "Classified briefing format, OPSEC-focused council reviewer"
+    trigger: "pull_request"
+    prompt_file: "templates/prompts/council-cia.md"
+    plugin: "council"
+    enabled: false
+
+  council_cobain:
+    name: "Council: Cobain"
+    emoji: "🎸"
+    description: "Anti-establishment, raw authenticity, anti-bloat council reviewer"
+    trigger: "pull_request"
+    prompt_file: "templates/prompts/council-cobain.md"
+    plugin: "council"
+    enabled: false
+
+  pages_builder:
+    name: "Pages Builder"
+    emoji: "📺"
+    description: "Builds the Bloomberg-terminal GitHub Pages frontend from memory data"
+    trigger: "push"
+    schedule: "0 */4 * * *"
+    prompt_file: null
+    plugin: "pages"
+    enabled: false
+
+  proposal_lint:
+    name: "Proposal Lint"
+    emoji: "🔍"
+    description: "Syntax gate for Architect PRs — validates Python and YAML"
+    trigger: "pull_request"
+    prompt_file: null
+    plugin: "architect"
+    enabled: false
+
 # Global settings for all agents
 defaults:
   provider: "anthropic"

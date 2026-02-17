@@ -1,0 +1,80 @@
+# ============================================================================
+# Pages Builder — Generates GitClaw's Bloomberg-terminal GitHub Pages site.
+# Reads memory files and state, generates static HTML in docs/.
+# ============================================================================
+name: "📺 Pages Builder"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'memory/**'
+      - 'config/**'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */4 * * *'  # Rebuild every 4 hours
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Check if enabled
+        id: check
+        run: |
+          if grep -q "enable: pages-builder" agent.md 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Pages Builder not enabled in agent.md"
+          fi
+
+      - name: Set up Python
+        if: steps.check.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build site
+        if: steps.check.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          cd agents
+          python3 pages_builder.py
+
+      - name: Persist docs
+        if: steps.check.outputs.enabled == 'true'
+        run: |
+          source scripts/git-persist.sh
+          git add docs/ 2>/dev/null || true
+
+          if ! git diff --cached --quiet 2>/dev/null; then
+            update_state '.stats.pages_built += 1 | .xp += 5'
+            git add memory/state.json
+            git commit -m "🧠 📺 Pages rebuild — $(date -u +%Y-%m-%dT%H:%MZ)" \
+              --author="gitclaw[bot] <gitclaw[bot]@users.noreply.github.com>"
+
+            # Push with retry
+            for i in 1 2 3; do
+              git pull --rebase origin main 2>/dev/null || true
+              if git push origin main; then
+                echo "Pages pushed successfully"
+                break
+              fi
+              echo "Push attempt $i failed, retrying..."
+              sleep $((i * 2))
+            done
+          else
+            echo "No changes to docs/, skipping commit"
+          fi

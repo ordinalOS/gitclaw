@@ -1,0 +1,95 @@
+# ============================================================================
+# Council Member — Reusable workflow for individual council reviews.
+# Called by council-review.yml for each of the 7 personas.
+# ============================================================================
+name: "⚖️ Council Member"
+
+on:
+  workflow_call:
+    inputs:
+      persona:
+        required: true
+        type: string
+      pr_number:
+        required: true
+        type: string
+      pr_title:
+        required: true
+        type: string
+      pr_body:
+        required: true
+        type: string
+      pr_diff:
+        required: true
+        type: string
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Summon council member
+        id: review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          COUNCIL_PERSONA: ${{ inputs.persona }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          PR_TITLE: ${{ inputs.pr_title }}
+          PR_BODY: ${{ inputs.pr_body }}
+          PR_DIFF: ${{ inputs.pr_diff }}
+        run: |
+          cd agents
+          REVIEW=$(python3 council_member.py)
+
+          echo "review<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$REVIEW" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Post review comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEW_BODY: ${{ steps.review.outputs.review }}
+          PR_NUM: ${{ inputs.pr_number }}
+        run: |
+          gh api repos/${{ github.repository }}/issues/$PR_NUM/comments \
+            -f body="$REVIEW_BODY"
+
+      - name: Archive review
+        env:
+          REVIEW_CONTENT: ${{ steps.review.outputs.review }}
+          COUNCIL_PERSONA: ${{ inputs.persona }}
+          PR_NUM: ${{ inputs.pr_number }}
+        run: |
+          mkdir -p memory/council
+          {
+            echo "# Council Review: $COUNCIL_PERSONA — PR #$PR_NUM"
+            echo "_Reviewed on $(date -u +"%Y-%m-%d %H:%M UTC")_"
+            echo ""
+            printf '%s\n' "$REVIEW_CONTENT"
+          } > "memory/council/$(date -u +%Y-%m-%d)-pr${PR_NUM}-${COUNCIL_PERSONA}.md"
+
+      - name: Persist
+        env:
+          COUNCIL_PERSONA: ${{ inputs.persona }}
+          PR_NUM: ${{ inputs.pr_number }}
+        run: |
+          source scripts/git-persist.sh
+          update_state '.stats.council_reviews += 1 | .xp += 10'
+          persist_many "⚖️ Council: $COUNCIL_PERSONA reviewed PR #$PR_NUM" \
+            "memory/council/" "memory/state.json"

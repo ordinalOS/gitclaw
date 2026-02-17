@@ -1,0 +1,250 @@
+# ============================================================================
+# Council Review — Orchestrates the Council of 7 for Architect PRs.
+# Gathers PR context, dispatches 7 parallel persona reviews,
+# tallies votes, and auto-merges or rejects.
+# ============================================================================
+name: "⚖️ Council of 7"
+
+on:
+  pull_request:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to review"
+        required: true
+        type: string
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: write
+
+jobs:
+  # ── Check if this is an Architect PR ────────────────────────────────────
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      should_review: ${{ steps.check.outputs.should_review }}
+    steps:
+      - name: Check if council should review
+        id: check
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "should_review=true" >> "$GITHUB_OUTPUT"
+          elif [ "$PR_AUTHOR" = "github-actions[bot]" ]; then
+            echo "should_review=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_review=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping: PR author is $PR_AUTHOR, not a bot PR"
+          fi
+
+  # ── Gather PR context ───────────────────────────────────────────────────
+  context:
+    needs: gate
+    if: needs.gate.outputs.should_review == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      pr_diff: ${{ steps.gather.outputs.pr_diff }}
+      pr_title: ${{ steps.gather.outputs.pr_title }}
+      pr_body: ${{ steps.gather.outputs.pr_body }}
+      pr_number: ${{ steps.gather.outputs.pr_number }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Gather PR information
+        id: gather
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_PR_NUM: ${{ inputs.pr_number }}
+          EVENT_PR_NUM: ${{ github.event.pull_request.number }}
+        run: |
+          PR_NUM="${INPUT_PR_NUM:-$EVENT_PR_NUM}"
+
+          TITLE=$(gh pr view "$PR_NUM" --json title --jq '.title' 2>/dev/null || echo "Untitled")
+          BODY=$(gh pr view "$PR_NUM" --json body --jq '.body' 2>/dev/null || echo "")
+          DIFF=$(gh pr diff "$PR_NUM" 2>/dev/null | head -500 || echo "No diff available")
+
+          echo "pr_number=$PR_NUM" >> "$GITHUB_OUTPUT"
+
+          echo "pr_title<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$TITLE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          echo "pr_body<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          echo "pr_diff<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DIFF" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+  # ── Council Members (7 parallel reviews) ────────────────────────────────
+  zuckerberg:
+    needs: context
+    uses: ./.github/workflows/council-member.yml
+    with:
+      persona: "zuckerberg"
+      pr_number: ${{ needs.context.outputs.pr_number }}
+      pr_title: ${{ needs.context.outputs.pr_title }}
+      pr_body: ${{ needs.context.outputs.pr_body }}
+      pr_diff: ${{ needs.context.outputs.pr_diff }}
+    secrets: inherit
+
+  wonderful:
+    needs: context
+    uses: ./.github/workflows/council-member.yml
+    with:
+      persona: "wonderful"
+      pr_number: ${{ needs.context.outputs.pr_number }}
+      pr_title: ${{ needs.context.outputs.pr_title }}
+      pr_body: ${{ needs.context.outputs.pr_body }}
+      pr_diff: ${{ needs.context.outputs.pr_diff }}
+    secrets: inherit
+
+  musk:
+    needs: context
+    uses: ./.github/workflows/council-member.yml
+    with:
+      persona: "musk"
+      pr_number: ${{ needs.context.outputs.pr_number }}
+      pr_title: ${{ needs.context.outputs.pr_title }}
+      pr_body: ${{ needs.context.outputs.pr_body }}
+      pr_diff: ${{ needs.context.outputs.pr_diff }}
+    secrets: inherit
+
+  toly:
+    needs: context
+    uses: ./.github/workflows/council-member.yml
+    with:
+      persona: "toly"
+      pr_number: ${{ needs.context.outputs.pr_number }}
+      pr_title: ${{ needs.context.outputs.pr_title }}
+      pr_body: ${{ needs.context.outputs.pr_body }}
+      pr_diff: ${{ needs.context.outputs.pr_diff }}
+    secrets: inherit
+
+  satoshi:
+    needs: context
+    uses: ./.github/workflows/council-member.yml
+    with:
+      persona: "satoshi"
+      pr_number: ${{ needs.context.outputs.pr_number }}
+      pr_title: ${{ needs.context.outputs.pr_title }}
+      pr_body: ${{ needs.context.outputs.pr_body }}
+      pr_diff: ${{ needs.context.outputs.pr_diff }}
+    secrets: inherit
+
+  cia:
+    needs: context
+    uses: ./.github/workflows/council-member.yml
+    with:
+      persona: "cia"
+      pr_number: ${{ needs.context.outputs.pr_number }}
+      pr_title: ${{ needs.context.outputs.pr_title }}
+      pr_body: ${{ needs.context.outputs.pr_body }}
+      pr_diff: ${{ needs.context.outputs.pr_diff }}
+    secrets: inherit
+
+  cobain:
+    needs: context
+    uses: ./.github/workflows/council-member.yml
+    with:
+      persona: "cobain"
+      pr_number: ${{ needs.context.outputs.pr_number }}
+      pr_title: ${{ needs.context.outputs.pr_title }}
+      pr_body: ${{ needs.context.outputs.pr_body }}
+      pr_diff: ${{ needs.context.outputs.pr_diff }}
+    secrets: inherit
+
+  # ── Tally Votes ─────────────────────────────────────────────────────────
+  tally:
+    needs: [context, zuckerberg, wonderful, musk, toly, satoshi, cia, cobain]
+    if: always() && needs.context.result == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Count votes and decide
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ needs.context.outputs.pr_number }}
+        run: |
+          # Fetch all PR comments
+          COMMENTS=$(gh api repos/${{ github.repository }}/issues/$PR_NUM/comments \
+            --jq '.[].body' 2>/dev/null || echo "")
+
+          APPROVES=$(echo "$COMMENTS" | grep -c "^VOTE: APPROVE" || true)
+          REJECTS=$(echo "$COMMENTS" | grep -c "^VOTE: REJECT" || true)
+          REVISES=$(echo "$COMMENTS" | grep -c "^VOTE: REVISE" || true)
+          TOTAL=$((APPROVES + REJECTS + REVISES))
+
+          echo "Votes: APPROVE=$APPROVES REJECT=$REJECTS REVISE=$REVISES TOTAL=$TOTAL"
+
+          TALLY_MSG="## ⚖️ Council of 7 — Final Tally
+
+          | Vote | Count |
+          |------|-------|
+          | APPROVE | $APPROVES |
+          | REJECT | $REJECTS |
+          | REVISE | $REVISES |
+
+          **Total votes cast:** $TOTAL / 7"
+
+          if [ "$APPROVES" -ge 4 ]; then
+            VERDICT="**APPROVED** — The Council has spoken. Auto-merging."
+            echo "verdict=approved" >> "$GITHUB_OUTPUT"
+          elif [ "$REJECTS" -ge 4 ]; then
+            VERDICT="**REJECTED** — The Council has spoken. Closing PR."
+            echo "verdict=rejected" >> "$GITHUB_OUTPUT"
+          else
+            VERDICT="**NEEDS REVISION** — The Council requests changes."
+            echo "verdict=revise" >> "$GITHUB_OUTPUT"
+          fi
+
+          FULL_MSG="$TALLY_MSG
+
+          $VERDICT
+
+          — ⚖️ *GitClaw Council of 7*"
+
+          gh api repos/${{ github.repository }}/issues/$PR_NUM/comments \
+            -f body="$FULL_MSG"
+
+          # Act on verdict
+          if [ "$APPROVES" -ge 4 ]; then
+            gh pr merge "$PR_NUM" --merge || echo "Auto-merge failed — may need manual merge"
+          elif [ "$REJECTS" -ge 4 ]; then
+            gh pr close "$PR_NUM" || echo "PR close failed"
+          fi
+
+      - name: Archive tally
+        env:
+          PR_NUM: ${{ needs.context.outputs.pr_number }}
+        run: |
+          mkdir -p memory/council
+          {
+            echo "# Council Tally — PR #$PR_NUM"
+            echo "_Tallied on $(date -u +"%Y-%m-%d %H:%M UTC")_"
+            echo ""
+            echo "Final verdict recorded."
+          } > "memory/council/$(date -u +%Y-%m-%d)-pr${PR_NUM}-tally.md"
+
+      - name: Persist
+        env:
+          PR_NUM: ${{ needs.context.outputs.pr_number }}
+        run: |
+          source scripts/git-persist.sh
+          update_state '.stats.council_tallies += 1 | .xp += 20'
+          persist_many "⚖️ Council tally: PR #$PR_NUM" \
+            "memory/council/" "memory/state.json"

@@ -1,0 +1,103 @@
+# ============================================================================
+# Proposal Lint — Syntax gate for Architect PRs.
+# Runs basic validation before the Council reviews.
+# ============================================================================
+name: "🔍 Proposal Lint"
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  lint:
+    # Only lint Architect PRs
+    if: startsWith(github.head_ref, 'feat/architect-')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Python syntax check
+        id: python_lint
+        run: |
+          ERRORS=""
+          for f in agents/*.py; do
+            if ! python3 -m py_compile "$f" 2>/tmp/pyerr; then
+              ERRORS="$ERRORS\n$(cat /tmp/pyerr)"
+            fi
+          done
+
+          if [ -n "$ERRORS" ]; then
+            echo "status=failed" >> "$GITHUB_OUTPUT"
+            echo "errors<<EOF" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "$ERRORS" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "status=passed" >> "$GITHUB_OUTPUT"
+            echo "All Python files pass syntax check"
+          fi
+
+      - name: YAML validation
+        id: yaml_lint
+        run: |
+          python3 -c "
+          import sys
+          errors = []
+          try:
+              import yaml
+              from pathlib import Path
+              for f in Path('.github/workflows').glob('*.yml'):
+                  try:
+                      yaml.safe_load(f.read_text())
+                  except Exception as e:
+                      errors.append(f'{f}: {e}')
+          except ImportError:
+              print('PyYAML not available, skipping YAML check')
+              sys.exit(0)
+
+          if errors:
+              for e in errors:
+                  print(e, file=sys.stderr)
+              sys.exit(1)
+          print('All YAML files valid')
+          "
+
+      - name: Post lint result
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUM: ${{ github.event.pull_request.number }}
+          LINT_STATUS: ${{ steps.python_lint.outputs.status }}
+          LINT_ERRORS: ${{ steps.python_lint.outputs.errors }}
+        run: |
+          if [ "$LINT_STATUS" = "passed" ]; then
+            MSG="## 🔍 Lint Gate: PASSED
+
+          All syntax checks passed. Council review may proceed.
+
+          — 🔍 *Proposal Lint*"
+          else
+            MSG="## 🔍 Lint Gate: FAILED
+
+          Syntax errors detected:
+          \`\`\`
+          $LINT_ERRORS
+          \`\`\`
+
+          Council review is blocked until lint passes.
+
+          — 🔍 *Proposal Lint*"
+          fi
+
+          gh api repos/${{ github.repository }}/issues/$PR_NUM/comments \
+            -f body="$MSG"
