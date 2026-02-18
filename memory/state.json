@@ -5,8 +5,8 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 291,
-  "level": "Apprentice",
+  "xp": 341,
+  "level": "Journeyman",
   "stats": {
     "issues_triaged": 0,
     "prs_reviewed": 0,
@@ -26,7 +26,8 @@
     "crypto_analyses": 0,
     "stock_analyses": 0,
     "pages_built": 25,
-    "council_reviews": 2
+    "council_reviews": 2,
+    "proposals_made": 1
   },
   "achievements": [],
   "last_active": "2026-02-18",
