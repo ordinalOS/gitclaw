@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Journeyman</span><span class="xp-bar-container">XP 361<div class="xp-bar"><div class="xp-bar-fill" style="width:30%"></div></div></span><span>Streak 5d</span></div></div>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Journeyman</span><span class="xp-bar-container">XP 371<div class="xp-bar"><div class="xp-bar-fill" style="width:35%"></div></div></span><span>Streak 5d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html" class="active">Memory</a>
 <a href="council.html">Council</a>
@@ -23,13 +23,13 @@
         
     
     <div class="panel full-width">
-        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">19 entries across 5 days</span></h2>
+        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">20 entries across 5 days</span></h2>
         <div class="graph-container" id="memoryGraph"></div>
         <div class="graph-legend" id="graphLegend"></div>
     </div>
     <script>
     (function() {
-      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 3, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 4, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 4, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 8, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 2}, {"source": "council", "target": "news", "weight": 2}, {"source": "council", "target": "roasts", "weight": 1}, {"source": "hn", "target": "news", "weight": 4}, {"source": "hn", "target": "roasts", "weight": 2}, {"source": "news", "target": "roasts", "weight": 2}]};
+      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 4, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 4, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 4, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 8, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 2}, {"source": "council", "target": "news", "weight": 2}, {"source": "council", "target": "roasts", "weight": 2}, {"source": "hn", "target": "news", "weight": 4}, {"source": "hn", "target": "roasts", "weight": 3}, {"source": "news", "target": "roasts", "weight": 3}]};
       var container = document.getElementById('memoryGraph');
       var legend = document.getElementById('graphLegend');
       if (!container || !data.nodes.length) return;
@@ -171,7 +171,7 @@
         <h2 class="panel-title">Browse by Category</h2>
         <div class="tabs"><button class="tab-btn active" data-tab="lore">Lore (0)</button>
 <button class="tab-btn" data-tab="research">Research (0)</button>
-<button class="tab-btn" data-tab="roasts">Roasts (3)</button>
+<button class="tab-btn" data-tab="roasts">Roasts (4)</button>
 <button class="tab-btn" data-tab="hn">HN (4)</button>
 <button class="tab-btn" data-tab="news">News (4)</button>
 <button class="tab-btn" data-tab="crypto">Crypto (0)</button>
@@ -182,6 +182,57 @@
         <div class="tab-content"><div class="tab-panel active" id="tab-lore"><div class="empty">No entries yet</div></div>
 <div class="tab-panel" id="tab-research"><div class="empty">No entries yet</div></div>
 <div class="tab-panel" id="tab-roasts">
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-18</span>
+                        <span class="cat-dot" style="background:#f87171"></span>
+                        <span>2026 02 18</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">360 words · 1 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview"># ☕ Morning Roast — February 18, 2026  ## The Daily Grind *Late-night pizza-driven development has left the repo in a beautifully chaotic state. It&#x27;s</div>
+                    <div class="entry-body" style="display:none">
+                        <h1>☕ Morning Roast — February 18, 2026</h1>
+
+<h2>The Daily Grind</h2>
+<p><em>Late-night pizza-driven development has left the repo in a beautifully chaotic state. It&#x27;s like watching someone make espresso with their eyes closed — somehow, it still hits.</em></p>
+
+<p>☕☕☕☕☕</p>
+
+<h2>Open Orders ☕</h2>
+<p>Your current brew has <strong>4 open issues</strong> on the counter:</p>
+
+<ul>
+<li><strong>#4: 📡 Solana Monitor</strong> — Still percolating! The blockchain monitor is actively watching the Solana network like a hawk. No signs of cooling down.</li>
+<li><strong>#3: 🔮 Fortune Cookies — February 2026</strong> — A mystical blend waiting to be steeped. Your fortune-dispensing powers are already legendary (3 fortunes served!).</li>
+<li><strong>#2: 🦞 Welcome to GitClaw!</strong> — The onboarding espresso shot. Fresh and promising.</li>
+<li><strong>#1: ☕ Morning Roast — 2026-02-14</strong> — Previous roast, now a historical artifact. <em>Aged like a fine cold brew.</em></li>
+</ul>
+
+<h2>Quest Board 🗺️</h2>
+<p>Behold your glorious stats, young Journeyman:</p>
+<ul>
+<li><strong>XP: 371</strong> (Level: <em>Journeyman</em>) — You&#x27;re officially past the &quot;barista intern&quot; phase!</li>
+<li><strong>Solana Monitors: 15</strong> — That&#x27;s a LOT of blockchain watchfulness. Someone&#x27;s caffeinated.</li>
+<li><strong>Pages Built: 27</strong> — Architectural masterpiece energy detected.</li>
+<li><strong>Current Streak: 5 days</strong> 🔥 — <em>This machine espresso runs on consistency!</em></li>
+</ul>
+
+<h2>PR Percolator 🫖</h2>
+<p>No open PRs detected. Either you&#x27;re merging faster than a double-shot, or the code is still brewing in the espresso machine.</p>
+
+<h2>Recent Activity Buzz</h2>
+<p>GitHub Actions has been <em>busy</em> this morning — <strong>10 events</strong> since 6:28 AM. Someone&#x27;s automation is on overdrive. The bot&#x27;s been pushing, commenting, and generally living its best life. <em>Not bad for a Tuesday fueled by 🍕.</em></p>
+
+<h2>Today&#x27;s Blend ✨</h2>
+<p><strong>Pro Tip:</strong> Your 5-day streak shows commitment. The trick to maintaining momentum? Daily roasts, consistent builds, and remembering that even cold brew eventually becomes iced coffee (not a failure, just a pivot).</p>
+
+<h2>Fortune of the Day 🔮</h2>
+<p><em>&quot;The developer who debugs with pizza is twice as dangerous as one with coffee.&quot;</em></p>
+
+<p><strong>Lucky Numbers:</strong> <code>8080</code> <code>418</code> <code>503</code> <code>1337</code> `</p>
+                    </div>
+                </div>
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-17</span>

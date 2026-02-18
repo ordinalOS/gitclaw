@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-02-18",
+    "label": "Roast",
+    "title": "2026 02 18",
+    "preview": "# \u2615 Morning Roast \u2014 February 18, 2026  ## The Daily Grind *Late-night pizza-driven development has left the repo in a beautifully chaotic state. It's like watching someone make espresso with their eye",
+    "category": "roasts",
+    "file": "2026-02-18.md"
+  },
+  {
+    "date": "2026-02-18",
     "label": "HN Digest",
     "title": "Top",
     "preview": "--- ### 07:20 UTC \u2014 top   # \ud83d\udd25 HN Hype Buster Report \u2014 Feb 18, 2026  ## Top Stories  **Claude Sonnet 4.6** \u2014 1,035 pts [Hype: 7/10] The LLM of the week drops and HN collectively loses its mind. Look,",
