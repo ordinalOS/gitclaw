@@ -1,5 +1,77 @@
 [
   {
+    "sha": "a7dc482",
+    "date": "2026-02-18",
+    "time": "07:47",
+    "message": "\ud83e\udde0 \ud83e\udd77 News Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "c6b2b84",
+    "date": "2026-02-18",
+    "time": "07:20",
+    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "3cc21c7",
+    "date": "2026-02-18",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: wonderful reviewed PR #6",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "38d490d",
+    "date": "2026-02-18",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cia reviewed PR #6",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "cec3aa1",
+    "date": "2026-02-18",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: toly reviewed PR #6",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e36cc1a",
+    "date": "2026-02-18",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cobain reviewed PR #6",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "594eb72",
+    "date": "2026-02-18",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \ud83c\udfd7\ufe0f Architect proposal logged",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "44ced0c",
+    "date": "2026-02-18",
+    "time": "06:24",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "77d31bc",
+    "date": "2026-02-18",
+    "time": "04:35",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-18T04:35Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "a596df7",
     "date": "2026-02-18",
     "time": "00:24",

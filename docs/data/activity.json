@@ -1,5 +1,53 @@
 [
   {
+    "date": "2026-02-18",
+    "label": "HN Digest",
+    "title": "Top",
+    "preview": "--- ### 07:20 UTC \u2014 top   # \ud83d\udd25 HN Hype Buster Report \u2014 Feb 18, 2026  ## Top Stories  **Claude Sonnet 4.6** \u2014 1,035 pts [Hype: 7/10] The LLM of the week drops and HN collectively loses its mind. Look,",
+    "category": "hn",
+    "file": "2026-02-18-top.md"
+  },
+  {
+    "date": "2026-02-18",
+    "label": "News",
+    "title": "Tech",
+    "preview": "--- ### 07:47 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja's network of informants is temporarily offline. All recon channels returned silence.  **Possible causes:** - News API keys no",
+    "category": "news",
+    "file": "2026-02-18-tech.md"
+  },
+  {
+    "date": "2026-02-18",
+    "label": "Council",
+    "title": "Pr6 Wonderful",
+    "preview": "# Council Review: wonderful \u2014 PR #6 _Reviewed on 2026-02-18 06:28 UTC_  # Mr. Wonderful's Council Review \u2014 PR #6: Error Handling for state.json  Here's the thing \u2014 I like this deal. Let me tell you wh",
+    "category": "council",
+    "file": "2026-02-18-pr6-wonderful.md"
+  },
+  {
+    "date": "2026-02-18",
+    "label": "Council",
+    "title": "Pr6 Toly",
+    "preview": "# Council Review: toly \u2014 PR #6 _Reviewed on 2026-02-18 06:28 UTC_  ## Council Review: PR #6 \u2014 State Error Handling  Alright, let's break this down.  ### Throughput Analysis  This is a defensive progra",
+    "category": "council",
+    "file": "2026-02-18-pr6-toly.md"
+  },
+  {
+    "date": "2026-02-18",
+    "label": "Council",
+    "title": "Pr6 Cobain",
+    "preview": "# Council Review: cobain \u2014 PR #6 _Reviewed on 2026-02-18 06:28 UTC_  # Council Review: Error Handling for Missing state.json  ## The Vibe Check This PR feels honest. It's not trying to be clever or im",
+    "category": "council",
+    "file": "2026-02-18-pr6-cobain.md"
+  },
+  {
+    "date": "2026-02-18",
+    "label": "Council",
+    "title": "Pr6 Cia",
+    "preview": "# Council Review: cia \u2014 PR #6 _Reviewed on 2026-02-18 06:28 UTC_  ``` [UNCLASSIFIED // FOR OFFICIAL USE ONLY]  CLASSIFIED INTELLIGENCE BRIEFING COUNCIL OF 7 SECURITY REVIEW Pull Request #6: Error Hand",
+    "category": "council",
+    "file": "2026-02-18-pr6-cia.md"
+  },
+  {
     "date": "2026-02-17",
     "label": "Roast",
     "title": "2026 02 17",
