@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 261,
+  "xp": 276,
   "level": "Apprentice",
   "stats": {
     "issues_triaged": 0,
@@ -17,22 +17,22 @@
     "fortunes_dispensed": 3,
     "roasts_delivered": 0,
     "comments_posted": 0,
-    "commits_made": 4,
+    "commits_made": 5,
     "solana_queries": 0,
-    "solana_monitors": 13,
+    "solana_monitors": 14,
     "solana_builds": 0,
     "hn_scrapes": 3,
     "news_scrapes": 3,
     "crypto_analyses": 0,
     "stock_analyses": 0,
-    "pages_built": 21,
+    "pages_built": 23,
     "council_reviews": 2
   },
   "achievements": [],
-  "last_active": "2026-02-17",
+  "last_active": "2026-02-18",
   "streak": {
-    "current": 4,
-    "longest": 4,
-    "last_date": "2026-02-17"
+    "current": 5,
+    "longest": 5,
+    "last_date": "2026-02-18"
   }
 }
