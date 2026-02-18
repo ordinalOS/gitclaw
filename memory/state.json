@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 351,
+  "xp": 361,
   "level": "Journeyman",
   "stats": {
     "issues_triaged": 0,
@@ -22,7 +22,7 @@
     "solana_monitors": 15,
     "solana_builds": 0,
     "hn_scrapes": 4,
-    "news_scrapes": 3,
+    "news_scrapes": 4,
     "crypto_analyses": 0,
     "stock_analyses": 0,
     "pages_built": 25,
