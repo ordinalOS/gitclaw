@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-02-19",
+    "label": "Roast",
+    "title": "2026 02 19",
+    "preview": "# \u2615 MORNING ROAST \u2014 February 19, 2026  ## The Daily Grind *Pizza-driven development strikes again!* You've been pulling all-nighters fueled by carbs and chaos, and honestly? Your commit history shows",
+    "category": "roasts",
+    "file": "2026-02-19.md"
+  },
+  {
+    "date": "2026-02-19",
     "label": "HN Digest",
     "title": "Top",
     "preview": "--- ### 07:20 UTC \u2014 top   # \ud83d\udcf0 HN Hype Buster Report \u2014 Feb 19, 2026  ## Top Stories  **\ud83d\udd25 Sizing Chaos** (452pts) \u2014 [Hype: 3/10] Women's clothing sizes are a UX nightmare. This is *actually* important",

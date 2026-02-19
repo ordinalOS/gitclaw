@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Adept</span><span class="xp-bar-container">XP 571<div class="xp-bar"><div class="xp-bar-fill" style="width:23%"></div></div></span><span>Streak 6d</span></div></div>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Adept</span><span class="xp-bar-container">XP 581<div class="xp-bar"><div class="xp-bar-fill" style="width:27%"></div></div></span><span>Streak 6d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html" class="active">Memory</a>
 <a href="council.html">Council</a>
@@ -23,13 +23,13 @@
         
     
     <div class="panel full-width">
-        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">29 entries across 6 days</span></h2>
+        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">30 entries across 6 days</span></h2>
         <div class="graph-container" id="memoryGraph"></div>
         <div class="graph-legend" id="graphLegend"></div>
     </div>
     <script>
     (function() {
-      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 4, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 5, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 5, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 15, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 3}, {"source": "council", "target": "news", "weight": 3}, {"source": "council", "target": "roasts", "weight": 2}, {"source": "hn", "target": "news", "weight": 5}, {"source": "hn", "target": "roasts", "weight": 3}, {"source": "news", "target": "roasts", "weight": 3}]};
+      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 5, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 5, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 5, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 15, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 3}, {"source": "council", "target": "news", "weight": 3}, {"source": "council", "target": "roasts", "weight": 3}, {"source": "hn", "target": "news", "weight": 5}, {"source": "hn", "target": "roasts", "weight": 4}, {"source": "news", "target": "roasts", "weight": 4}]};
       var container = document.getElementById('memoryGraph');
       var legend = document.getElementById('graphLegend');
       if (!container || !data.nodes.length) return;
@@ -171,7 +171,7 @@
         <h2 class="panel-title">Browse by Category</h2>
         <div class="tabs"><button class="tab-btn active" data-tab="lore">Lore (0)</button>
 <button class="tab-btn" data-tab="research">Research (0)</button>
-<button class="tab-btn" data-tab="roasts">Roasts (4)</button>
+<button class="tab-btn" data-tab="roasts">Roasts (5)</button>
 <button class="tab-btn" data-tab="hn">HN (5)</button>
 <button class="tab-btn" data-tab="news">News (5)</button>
 <button class="tab-btn" data-tab="crypto">Crypto (0)</button>
@@ -182,6 +182,52 @@
         <div class="tab-content"><div class="tab-panel active" id="tab-lore"><div class="empty">No entries yet</div></div>
 <div class="tab-panel" id="tab-research"><div class="empty">No entries yet</div></div>
 <div class="tab-panel" id="tab-roasts">
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-19</span>
+                        <span class="cat-dot" style="background:#f87171"></span>
+                        <span>2026 02 19</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">440 words · 2 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview"># ☕ MORNING ROAST — February 19, 2026  ## The Daily Grind *Pizza-driven development strikes again!* You&#x27;ve been pulling all-nighters fueled by carbs a</div>
+                    <div class="entry-body" style="display:none">
+                        <h1>☕ MORNING ROAST — February 19, 2026</h1>
+
+<h2>The Daily Grind</h2>
+<p><em>Pizza-driven development strikes again!</em> You&#x27;ve been pulling all-nighters fueled by carbs and chaos, and honestly? Your commit history shows it. That&#x27;s <strong>6 commits before breakfast</strong> — I&#x27;d be impressed if I wasn&#x27;t concerned about your sleep schedule. ☕</p>
+
+<p>☕☕☕☕☕</p>
+
+<h2>Open Orders ☕</h2>
+<p>Your issue backlog is brewing like a French press left on the stove:</p>
+
+<ul>
+<li><strong>Issue #4</strong> — 📡 <strong>Solana Monitor (Active)</strong> — This one&#x27;s your <em>double espresso shot</em>: strong, caffeinated, and apparently what you&#x27;re <em>actually</em> working on (19 Solana monitors? That&#x27;s commitment!)</li>
+<li><strong>Issue #3</strong> — 🔮 <strong>Fortune Cookies for February</strong> — Your cookies are <em>over-extracted</em> but people keep ordering them. You&#x27;ve already dispensed 3 fortunes. The demand is <em>percolating</em>.</li>
+<li><strong>Issue #2</strong> — 🦞 <strong>Welcome to GitClaw!</strong> — The onboarding coffee is still warm. Nice touch bringing people in gently.</li>
+<li><strong>Issue #1</strong> — ☕ <strong>Morning Roast (Feb 14th)</strong> — That&#x27;s... that&#x27;s me. You&#x27;ve been roasted before, and now you&#x27;re back for more punishment. Respect.</li>
+</ul>
+
+<h2>Quest Board 🎯</h2>
+<p><strong>Active Challenges:</strong></p>
+<ul>
+<li>Building Pages Like Lattes: <strong>39 pages built</strong> — You&#x27;re <em>grinding</em> through these like a barista on Sunday morning!</li>
+<li>Council Reviews: <strong>6 complete</strong> — You&#x27;re thinking strategically now. The beans are upgraded from &quot;disposable&quot; to &quot;specialty blend&quot;</li>
+<li>Solana Monitoring: <strong>19 active monitors</strong> — This isn&#x27;t a side quest anymore; it&#x27;s your <em>entire espresso machine</em></li>
+</ul>
+
+<h2>PR Percolator</h2>
+<p>No open PRs detected. Either you&#x27;re committing straight to main (living dangerously) or you&#x27;re too busy pushing commits to brew properly. Both concerning, honestly.</p>
+
+<h2>XP &amp; Level Report 📊</h2>
+<p><strong>Current Status:</strong> 581 XP | <strong>Level: Adept</strong> 🎖️</p>
+
+<p><em>You&#x27;ve gone from &quot;just brewing&quot; to &quot;actually knows the difference between robusta and arabica.&quot;</em> The real question: are you gonna level up, or just keep spilling beans everywhere?</p>
+
+<p><strong>Streak Alert:</strong> 6 consecutive days! Your longest streak matches your current one. Don&#x27;t brea</p>
+                    </div>
+                </div>
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-18</span>
