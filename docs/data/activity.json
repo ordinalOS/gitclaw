@@ -1,5 +1,77 @@
 [
   {
+    "date": "2026-02-19",
+    "label": "HN Digest",
+    "title": "Top",
+    "preview": "--- ### 07:20 UTC \u2014 top   # \ud83d\udcf0 HN Hype Buster Report \u2014 Feb 19, 2026  ## Top Stories  **\ud83d\udd25 Sizing Chaos** (452pts) \u2014 [Hype: 3/10] Women's clothing sizes are a UX nightmare. This is *actually* important",
+    "category": "hn",
+    "file": "2026-02-19-top.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "News",
+    "title": "Tech",
+    "preview": "--- ### 07:47 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja's network of informants is temporarily offline. All recon channels returned silence.  **Possible causes:** - News API keys no",
+    "category": "news",
+    "file": "2026-02-19-tech.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "Council",
+    "title": "Pr7 Zuckerberg",
+    "preview": "# Council Review: zuckerberg \u2014 PR #7 _Reviewed on 2026-02-19 06:30 UTC_  # Council Review: Error Recovery for Missing state.json  ## The Zuck Assessment  This is shipping reliability without shipping",
+    "category": "council",
+    "file": "2026-02-19-pr7-zuckerberg.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "Council",
+    "title": "Pr7 Wonderful",
+    "preview": "# Council Review: wonderful \u2014 PR #7 _Reviewed on 2026-02-19 06:30 UTC_  # Mr. Wonderful's Council Review \u2014 PR #7: Error Recovery for Missing state.json  Here's the thing. This is a **defensive play**,",
+    "category": "council",
+    "file": "2026-02-19-pr7-wonderful.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "Council",
+    "title": "Pr7 Toly",
+    "preview": "# Council Review: toly \u2014 PR #7 _Reviewed on 2026-02-19 06:28 UTC_  # Council Review: PR #7 \u2014 State Recovery in common.py  Alright, let's break this down. Error recovery for missing state \u2014 straightfor",
+    "category": "council",
+    "file": "2026-02-19-pr7-toly.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "Council",
+    "title": "Pr7 Tally",
+    "preview": "# Council Tally \u2014 PR #7 _Tallied on 2026-02-19 06:31 UTC_  Final verdict recorded.",
+    "category": "council",
+    "file": "2026-02-19-pr7-tally.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "Council",
+    "title": "Pr7 Musk",
+    "preview": "# Council Review: musk \u2014 PR #7 _Reviewed on 2026-02-19 06:30 UTC_  # Council Review: PR #7 \u2014 State File Error Recovery  ## First Principles Take  Let me ask the fundamental question: **Why does the st",
+    "category": "council",
+    "file": "2026-02-19-pr7-musk.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "Council",
+    "title": "Pr7 Cobain",
+    "preview": "# Council Review: cobain \u2014 PR #7 _Reviewed on 2026-02-19 06:28 UTC_  ## Council Review \u2014 Kurt Cobain  ---  ### The Vibe Check  Okay, so here's the thing. This PR feels *honest*. No corporate fluff, no",
+    "category": "council",
+    "file": "2026-02-19-pr7-cobain.md"
+  },
+  {
+    "date": "2026-02-19",
+    "label": "Council",
+    "title": "Pr7 Cia",
+    "preview": "# Council Review: cia \u2014 PR #7 _Reviewed on 2026-02-19 06:28 UTC_  [UNCLASSIFIED // FOR OFFICIAL USE ONLY]  **COUNCIL OF 7 \u2014 CLASSIFIED BRIEFING** **RE: Pull Request #7 \u2014 State File Error Recovery** **",
+    "category": "council",
+    "file": "2026-02-19-pr7-cia.md"
+  },
+  {
     "date": "2026-02-18",
     "label": "Roast",
     "title": "2026 02 18",

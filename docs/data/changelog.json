@@ -1,5 +1,117 @@
 [
   {
+    "sha": "47121b0",
+    "date": "2026-02-19",
+    "time": "07:47",
+    "message": "\ud83e\udde0 \ud83e\udd77 News Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e310cc1",
+    "date": "2026-02-19",
+    "time": "07:20",
+    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "b8b3cc9",
+    "date": "2026-02-19",
+    "time": "06:31",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council tally: PR #7 (4 reviews)",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "a14cb4b",
+    "date": "2026-02-19",
+    "time": "06:30",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: zuckerberg reviewed PR #7",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "1eb8b39",
+    "date": "2026-02-19",
+    "time": "06:30",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: musk reviewed PR #7",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "1981927",
+    "date": "2026-02-19",
+    "time": "06:30",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: wonderful reviewed PR #7",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "239d016",
+    "date": "2026-02-19",
+    "time": "06:30",
+    "message": "\ud83e\udde0 \ud83c\udfd7\ufe0f Architect proposal logged",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "b6c5e44",
+    "date": "2026-02-19",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: zuckerberg reviewed PR #7",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "5955623",
+    "date": "2026-02-19",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cia reviewed PR #7",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "033ccce",
+    "date": "2026-02-19",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: toly reviewed PR #7",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "6c641de",
+    "date": "2026-02-19",
+    "time": "06:28",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cobain reviewed PR #7",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "adfcb8b",
+    "date": "2026-02-19",
+    "time": "06:27",
+    "message": "\ud83e\udde0 \ud83c\udfd7\ufe0f Architect proposal logged",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "90272a1",
+    "date": "2026-02-19",
+    "time": "06:23",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "7cde86e",
+    "date": "2026-02-19",
+    "time": "04:34",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-19T04:34Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "cb26823",
     "date": "2026-02-19",
     "time": "00:25",
@@ -686,53 +798,5 @@
     "message": "\ud83e\udde0 \ud83e\udd9e GitClaw initialized! Persona: meme_lord",
     "author": "gitclaw[bot]",
     "is_agent": true
-  },
-  {
-    "sha": "3b5f113",
-    "date": "2026-02-14",
-    "time": "17:10",
-    "message": "security hardening",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "3eb190e",
-    "date": "2026-02-14",
-    "time": "21:57",
-    "message": "\ud83e\udde0 \u2615 Morning Roast \u2014 2026-02-14",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "dc42bc5",
-    "date": "2026-02-14",
-    "time": "16:53",
-    "message": "haiku testing",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "3a5c5e8",
-    "date": "2026-02-14",
-    "time": "16:51",
-    "message": "label fix",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "1cd907c",
-    "date": "2026-02-14",
-    "time": "16:46",
-    "message": "solana adapter",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "21fb1cf",
-    "date": "2026-02-14",
-    "time": "16:37",
-    "message": "initial",
-    "author": "nightfallsnet",
-    "is_agent": false
   }
 ]
