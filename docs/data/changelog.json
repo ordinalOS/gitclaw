@@ -1,5 +1,21 @@
 [
   {
+    "sha": "c9fde90",
+    "date": "2026-02-19",
+    "time": "18:18",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "5bdf55c",
+    "date": "2026-02-19",
+    "time": "16:13",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-19T16:13Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "930aa62",
     "date": "2026-02-19",
     "time": "12:14",
@@ -782,21 +798,5 @@
     "message": "\ud83e\udde0 \ud83d\udc93 Heartbeat \u2014 2026-02-15",
     "author": "gitclaw[bot]",
     "is_agent": true
-  },
-  {
-    "sha": "7d15afc",
-    "date": "2026-02-15",
-    "time": "00:23",
-    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "2e55221",
-    "date": "2026-02-14",
-    "time": "17:31",
-    "message": "add market & news plugin: HN scraper, news ninja, crypto oracle, stock wizard",
-    "author": "nightfallsnet",
-    "is_agent": false
   }
 ]
