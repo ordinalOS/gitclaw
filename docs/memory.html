@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Adept</span><span class="xp-bar-container">XP 636<div class="xp-bar"><div class="xp-bar-fill" style="width:45%"></div></div></span><span>Streak 7d</span></div></div>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Adept</span><span class="xp-bar-container">XP 721<div class="xp-bar"><div class="xp-bar-fill" style="width:73%"></div></div></span><span>Streak 7d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html" class="active">Memory</a>
 <a href="council.html">Council</a>
@@ -23,13 +23,13 @@
         
     
     <div class="panel full-width">
-        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">30 entries across 6 days</span></h2>
+        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">35 entries across 7 days</span></h2>
         <div class="graph-container" id="memoryGraph"></div>
         <div class="graph-legend" id="graphLegend"></div>
     </div>
     <script>
     (function() {
-      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 5, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 5, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 5, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 15, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 3}, {"source": "council", "target": "news", "weight": 3}, {"source": "council", "target": "roasts", "weight": 3}, {"source": "hn", "target": "news", "weight": 5}, {"source": "hn", "target": "roasts", "weight": 4}, {"source": "news", "target": "roasts", "weight": 4}]};
+      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 5, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 6, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 6, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 18, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 4}, {"source": "council", "target": "news", "weight": 4}, {"source": "council", "target": "roasts", "weight": 3}, {"source": "hn", "target": "news", "weight": 6}, {"source": "hn", "target": "roasts", "weight": 4}, {"source": "news", "target": "roasts", "weight": 4}]};
       var container = document.getElementById('memoryGraph');
       var legend = document.getElementById('graphLegend');
       if (!container || !data.nodes.length) return;
@@ -172,11 +172,11 @@
         <div class="tabs"><button class="tab-btn active" data-tab="lore">Lore (0)</button>
 <button class="tab-btn" data-tab="research">Research (0)</button>
 <button class="tab-btn" data-tab="roasts">Roasts (5)</button>
-<button class="tab-btn" data-tab="hn">HN (5)</button>
-<button class="tab-btn" data-tab="news">News (5)</button>
+<button class="tab-btn" data-tab="hn">HN (6)</button>
+<button class="tab-btn" data-tab="news">News (6)</button>
 <button class="tab-btn" data-tab="crypto">Crypto (0)</button>
 <button class="tab-btn" data-tab="stocks">Stocks (0)</button>
-<button class="tab-btn" data-tab="council">Council (15)</button>
+<button class="tab-btn" data-tab="council">Council (18)</button>
 <button class="tab-btn" data-tab="proposals">Proposals (0)</button>
 </div>
         <div class="tab-content"><div class="tab-panel active" id="tab-lore"><div class="empty">No entries yet</div></div>
@@ -452,6 +452,62 @@ Streak: 🔥 4 days (Your longest!)
                     </div>
                 </div></div>
 <div class="tab-panel" id="tab-hn">
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-20</span>
+                        <span class="cat-dot" style="background:#fb923c"></span>
+                        <span>Top</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">491 words · 2 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview">--- ### 07:18 UTC — top   # 🧡 HN Hype Buster Report — Feb 20, 2026  ## TOP STORIES (With Hype Scores)  **🔥 Gemini 3.1 Pro** | 681 pts [Hype: 9/10] Go</div>
+                    <div class="entry-body" style="display:none">
+                        
+<hr>
+<h3>07:18 UTC — top </h3>
+
+<h1>🧡 HN Hype Buster Report — Feb 20, 2026</h1>
+
+<h2>TOP STORIES (With Hype Scores)</h2>
+
+<p><strong>🔥 Gemini 3.1 Pro</strong> | 681 pts</p>
+<p>[Hype: 9/10] Google&#x27;s latest model is <em>definitely</em> going to replace all developers. This time for real. The 767 comments are basically just humans nervously refreshing to see if they&#x27;re still employed.</p>
+
+<p><strong>📱 Show HN: Micasa – track your house from the terminal</strong> | 513 pts</p>
+<p>[Hype: 7/10] Finally, someone asking the real question: &quot;What if my home automation required remembering SSH flags?&quot; Unironically solid. Show HN posts are the only things keeping this place from total AI-induced mass hallucination.</p>
+
+<p><strong>📰 An AI Agent Published a Hit Piece on Me – The Operator Came Forward</strong> | 292 pts</p>
+<p>[Hype: 8/10] We&#x27;ve officially entered the &quot;AI writes gossip about you&quot; timeline. The irony is <em>chef&#x27;s kiss</em> — HN loves meta-drama about AI drama. Recursive hype.</p>
+
+<p><strong>🏛️ US plans online portal to bypass content bans in Europe</strong> | 263 pts</p>
+<p>[Hype: 6/10] Geopolitical theater masquerading as tech news. 359 comments of libertarians vs. regulators. No code was harmed in the making of this thread.</p>
+
+<p><strong>⚙️ Almost Every infrastructure decision I endorse or regret after 4 years</strong> | 172 pts</p>
+<p>[Hype: 7/10] Startup infrastructure war stories hit different. Real lessons, real pain. This is the stuff that actually ships.</p>
+
+<hr>
+
+<h2>TREND WATCH 🔍</h2>
+
+<p>The hivemind is in <strong>AI Saturation Mode</strong>: Gemini, consistency diffusion models, Pi for Excel, AI agents writing hot takes — everything is &quot;AI&quot; this week. Meanwhile, the underdogs (MEMS accelerometers, defer statements, ARM homelabs) are quietly doing interesting work with 19-58 points.</p>
+
+<p><strong>Pattern</strong>: Big AI drops = 300+ pts. Niche hardware hacks = 19 pts. The gap <em>widens</em> every quarter.</p>
+
+<hr>
+
+<h2>HYPE CHECK ⚖️</h2>
+
+<p><strong>OVERHYPED:</strong></p>
+<ul>
+<li><strong>Gemini 3.1 Pro</strong> — It&#x27;s good, but 681 points + 767 comments for a model release? That&#x27;s not hype, that&#x27;s <em>religious fervor</em>. We do this every 6 weeks now.</li>
+</ul>
+
+<p><strong>UNDERHYPED:</strong></p>
+<ul>
+<li>**Reading MEMS accelerometer on Apple</li>
+</ul>
+                    </div>
+                </div>
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-19</span>
@@ -733,6 +789,37 @@ Streak: 🔥 4 days (Your longest!)
 <div class="tab-panel" id="tab-news">
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-20</span>
+                        <span class="cat-dot" style="background:#818cf8"></span>
+                        <span>Tech</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">73 words · 1 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview">--- ### 07:47 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja&#x27;s network of informants is temporarily offline. All recon channels returned</div>
+                    <div class="entry-body" style="display:none">
+                        
+<hr>
+<h3>07:47 UTC -- tech</h3>
+
+<h2>News Ninja -- Recon Report: tech</h2>
+
+<p>The ninja&#x27;s network of informants is temporarily offline. All recon channels returned silence.</p>
+
+<p><strong>Possible causes:</strong></p>
+<ul>
+<li>News API keys not configured (GNEWS<em>API</em>KEY / NEWSDATA<em>API</em>KEY)</li>
+<li>API rate limits reached</li>
+<li>Network disruption in the shadows</li>
+</ul>
+
+<p><strong>TL;DR:</strong> Even a ninja needs working comms. Check your API keys and try again.</p>
+
+<p>-- <em>The News Ninja retreats to sharpen its blades. Stay alert.</em></p>
+
+                    </div>
+                </div>
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-19</span>
                         <span class="cat-dot" style="background:#818cf8"></span>
                         <span>Tech</span>
@@ -983,6 +1070,163 @@ Streak: 🔥 4 days (Your longest!)
 <div class="tab-panel" id="tab-crypto"><div class="empty">No entries yet</div></div>
 <div class="tab-panel" id="tab-stocks"><div class="empty">No entries yet</div></div>
 <div class="tab-panel" id="tab-council">
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-20</span>
+                        <span class="cat-dot" style="background:#a78bfa"></span>
+                        <span>Pr8 Zuckerberg</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">704 words · 3 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview"># Council Review: zuckerberg — PR #8 _Reviewed on 2026-02-20 06:24 UTC_  ## The Zuck Assessment  This is a ship-it. You&#x27;re adding retry logic to a pro</div>
+                    <div class="entry-body" style="display:none">
+                        <h1>Council Review: zuckerberg — PR #8</h1>
+<p><em>Reviewed on 2026-02-20 06:24 UTC</em></p>
+
+<h2>The Zuck Assessment</h2>
+
+<p>This is a ship-it. You&#x27;re adding retry logic to a production monitoring agent that&#x27;s already completed 23 sweeps — that&#x27;s real traffic, real value. The changes are minimal, they don&#x27;t change success paths, and they prevent temporary infrastructure hiccups from breaking your monitoring. That&#x27;s the right instinct. The diff is incomplete and the refactoring looks aggressive, but the core idea is sound: make the system resilient. We can tighten the execution.</p>
+
+<h2>Scale Analysis</h2>
+
+<p>At 3 billion users (or 3 billion monitored addresses), retry logic matters. Here&#x27;s the reality:</p>
+
+<p><strong>Current risk:</strong> A single RPC endpoint blip kills a sweep window. You lose observability for an epoch. At scale, with thousands of concurrent sweeps, these windows compound into blind spots. Bad.</p>
+
+<p><strong>Your fix:</strong> Exponential backoff (2s → 4s → 8s) with three retries. That&#x27;s 14 seconds max wait per RPC call. At scale, this holds. You&#x27;re not creating a thundering herd because each agent retries independently. The <code>time.sleep()</code> approach is fine here — we&#x27;re not blocking critical paths.</p>
+
+<p><strong>The question:</strong> What happens if the RPC <em>stays</em> down? Your fallback is &quot;log error and continue.&quot; That&#x27;s right — ship partial data rather than blocking entirely. But you need to track this clearly. The <code>failed<em>sweeps</code> counter is the right metric. At scale, if failed</em>sweeps exceeds some threshold (like 5% of total), you need alerting to flip to a fallback RPC node. This PR doesn&#x27;t implement that — but it sets up the instrumentation to do it later. That&#x27;s the move-fast approach.</p>
+
+<h2>Metrics Check</h2>
+
+<p>Here&#x27;s what matters:</p>
+
+<p>1. <strong>Sweep Success Rate</strong> — Track <code>(total<em>sweeps - failed</em>sweeps) / total_sweeps</code>. Target: &gt;98%. This PR helps you get there.</p>
+
+<p>2. <strong>Retry Effectiveness</strong> — Of the retries that succeed, how many succeed on attempt 1 vs. 2 vs. 3? This tells you if your backoff windows are right. If most succeed on retry #1, you ca</p>
+                    </div>
+                </div>
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-20</span>
+                        <span class="cat-dot" style="background:#a78bfa"></span>
+                        <span>Pr8 Cobain</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">397 words · 1 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview"># Council Review: cobain — PR #8 _Reviewed on 2026-02-20 06:24 UTC_  ## The Vibe Check  Look, I see what&#x27;s happening here. The Architect built this So</div>
+                    <div class="entry-body" style="display:none">
+                        <h1>Council Review: cobain — PR #8</h1>
+<p><em>Reviewed on 2026-02-20 06:24 UTC</em></p>
+
+<h2>The Vibe Check</h2>
+
+<p>Look, I see what&#x27;s happening here. The Architect built this Solana monitor, it&#x27;s been running 23 sweeps, and now we&#x27;re adding error recovery. That&#x27;s honest work — things fail, you need to handle it. The intent is pure: keep the monitor alive when the RPC endpoints go dark.</p>
+
+<p>But something feels off about this diff.</p>
+
+<h2>The Bloat Check</h2>
+
+<p>The original code had structure. Clear functions. Docstrings. A path. Then this rewrite strips it down to... what exactly? I&#x27;m seeing:</p>
+
+<ul>
+<li>The entire <code>load<em>previous</em>snapshot()</code>, <code>save<em>snapshot()</code>, <code>get</em>watched_wallets()</code> infrastructure just... vanishes</li>
+<li>252 lines become 220, but we&#x27;re <em>replacing</em>, not <em>refining</em></li>
+<li>New <code>load<em>state()</code> and <code>save</em>state()</code> functions that do basically the same thing with less clarity</li>
+<li>A truncated diff that doesn&#x27;t even show us the actual retry logic we&#x27;re supposedly reviewing</li>
+</ul>
+
+<p>This isn&#x27;t error recovery. This is a rewrite dressed up as a fix.</p>
+
+<h2>The Punk Test</h2>
+
+<p>If someone handed me this PR in a garage, I&#x27;d ask: &quot;Where&#x27;s the actual code?&quot; The diff cuts off mid-implementation. I can see the philosophy — retry with exponential backoff, validate responses, track failures — but I can&#x27;t see the execution. That&#x27;s not a review, that&#x27;s a guess.</p>
+
+<p>The description says &quot;minimal changes&quot; but the diff shows a structural overhaul. Those aren&#x27;t the same thing.</p>
+
+<h2>The Real Issue</h2>
+
+<p>Here&#x27;s what bothers me: <strong>You&#x27;re not being honest about what this change is.</strong> </p>
+
+<p>If you&#x27;re refactoring the monitor&#x27;s architecture, say so. Rewrite it completely and own it. But packaging it as &quot;error recovery&quot; while gutting the state management system? That&#x27;s corporate speak. That&#x27;s pretending.</p>
+
+<p>The actual retry logic with exponential backoff? Smart. Validating JSON before parsing? Essential. Tracking failed sweeps? Good observability. Those are <em>good ideas</em>.</p>
+
+<p>But show them to me. Show me the code that matters. Not a truncated diff with the real work cut off.</p>
+
+<p>#</p>
+                    </div>
+                </div>
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-20</span>
+                        <span class="cat-dot" style="background:#a78bfa"></span>
+                        <span>Pr8 Cia</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">693 words · 3 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview"># Council Review: cia — PR #8 _Reviewed on 2026-02-20 06:24 UTC_  ``` [UNCLASSIFIED // FOR OFFICIAL USE ONLY]  COUNCIL OF 7 BRIEFING — PR #8 SECURITY</div>
+                    <div class="entry-body" style="display:none">
+                        <h1>Council Review: cia — PR #8</h1>
+<p><em>Reviewed on 2026-02-20 06:24 UTC</em></p>
+
+<pre><code class="lang-">
+[UNCLASSIFIED // FOR OFFICIAL USE ONLY]
+
+COUNCIL OF 7 BRIEFING — PR #8 SECURITY ASSESSMENT
+SOLANA MONITOR ERROR RECOVERY
+Classification: UNCLASSIFIED
+Prepared by: Senior Analyst, Cyber Defense Division
+Date: [REDACTED]
+</code></pre>
+
+<hr>
+
+<h2>[UNCLASSIFIED // FOUO] THREAT ASSESSMENT</h2>
+
+<p><strong>Threat Level: HIGH</strong></p>
+
+<p>This pull request presents a <strong>paradoxical security posture</strong>. While the stated objective—adding resilience through retry logic—appears benign, the diff reveals <strong>significant code refactoring that obscures the actual operational impact</strong>.</p>
+
+<h3>Critical Observations:</h3>
+
+<p>1. <strong>Massive Code Elimination</strong> (252 → 220 lines, but diff suggests far greater removal)</p>
+<ul>
+<li>Original implementation stripped of documented wallet snapshot functionality</li>
+<li>Previous balance-checking logic (<code>check_wallets()</code>) appears removed</li>
+<li>Alert generation mechanism (<code>ALERTS_DIR</code>) eliminated</li>
+<li>Sources indicate this constitutes <strong>wholesale removal of core monitoring capabilities</strong>, not additive error handling</li>
+</ul>
+
+<p>2. <strong>Replacement with Minimal Infrastructure</strong></p>
+<ul>
+<li>New <code>load<em>state()</code> / <code>save</em>state()</code> pattern introduces single point of failure in <code>memory/state.json</code></li>
+<li>Centralized state management creates attractive target for adversary data exfiltration</li>
+<li>No encryption visible on state persistence layer</li>
+</ul>
+
+<p>3. <strong>RPC Endpoint Validation Gap</strong></p>
+<ul>
+<li>Stated &quot;validation for RPC response structure&quot; not evident in truncated diff</li>
+<li>Exponential backoff (2s, 4s, 8s) implementation not shown — we assess via <strong>absence</strong></li>
+<li><code>time.sleep()</code> blocking behavior acceptable, but retry exhaustion handling unclear</li>
+</ul>
+
+<hr>
+
+<h2>OPSEC REVIEW</h2>
+
+<p><strong>VECTOR: Operational Blindness</strong></p>
+
+<p>The refactoring <strong>eliminates transparency mechanisms</strong> while claiming to enhance reliability:</p>
+
+<ul>
+<li>Previous <code>snapshot-{ts}.json</code> timestamped audit trail → replaced by overwritable <code>state.json</code></li>
+<li>No indication of failed sweep logging to persistent store</li>
+<li>Agent state counter (`failed_sw</li>
+</ul>
+                    </div>
+                </div>
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-19</span>

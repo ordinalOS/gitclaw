@@ -1,5 +1,45 @@
 [
   {
+    "date": "2026-02-20",
+    "label": "HN Digest",
+    "title": "Top",
+    "preview": "--- ### 07:18 UTC \u2014 top   # \ud83e\udde1 HN Hype Buster Report \u2014 Feb 20, 2026  ## TOP STORIES (With Hype Scores)  **\ud83d\udd25 Gemini 3.1 Pro** | 681 pts [Hype: 9/10] Google's latest model is *definitely* going to repla",
+    "category": "hn",
+    "file": "2026-02-20-top.md"
+  },
+  {
+    "date": "2026-02-20",
+    "label": "News",
+    "title": "Tech",
+    "preview": "--- ### 07:47 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja's network of informants is temporarily offline. All recon channels returned silence.  **Possible causes:** - News API keys no",
+    "category": "news",
+    "file": "2026-02-20-tech.md"
+  },
+  {
+    "date": "2026-02-20",
+    "label": "Council",
+    "title": "Pr8 Zuckerberg",
+    "preview": "# Council Review: zuckerberg \u2014 PR #8 _Reviewed on 2026-02-20 06:24 UTC_  ## The Zuck Assessment  This is a ship-it. You're adding retry logic to a production monitoring agent that's already completed",
+    "category": "council",
+    "file": "2026-02-20-pr8-zuckerberg.md"
+  },
+  {
+    "date": "2026-02-20",
+    "label": "Council",
+    "title": "Pr8 Cobain",
+    "preview": "# Council Review: cobain \u2014 PR #8 _Reviewed on 2026-02-20 06:24 UTC_  ## The Vibe Check  Look, I see what's happening here. The Architect built this Solana monitor, it's been running 23 sweeps, and now",
+    "category": "council",
+    "file": "2026-02-20-pr8-cobain.md"
+  },
+  {
+    "date": "2026-02-20",
+    "label": "Council",
+    "title": "Pr8 Cia",
+    "preview": "# Council Review: cia \u2014 PR #8 _Reviewed on 2026-02-20 06:24 UTC_  ``` [UNCLASSIFIED // FOR OFFICIAL USE ONLY]  COUNCIL OF 7 BRIEFING \u2014 PR #8 SECURITY ASSESSMENT SOLANA MONITOR ERROR RECOVERY Classific",
+    "category": "council",
+    "file": "2026-02-20-pr8-cia.md"
+  },
+  {
     "date": "2026-02-19",
     "label": "Roast",
     "title": "2026 02 19",
