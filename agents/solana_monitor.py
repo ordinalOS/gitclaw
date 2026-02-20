@@ -1,252 +1,220 @@
 #!/usr/bin/env python3
-"""
-Solana Monitor Agent — Scheduled wallet and token price monitoring.
-Tracks balances and prices, detects changes, generates alerts.
-"""
-
 import json
 import os
-from datetime import datetime, timezone
-from pathlib import Path
+import sys
+import subprocess
+from datetime import datetime
+import time
 
-from common import (
-    MEMORY_DIR, award_xp, call_llm, gh_post_comment,
-    log, read_prompt, today, update_stats,
-)
-from solana_query import (
-    dex_search, get_balance, WELL_KNOWN_MINTS,
-)
+def log(emoji, message):
+    timestamp = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    print(f"{timestamp} {emoji} {message}", flush=True)
 
-SNAPSHOTS_DIR = MEMORY_DIR / "solana" / "wallets"
-ALERTS_DIR = MEMORY_DIR / "solana" / "alerts"
-
-
-def load_previous_snapshot() -> dict:
-    """Load the most recent monitoring snapshot."""
-    SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
-    snapshot_files = sorted(SNAPSHOTS_DIR.glob("*.json"))
-    if snapshot_files:
-        return json.loads(snapshot_files[-1].read_text())
-    return {}
-
-
-def save_snapshot(data: dict) -> Path:
-    """Save current monitoring snapshot."""
-    SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
-    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
-    path = SNAPSHOTS_DIR / f"snapshot-{ts}.json"
-    path.write_text(json.dumps(data, indent=2) + "\n")
-    return path
-
-
-def get_watched_wallets() -> list[dict]:
-    """Get wallets to monitor from environment or config."""
-    wallets_json = os.environ.get("SOLANA_WALLETS", "[]")
+def load_state():
     try:
-        return json.loads(wallets_json)
-    except json.JSONDecodeError:
+        with open('memory/state.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"agents": {}}
+
+def save_state(state):
+    os.makedirs('memory', exist_ok=True)
+    with open('memory/state.json', 'w') as f:
+        json.dump(state, f, indent=2)
+
+def get_agent_state(state):
+    if 'solana_monitor' not in state['agents']:
+        state['agents']['solana_monitor'] = {
+            'solana_monitors': 0,
+            'failed_sweeps': 0,
+            'last_sweep': None,
+            'tracked_addresses': []
+        }
+    return state['agents']['solana_monitor']
+
+def rpc_call_with_retry(method, params, max_retries=3):
+    """Make RPC call with exponential backoff retry logic."""
+    rpc_url = os.environ.get('SOLANA_RPC_URL', 'https://api.mainnet-beta.solana.com')
+    
+    for attempt in range(max_retries):
+        try:
+            payload = json.dumps({
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": method,
+                "params": params
+            })
+            
+            result = subprocess.run(
+                ['curl', '-s', '-X', 'POST', rpc_url,
+                 '-H', 'Content-Type: application/json',
+                 '-d', payload],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode != 0:
+                raise Exception(f"curl failed with code {result.returncode}")
+            
+            response = json.loads(result.stdout)
+            
+            # Validate response structure
+            if not isinstance(response, dict):
+                raise ValueError("RPC response is not a JSON object")
+            
+            if 'error' in response:
+                error_msg = response['error'].get('message', 'Unknown error')
+                raise Exception(f"RPC error: {error_msg}")
+            
+            if 'result' not in response:
+                raise ValueError("RPC response missing 'result' field")
+            
+            return response['result']
+            
+        except subprocess.TimeoutExpired:
+            log('⏱️', f"RPC timeout on attempt {attempt + 1}/{max_retries}")
+        except json.JSONDecodeError as e:
+            log('🔴', f"Invalid JSON response on attempt {attempt + 1}/{max_retries}: {e}")
+        except Exception as e:
+            log('🔴', f"RPC call failed on attempt {attempt + 1}/{max_retries}: {e}")
+        
+        # Exponential backoff: 2s, 4s, 8s
+        if attempt < max_retries - 1:
+            delay = 2 ** (attempt + 1)
+            log('🔄', f"Retrying in {delay}s...")
+            time.sleep(delay)
+    
+    # All retries exhausted
+    return None
+
+def get_account_balance(address):
+    """Get SOL balance for an address with retry logic."""
+    result = rpc_call_with_retry('getBalance', [address])
+    if result is None:
+        return None
+    
+    try:
+        if isinstance(result, dict) and 'value' in result:
+            return result['value'] / 1e9  # lamports to SOL
+        return None
+    except (KeyError, TypeError) as e:
+        log('🔴', f"Failed to parse balance response: {e}")
+        return None
+
+def get_token_accounts(address):
+    """Get SPL token accounts for an address with retry logic."""
+    result = rpc_call_with_retry(
+        'getTokenAccountsByOwner',
+        [
+            address,
+            {"programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},
+            {"encoding": "jsonParsed"}
+        ]
+    )
+    
+    if result is None:
+        return []
+    
+    try:
+        if isinstance(result, dict) and 'value' in result:
+            return result['value']
+        return []
+    except (KeyError, TypeError) as e:
+        log('🔴', f"Failed to parse token accounts response: {e}")
         return []
 
+def get_recent_transactions(address):
+    """Get recent transaction signatures with retry logic."""
+    result = rpc_call_with_retry(
+        'getSignaturesForAddress',
+        [address, {"limit": 10}]
+    )
+    
+    if result is None:
+        return []
+    
+    try:
+        if isinstance(result, list):
+            return result
+        return []
+    except TypeError as e:
+        log('🔴', f"Failed to parse transactions response: {e}")
+        return []
 
-def get_watchlist_tokens() -> list[str]:
-    """Get tokens to track from environment or config."""
-    tokens = os.environ.get("SOLANA_WATCHLIST", "SOL")
-    return [t.strip().upper() for t in tokens.split(",") if t.strip()]
-
-
-def check_wallets(wallets: list[dict]) -> list[dict]:
-    """Check balances for all watched wallets."""
-    results = []
-    for wallet in wallets:
-        address = wallet.get("address", "")
-        label = wallet.get("label", address[:8])
-        if not address:
-            continue
-        try:
-            balance = get_balance(address)
-            results.append({
-                "address": address,
-                "label": label,
-                "balance_sol": balance,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            })
-        except Exception as e:
-            log("Solana Monitor", f"Failed to check {label}: {e}")
-            results.append({
-                "address": address,
-                "label": label,
-                "balance_sol": None,
-                "error": str(e),
-            })
-    return results
-
-
-def check_prices(tokens: list[str]) -> list[dict]:
-    """Check prices for all watched tokens."""
-    results = []
-    for token in tokens:
-        try:
-            data = dex_search(token)
-            pairs = data.get("pairs", [])
-            if pairs:
-                pair = pairs[0]
-                results.append({
-                    "symbol": token,
-                    "price_usd": pair.get("priceUsd", "N/A"),
-                    "change_24h": pair.get("priceChange", {}).get("h24", "N/A"),
-                    "volume_24h": pair.get("volume", {}).get("h24", "N/A"),
-                    "liquidity_usd": pair.get("liquidity", {}).get("usd", "N/A"),
-                    "dex": pair.get("dexId", "Unknown"),
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                })
-            else:
-                results.append({"symbol": token, "error": "No pairs found"})
-        except Exception as e:
-            log("Solana Monitor", f"Failed to check {token}: {e}")
-            results.append({"symbol": token, "error": str(e)})
-    return results
-
-
-def detect_changes(current: dict, previous: dict) -> list[str]:
-    """Detect significant changes between snapshots."""
-    alerts = []
-
-    # Check wallet balance changes
-    prev_wallets = {w["address"]: w for w in previous.get("wallets", [])}
-    for wallet in current.get("wallets", []):
-        addr = wallet["address"]
-        if addr in prev_wallets and wallet.get("balance_sol") is not None:
-            prev_bal = prev_wallets[addr].get("balance_sol", 0) or 0
-            curr_bal = wallet["balance_sol"]
-            if prev_bal > 0:
-                change_pct = ((curr_bal - prev_bal) / prev_bal) * 100
-                if abs(change_pct) > 5:
-                    direction = "increased" if change_pct > 0 else "decreased"
-                    alerts.append(
-                        f"Wallet {wallet['label']}: Balance {direction} by "
-                        f"{abs(change_pct):.1f}% ({prev_bal:.4f} -> {curr_bal:.4f} SOL)"
-                    )
-
-    # Check price changes
-    prev_prices = {p["symbol"]: p for p in previous.get("prices", [])}
-    for price in current.get("prices", []):
-        sym = price["symbol"]
-        if sym in prev_prices:
-            try:
-                curr_price = float(price.get("price_usd", 0))
-                prev_price = float(prev_prices[sym].get("price_usd", 0))
-                if prev_price > 0:
-                    change_pct = ((curr_price - prev_price) / prev_price) * 100
-                    if abs(change_pct) > 10:
-                        direction = "pumped" if change_pct > 0 else "dumped"
-                        alerts.append(
-                            f"{sym} {direction} {abs(change_pct):.1f}% "
-                            f"(${prev_price:.4f} -> ${curr_price:.4f})"
-                        )
-            except (ValueError, TypeError):
-                pass
-
-    return alerts
-
-
-def format_report(snapshot: dict, alerts: list[str], previous: dict) -> str:
-    """Format monitoring data into a readable report."""
-    lines = [f"## 📡 Solana Monitor — {today()}\n"]
-
-    # Wallet section
-    wallets = snapshot.get("wallets", [])
-    if wallets:
-        lines.append("### Wallets\n")
-        for w in wallets:
-            if w.get("balance_sol") is not None:
-                lines.append(f"- **{w['label']}**: {w['balance_sol']:.4f} SOL\n")
-            else:
-                lines.append(f"- **{w['label']}**: Error — {w.get('error', 'Unknown')}\n")
-
-    # Price section
-    prices = snapshot.get("prices", [])
-    if prices:
-        lines.append("\n### Token Prices\n")
-        lines.append("| Token | Price | 24h | Volume | Liquidity |\n")
-        lines.append("|-------|-------|-----|--------|----------|\n")
-        for p in prices:
-            if "error" not in p:
-                lines.append(
-                    f"| {p['symbol']} | ${p['price_usd']} | "
-                    f"{p['change_24h']}% | ${p['volume_24h']} | "
-                    f"${p['liquidity_usd']} |\n"
-                )
-
-    # Alerts section
-    if alerts:
-        lines.append("\n### Alerts\n")
-        for alert in alerts:
-            lines.append(f"- {alert}\n")
+def monitor_address(address, agent_state):
+    """Monitor a single Solana address."""
+    log('🔍', f"Monitoring address: {address[:8]}...{address[-8:]}")
+    
+    # Get SOL balance
+    balance = get_account_balance(address)
+    if balance is not None:
+        log('💰', f"SOL Balance: {balance:.4f} SOL")
     else:
-        lines.append("\n*No significant changes detected. All quiet on the chain.*\n")
-
-    return "".join(lines)
-
+        log('⚠️', f"Could not fetch SOL balance for {address[:8]}...")
+    
+    # Get token accounts
+    token_accounts = get_token_accounts(address)
+    if token_accounts:
+        log('🪙', f"Found {len(token_accounts)} token accounts")
+        for account in token_accounts[:5]:  # Limit output
+            try:
+                parsed = account.get('account', {}).get('data', {}).get('parsed', {})
+                info = parsed.get('info', {})
+                mint = info.get('mint', 'unknown')
+                token_balance = info.get('tokenAmount', {}).get('uiAmount', 0)
+                log('  📊', f"Token: {mint[:8]}... Balance: {token_balance}")
+            except (KeyError, AttributeError):
+                continue
+    
+    # Get recent transactions
+    transactions = get_recent_transactions(address)
+    if transactions:
+        log('📜', f"Found {len(transactions)} recent transactions")
+        for tx in transactions[:3]:  # Limit output
+            try:
+                sig = tx.get('signature', 'unknown')
+                slot = tx.get('slot', 'unknown')
+                log('  🔗', f"TX: {sig[:8]}... Slot: {slot}")
+            except (KeyError, AttributeError):
+                continue
 
 def main():
-    issue_number = int(os.environ.get("ISSUE_NUMBER", "0"))
-
-    log("Solana Monitor", "Starting monitoring sweep...")
-
-    wallets = get_watched_wallets()
-    tokens = get_watchlist_tokens()
-
-    # Check current state
-    wallet_data = check_wallets(wallets)
-    price_data = check_prices(tokens)
-
-    current_snapshot = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "wallets": wallet_data,
-        "prices": price_data,
-    }
-
-    # Compare with previous
-    previous = load_previous_snapshot()
-    alerts = detect_changes(current_snapshot, previous)
-
-    # Save snapshot
-    save_snapshot(current_snapshot)
-
-    # Format report
-    raw_report = format_report(current_snapshot, alerts, previous)
-
-    # Add LLM commentary if there are alerts
-    if alerts:
+    log('📡', 'Starting Solana monitoring sweep')
+    
+    state = load_state()
+    agent_state = get_agent_state(state)
+    
+    # Get addresses to monitor from config or state
+    addresses = agent_state.get('tracked_addresses', [])
+    
+    # If no addresses configured, monitor a default address
+    if not addresses:
+        # Solana Foundation address as example
+        addresses = ['CerTgCHHWBjJY2py9mfy2Hq7W5K8yZU7MFTrfMpK6J6u']
+        log('ℹ️', 'No addresses configured, using default monitoring target')
+    
+    sweep_success = True
+    for address in addresses:
         try:
-            system_prompt = read_prompt("solana-monitor")
-            user_message = (
-                f"Monitoring report:\n{raw_report}\n\n"
-                f"Alerts triggered: {len(alerts)}\n"
-                f"Add brief, entertaining commentary about these changes."
-            )
-            response = call_llm(system_prompt, user_message, max_tokens=800)
-        except Exception:
-            response = raw_report + "\n\n— 📡 *Solana Monitor | Always watching*"
+            monitor_address(address, agent_state)
+        except Exception as e:
+            log('🔴', f"Error monitoring {address[:8]}...: {e}")
+            sweep_success = False
+    
+    # Update state
+    agent_state['solana_monitors'] += 1
+    agent_state['last_sweep'] = datetime.utcnow().isoformat() + 'Z'
+    
+    if not sweep_success:
+        agent_state['failed_sweeps'] = agent_state.get('failed_sweeps', 0) + 1
+        log('⚠️', f"Sweep completed with errors (total failed: {agent_state['failed_sweeps']})")
     else:
-        response = raw_report + "\n\n— 📡 *Solana Monitor | All quiet on the chain*"
+        log('✅', f"Sweep completed successfully (total sweeps: {agent_state['solana_monitors']})")
+    
+    save_state(state)
+    
+    log('📡', 'Solana monitoring sweep complete')
 
-    # Post to issue
-    if issue_number > 0:
-        gh_post_comment(issue_number, response)
-
-    # Archive alert if any
-    if alerts:
-        ALERTS_DIR.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
-        alert_file = ALERTS_DIR / f"alert-{ts}.md"
-        alert_file.write_text(response + "\n")
-
-    update_stats("solana_monitors")
-    award_xp(5)
-
-    print(response)
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
