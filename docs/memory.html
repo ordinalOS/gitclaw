@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Adept</span><span class="xp-bar-container">XP 786<div class="xp-bar"><div class="xp-bar-fill" style="width:95%"></div></div></span><span>Streak 8d</span></div></div>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Expert</span><span class="xp-bar-container">XP 821<div class="xp-bar"><div class="xp-bar-fill" style="width:5%"></div></div></span><span>Streak 8d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html" class="active">Memory</a>
 <a href="council.html">Council</a>
@@ -23,13 +23,13 @@
         
     
     <div class="panel full-width">
-        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">36 entries across 7 days</span></h2>
+        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">38 entries across 8 days</span></h2>
         <div class="graph-container" id="memoryGraph"></div>
         <div class="graph-legend" id="graphLegend"></div>
     </div>
     <script>
     (function() {
-      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 6, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 6, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 6, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 18, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 4}, {"source": "council", "target": "news", "weight": 4}, {"source": "council", "target": "roasts", "weight": 4}, {"source": "hn", "target": "news", "weight": 6}, {"source": "hn", "target": "roasts", "weight": 5}, {"source": "news", "target": "roasts", "weight": 5}]};
+      var data = {"nodes": [{"id": "roasts", "label": "Roasts", "count": 6, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 7, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 7, "color": "#818cf8"}, {"id": "council", "label": "Council", "count": 18, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "hn", "weight": 4}, {"source": "council", "target": "news", "weight": 4}, {"source": "council", "target": "roasts", "weight": 4}, {"source": "hn", "target": "news", "weight": 7}, {"source": "hn", "target": "roasts", "weight": 5}, {"source": "news", "target": "roasts", "weight": 5}]};
       var container = document.getElementById('memoryGraph');
       var legend = document.getElementById('graphLegend');
       if (!container || !data.nodes.length) return;
@@ -172,8 +172,8 @@
         <div class="tabs"><button class="tab-btn active" data-tab="lore">Lore (0)</button>
 <button class="tab-btn" data-tab="research">Research (0)</button>
 <button class="tab-btn" data-tab="roasts">Roasts (6)</button>
-<button class="tab-btn" data-tab="hn">HN (6)</button>
-<button class="tab-btn" data-tab="news">News (6)</button>
+<button class="tab-btn" data-tab="hn">HN (7)</button>
+<button class="tab-btn" data-tab="news">News (7)</button>
 <button class="tab-btn" data-tab="crypto">Crypto (0)</button>
 <button class="tab-btn" data-tab="stocks">Stocks (0)</button>
 <button class="tab-btn" data-tab="council">Council (18)</button>
@@ -511,6 +511,75 @@ Streak: 🔥 4 days (Your longest!)
 <div class="tab-panel" id="tab-hn">
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-21</span>
+                        <span class="cat-dot" style="background:#fb923c"></span>
+                        <span>Top</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">488 words · 2 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview">--- ### 07:10 UTC — top   # 🧡 HN Hype Buster Report — 2026-02-21  ## Top Stories (With Hype Scores)  1. **Keep Android Open** [1325 pts] | `[Hype: 3/</div>
+                    <div class="entry-body" style="display:none">
+                        
+<hr>
+<h3>07:10 UTC — top </h3>
+
+<h1>🧡 HN Hype Buster Report — 2026-02-21</h1>
+
+<h2>Top Stories (With Hype Scores)</h2>
+
+<p>1. <strong>Keep Android Open</strong> [1325 pts] | <code>[Hype: 3/10]</code></p>
+<ul>
+<li>F-Droid rallying the troops. Solid activism, but preaching to the choir on HN. The real fight happens in app stores, not comments.</li>
+</ul>
+
+<p>2. <strong>Facebook is cooked</strong> [958 pts] | <code>[Hype: 7/10]</code></p>
+<ul>
+<li>The social media death spiral hits peak vindication energy. Deserved, but we&#x27;ve been saying this since 2012.</li>
+</ul>
+
+<p>3. <strong>Meta Deployed AI and It Is Killing Our Agency</strong> [84 pts] | <code>[Hype: 8/10]</code></p>
+<ul>
+<li>MASSIVELY undershown given the explosive premise. This story <em>should</em> be top 3. The comment ratio is sus — people are reading and staying quiet.</li>
+</ul>
+
+<p>4. <strong>I found a Vulnerability. They found a Lawyer</strong> [488 pts] | <code>[Hype: 9/10]</code></p>
+<ul>
+<li><em>Chef&#x27;s kiss.</em> Responsible disclosure meets legal terror. This is the story that keeps security researchers awake at 3am.</li>
+</ul>
+
+<p>5. <strong>Ggml.ai joins Hugging Face</strong> [715 pts] | <code>[Hype: 4/10]</code></p>
+<ul>
+<li>Local AI gets a big hug (literally). Important infrastructure play, but the &quot;AI&quot; tag makes HN upvote it reflexively. Real impact: medium.</li>
+</ul>
+
+<p>6. <strong>Wikipedia deprecates Archive.today</strong> [388 pts] | <code>[Hype: 6/10]</code></p>
+<ul>
+<li>A DDoS-wielding archive bites the dust. Nobody saw that coming... except everyone who read the tea leaves.</li>
+</ul>
+
+<p>7. <strong>Turn Dependabot Off</strong> [385 pts] | <code>[Hype: 8/10]</code></p>
+<ul>
+<li>Finally, someone said the quiet part loud. Dependabot fatigue is real. This hits different because it&#x27;s heresy against the CI/CD industrial complex.</li>
+</ul>
+
+<hr>
+
+<h2>Trend Watch 🔍</h2>
+
+<p>The hivemind is <em>obsessed</em> with <strong>infrastructure decay &amp; corporate enshittification</strong>. Four of the top 10 stories are &quot;X is broken/evil/killing us&quot; narratives. Meta-bashing season is <em>strong</em>. Meanwhile, actual technical deep-dives (SIMD evolution, storage systems) are languishing in the comment graveyard.</p>
+
+<hr>
+
+<h2>Hype Check ✅❌</h2>
+
+<p><strong>OVERHYPED:</strong></p>
+<ul>
+<li><strong>Ggml.ai/Hugging Face merger</strong> — Gets upvotes for the &quot;AI&quot; buzzword, but it&#x27;s really just infra consolidation. Less revolutionary, mor</li>
+</ul>
+                    </div>
+                </div>
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-20</span>
                         <span class="cat-dot" style="background:#fb923c"></span>
                         <span>Top</span>
@@ -844,6 +913,37 @@ Streak: 🔥 4 days (Your longest!)
                     </div>
                 </div></div>
 <div class="tab-panel" id="tab-news">
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-21</span>
+                        <span class="cat-dot" style="background:#818cf8"></span>
+                        <span>Tech</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">73 words · 1 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview">--- ### 07:42 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja&#x27;s network of informants is temporarily offline. All recon channels returned</div>
+                    <div class="entry-body" style="display:none">
+                        
+<hr>
+<h3>07:42 UTC -- tech</h3>
+
+<h2>News Ninja -- Recon Report: tech</h2>
+
+<p>The ninja&#x27;s network of informants is temporarily offline. All recon channels returned silence.</p>
+
+<p><strong>Possible causes:</strong></p>
+<ul>
+<li>News API keys not configured (GNEWS<em>API</em>KEY / NEWSDATA<em>API</em>KEY)</li>
+<li>API rate limits reached</li>
+<li>Network disruption in the shadows</li>
+</ul>
+
+<p><strong>TL;DR:</strong> Even a ninja needs working comms. Check your API keys and try again.</p>
+
+<p>-- <em>The News Ninja retreats to sharpen its blades. Stay alert.</em></p>
+
+                    </div>
+                </div>
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-20</span>

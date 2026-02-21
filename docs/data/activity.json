@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-02-21",
+    "label": "HN Digest",
+    "title": "Top",
+    "preview": "--- ### 07:10 UTC \u2014 top   # \ud83e\udde1 HN Hype Buster Report \u2014 2026-02-21  ## Top Stories (With Hype Scores)  1. **Keep Android Open** [1325 pts] | `[Hype: 3/10]`    - F-Droid rallying the troops. Solid activ",
+    "category": "hn",
+    "file": "2026-02-21-top.md"
+  },
+  {
+    "date": "2026-02-21",
+    "label": "News",
+    "title": "Tech",
+    "preview": "--- ### 07:42 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja's network of informants is temporarily offline. All recon channels returned silence.  **Possible causes:** - News API keys no",
+    "category": "news",
+    "file": "2026-02-21-tech.md"
+  },
+  {
     "date": "2026-02-20",
     "label": "Roast",
     "title": "2026 02 20",

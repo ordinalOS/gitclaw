@@ -1,5 +1,37 @@
 [
   {
+    "sha": "151d3c5",
+    "date": "2026-02-21",
+    "time": "07:42",
+    "message": "\ud83e\udde0 \ud83e\udd77 News Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "287d16f",
+    "date": "2026-02-21",
+    "time": "07:10",
+    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "50945d0",
+    "date": "2026-02-21",
+    "time": "06:13",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e9b6689",
+    "date": "2026-02-21",
+    "time": "04:28",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-21T04:28Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "b122a4e",
     "date": "2026-02-21",
     "time": "00:23",
@@ -766,37 +798,5 @@
     "message": "fix pages-builder: set git identity before commit",
     "author": "nightfallsnet",
     "is_agent": false
-  },
-  {
-    "sha": "5375964",
-    "date": "2026-02-17",
-    "time": "03:36",
-    "message": "enable architect, council, pages-builder, and karen agents",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "29cd546",
-    "date": "2026-02-17",
-    "time": "03:34",
-    "message": "add Karen QA agent: bug hunter, memory auditor, PR reviewer",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "4a38d6d",
-    "date": "2026-02-17",
-    "time": "03:30",
-    "message": "add architect + council of 7 + GitHub Pages pipeline",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "17ebfeb",
-    "date": "2026-02-17",
-    "time": "09:19",
-    "message": "\ud83e\udde0 \u2615 Morning Roast \u2014 2026-02-17",
-    "author": "gitclaw[bot]",
-    "is_agent": true
   }
 ]
