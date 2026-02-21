@@ -1,5 +1,13 @@
 [
   {
+    "sha": "7bfd684",
+    "date": "2026-02-21",
+    "time": "08:02",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-21T08:02Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "151d3c5",
     "date": "2026-02-21",
     "time": "07:42",
@@ -788,14 +796,6 @@
     "date": "2026-02-17",
     "time": "03:46",
     "message": "\ud83d\udcfa initial Pages build \u2014 6 pages + data files",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "19cb9a5",
-    "date": "2026-02-17",
-    "time": "03:38",
-    "message": "fix pages-builder: set git identity before commit",
     "author": "nightfallsnet",
     "is_agent": false
   }
