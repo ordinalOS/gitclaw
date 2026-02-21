@@ -5,8 +5,8 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 796,
-  "level": "Adept",
+  "xp": 801,
+  "level": "Expert",
   "stats": {
     "issues_triaged": 0,
     "prs_reviewed": 0,
@@ -19,7 +19,7 @@
     "comments_posted": 0,
     "commits_made": 8,
     "solana_queries": 0,
-    "solana_monitors": 26,
+    "solana_monitors": 27,
     "solana_builds": 0,
     "hn_scrapes": 6,
     "news_scrapes": 6,
