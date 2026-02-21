@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 781,
+  "xp": 786,
   "level": "Adept",
   "stats": {
     "issues_triaged": 0,
@@ -19,7 +19,7 @@
     "comments_posted": 0,
     "commits_made": 7,
     "solana_queries": 0,
-    "solana_monitors": 25,
+    "solana_monitors": 26,
     "solana_builds": 0,
     "hn_scrapes": 6,
     "news_scrapes": 6,
