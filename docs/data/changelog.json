@@ -1,5 +1,21 @@
 [
   {
+    "sha": "635488d",
+    "date": "2026-02-21",
+    "time": "18:06",
+    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "fa02447",
+    "date": "2026-02-21",
+    "time": "16:02",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-21T16:02Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "745e5af",
     "date": "2026-02-21",
     "time": "12:07",
@@ -782,21 +798,5 @@
     "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T12:06Z",
     "author": "gitclaw[bot]",
     "is_agent": true
-  },
-  {
-    "sha": "e704df7",
-    "date": "2026-02-17",
-    "time": "12:02",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T12:02Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "6313b52",
-    "date": "2026-02-17",
-    "time": "04:02",
-    "message": "Apple HIG redesign + fix architect JSON parsing and committer identity",
-    "author": "nightfallsnet",
-    "is_agent": false
   }
 ]
