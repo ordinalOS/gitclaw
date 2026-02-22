@@ -25,6 +25,14 @@
   },
   {
     "date": "2026-02-22",
+    "label": "News",
+    "title": "Tech",
+    "preview": "--- ### 07:43 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja's network of informants is temporarily offline. All recon channels returned silence.  **Possible causes:** - News API keys no",
+    "category": "news",
+    "file": "2026-02-22-tech.md"
+  },
+  {
+    "date": "2026-02-22",
     "label": "Crypto",
     "title": "Bitcoin",
     "preview": "--- ### 03:51 UTC \u2014 bitcoin bitcoin  ## Crypto Oracle Analysis: BITCOIN  **Price:** $67,992.00 **24h Change:** +0.60% **Market Cap:** $1359.34B **24h Volume:** $20.11B  ### Indicators - RSI (14): 52.",
@@ -390,13 +398,5 @@
     "preview": "--- ### 07:43 UTC -- tech  # \ud83d\udcf0 News Ninja Strike Report  ## Strike Report - **Low Impact** \u2014 *Ask HN: Career in Software Dev (AI Era)*   - The dojo teaches: even in the age of the algorithm, human co",
     "category": "news",
     "file": "2026-02-15-tech.md"
-  },
-  {
-    "date": "2026-02-14",
-    "label": "Roast",
-    "title": "2026 02 14",
-    "preview": "# \u2615 MORNING ROAST \u2014 Valentine's Day Edition \u2615  ## The Daily Grind *Valentine's Day 2026: ordinalOS is out here pulling all-nighters like love itself depends on it. Four commits before midnight? Someon",
-    "category": "roasts",
-    "file": "2026-02-14.md"
   }
 ]

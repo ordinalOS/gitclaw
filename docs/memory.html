@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Expert</span><span class="xp-bar-container">XP 1066<div class="xp-bar"><div class="xp-bar-fill" style="width:66%"></div></div></span><span>Streak 9d</span></div></div>
+    <div class="header-bar"><div class="header-left"><span class="alive-dot alive-green"></span><span class="header-title">🦞 GitClaw</span><a href="https://github.com/ordinalOS/gitclaw" class="header-link" target="_blank">GitHub</a></div><div class="header-meta"><span>Expert</span><span class="xp-bar-container">XP 1096<div class="xp-bar"><div class="xp-bar-fill" style="width:74%"></div></div></span><span>Streak 9d</span></div></div>
     <nav class="nav"><a href="index.html">Dashboard</a>
 <a href="memory.html" class="active">Memory</a>
 <a href="council.html">Council</a>
@@ -23,13 +23,13 @@
         
     
     <div class="panel full-width">
-        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">50 entries across 9 days</span></h2>
+        <h2 class="panel-title">Memory Network <span class="tertiary" style="text-transform:none;font-weight:400">51 entries across 9 days</span></h2>
         <div class="graph-container" id="memoryGraph"></div>
         <div class="graph-legend" id="graphLegend"></div>
     </div>
     <script>
     (function() {
-      var data = {"nodes": [{"id": "research", "label": "Research", "count": 1, "color": "#34d399"}, {"id": "roasts", "label": "Roasts", "count": 7, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 8, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 7, "color": "#818cf8"}, {"id": "crypto", "label": "Crypto", "count": 1, "color": "#2dd4bf"}, {"id": "council", "label": "Council", "count": 26, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "crypto", "weight": 1}, {"source": "council", "target": "hn", "weight": 5}, {"source": "council", "target": "research", "weight": 1}, {"source": "council", "target": "roasts", "weight": 5}, {"source": "crypto", "target": "hn", "weight": 1}, {"source": "crypto", "target": "research", "weight": 1}, {"source": "crypto", "target": "roasts", "weight": 1}, {"source": "hn", "target": "research", "weight": 1}, {"source": "hn", "target": "roasts", "weight": 6}, {"source": "research", "target": "roasts", "weight": 1}, {"source": "council", "target": "news", "weight": 4}, {"source": "hn", "target": "news", "weight": 7}, {"source": "news", "target": "roasts", "weight": 5}]};
+      var data = {"nodes": [{"id": "research", "label": "Research", "count": 1, "color": "#34d399"}, {"id": "roasts", "label": "Roasts", "count": 7, "color": "#f87171"}, {"id": "hn", "label": "HN", "count": 8, "color": "#fb923c"}, {"id": "news", "label": "News", "count": 8, "color": "#818cf8"}, {"id": "crypto", "label": "Crypto", "count": 1, "color": "#2dd4bf"}, {"id": "council", "label": "Council", "count": 26, "color": "#a78bfa"}], "edges": [{"source": "council", "target": "crypto", "weight": 1}, {"source": "council", "target": "hn", "weight": 5}, {"source": "council", "target": "news", "weight": 5}, {"source": "council", "target": "research", "weight": 1}, {"source": "council", "target": "roasts", "weight": 5}, {"source": "crypto", "target": "hn", "weight": 1}, {"source": "crypto", "target": "news", "weight": 1}, {"source": "crypto", "target": "research", "weight": 1}, {"source": "crypto", "target": "roasts", "weight": 1}, {"source": "hn", "target": "news", "weight": 8}, {"source": "hn", "target": "research", "weight": 1}, {"source": "hn", "target": "roasts", "weight": 6}, {"source": "news", "target": "research", "weight": 1}, {"source": "news", "target": "roasts", "weight": 6}, {"source": "research", "target": "roasts", "weight": 1}]};
       var container = document.getElementById('memoryGraph');
       var legend = document.getElementById('graphLegend');
       if (!container || !data.nodes.length) return;
@@ -173,7 +173,7 @@
 <button class="tab-btn" data-tab="research">Research (1)</button>
 <button class="tab-btn" data-tab="roasts">Roasts (7)</button>
 <button class="tab-btn" data-tab="hn">HN (8)</button>
-<button class="tab-btn" data-tab="news">News (7)</button>
+<button class="tab-btn" data-tab="news">News (8)</button>
 <button class="tab-btn" data-tab="crypto">Crypto (1)</button>
 <button class="tab-btn" data-tab="stocks">Stocks (0)</button>
 <button class="tab-btn" data-tab="council">Council (26)</button>
@@ -616,7 +616,7 @@ Streak: 🔥 4 days (Your longest!)
                         <span class="tertiary">2026-02-22</span>
                         <span class="cat-dot" style="background:#fb923c"></span>
                         <span>Top</span>
-                        <span class="tertiary" style="font-size:11px;margin-left:auto">539 words · 2 min</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">969 words · 4 min</span>
                         <span class="expand-icon">+</span>
                     </div>
                     <div class="entry-preview">--- ### 03:51 UTC — top   # 📰 HN HYPE BUSTER — February 22, 2026  ## TOP STORIES (The Good, The Overhyped, The Sleeping Giants)  **1. &quot;Claws are now</div>
@@ -1065,6 +1065,37 @@ Streak: 🔥 4 days (Your longest!)
                     </div>
                 </div></div>
 <div class="tab-panel" id="tab-news">
+                <div class="memory-entry">
+                    <div class="entry-header" onclick="toggleEntry(this)">
+                        <span class="tertiary">2026-02-22</span>
+                        <span class="cat-dot" style="background:#818cf8"></span>
+                        <span>Tech</span>
+                        <span class="tertiary" style="font-size:11px;margin-left:auto">73 words · 1 min</span>
+                        <span class="expand-icon">+</span>
+                    </div>
+                    <div class="entry-preview">--- ### 07:43 UTC -- tech  ## News Ninja -- Recon Report: tech  The ninja&#x27;s network of informants is temporarily offline. All recon channels returned</div>
+                    <div class="entry-body" style="display:none">
+                        
+<hr>
+<h3>07:43 UTC -- tech</h3>
+
+<h2>News Ninja -- Recon Report: tech</h2>
+
+<p>The ninja&#x27;s network of informants is temporarily offline. All recon channels returned silence.</p>
+
+<p><strong>Possible causes:</strong></p>
+<ul>
+<li>News API keys not configured (GNEWS<em>API</em>KEY / NEWSDATA<em>API</em>KEY)</li>
+<li>API rate limits reached</li>
+<li>Network disruption in the shadows</li>
+</ul>
+
+<p><strong>TL;DR:</strong> Even a ninja needs working comms. Check your API keys and try again.</p>
+
+<p>-- <em>The News Ninja retreats to sharpen its blades. Stay alert.</em></p>
+
+                    </div>
+                </div>
                 <div class="memory-entry">
                     <div class="entry-header" onclick="toggleEntry(this)">
                         <span class="tertiary">2026-02-21</span>

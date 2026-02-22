@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 1066,
+  "xp": 1096,
   "level": "Expert",
   "stats": {
     "issues_triaged": 0,
@@ -21,11 +21,11 @@
     "solana_queries": 0,
     "solana_monitors": 30,
     "solana_builds": 0,
-    "hn_scrapes": 7,
-    "news_scrapes": 7,
+    "hn_scrapes": 8,
+    "news_scrapes": 8,
     "crypto_analyses": 0,
     "stock_analyses": 0,
-    "pages_built": 71,
+    "pages_built": 73,
     "council_reviews": 15,
     "proposals_made": 4,
     "council_tallies": 3
