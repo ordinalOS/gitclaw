@@ -1,0 +1,114 @@
+{
+  "timestamp": "2026-02-22T03:51:08.093073+00:00",
+  "total": 15,
+  "critical": 0,
+  "warnings": 11,
+  "nitpicks": 4,
+  "issues": [
+    {
+      "severity": "NITPICK",
+      "file": "agents/karen.py",
+      "field": "line 305",
+      "problem": "Found TODO comment: # Check for TODO/FIXME/HACK comments",
+      "detail": "Someone left a note and never came back. Classic."
+    },
+    {
+      "severity": "NITPICK",
+      "file": "agents/karen.py",
+      "field": "line 305",
+      "problem": "Found FIXME comment: # Check for TODO/FIXME/HACK comments",
+      "detail": "Someone left a note and never came back. Classic."
+    },
+    {
+      "severity": "NITPICK",
+      "file": "agents/karen.py",
+      "field": "line 305",
+      "problem": "Found HACK comment: # Check for TODO/FIXME/HACK comments",
+      "detail": "Someone left a note and never came back. Classic."
+    },
+    {
+      "severity": "NITPICK",
+      "file": "agents/news_scraper.py",
+      "field": "line 147",
+      "problem": "Found HACK comment: # Ultra-fallback: Hacker News Algolia",
+      "detail": "Someone left a note and never came back. Classic."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/code-jester.yml",
+      "field": "line 48",
+      "problem": "Possible GitHub expression in run block: DIFF=$(gh pr diff ${{ github.event.pull_request.number }} 2>",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/code-jester.yml",
+      "field": "line 53",
+      "problem": "Possible GitHub expression in run block: FILES=$(gh pr view ${{ github.event.pull_request.number }} -",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/code-jester.yml",
+      "field": "line 106",
+      "problem": "Possible GitHub expression in run block: gh pr review ${{ github.event.pull_request.number }} \\",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/karen.yml",
+      "field": "line 210",
+      "problem": "Possible GitHub expression in run block: persist \"memory/state.json\" \"\ud83d\udc85 Karen reviewed PR #${{ github",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/python-agent-runner.yml",
+      "field": "line 91",
+      "problem": "Possible GitHub expression in run block: python3 \"${{ inputs.agent_script }}\"",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/quest-master.yml",
+      "field": "line 101",
+      "problem": "Possible GitHub expression in run block: gh issue edit ${{ github.event.issue.number }} \\",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/quest-master.yml",
+      "field": "line 109",
+      "problem": "Possible GitHub expression in run block: persist \"memory/state.json\" \"\u2694\ufe0f Quest posted for issue #${{ ",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/setup.yml",
+      "field": "line 52",
+      "problem": "Possible GitHub expression in run block: \"persona\": \"${{ inputs.persona }}\",",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/setup.yml",
+      "field": "line 81",
+      "problem": "Possible GitHub expression in run block: persist \"memory/state.json\" \"\ud83e\udd9e GitClaw initialized! Persona:",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/setup.yml",
+      "field": "line 92",
+      "problem": "Possible GitHub expression in run block: **Persona:** ${{ inputs.persona }}",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    },
+    {
+      "severity": "WARNING",
+      "file": ".github/workflows/setup.yml",
+      "field": "line 116",
+      "problem": "Possible GitHub expression in run block: echo \"- Persona: **${{ inputs.persona }}**\" >> $GITHUB_STEP_",
+      "detail": "Verify this is passed via env: block, not interpolated directly."
+    }
+  ]
+}

@@ -5,12 +5,12 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 901,
+  "xp": 916,
   "level": "Expert",
   "stats": {
     "issues_triaged": 0,
     "prs_reviewed": 0,
-    "researches_completed": 1,
+    "researches_completed": 0,
     "quests_completed": 0,
     "lore_entries": 0,
     "dreams_interpreted": 1,
@@ -23,12 +23,13 @@
     "solana_builds": 0,
     "hn_scrapes": 7,
     "news_scrapes": 7,
-    "crypto_analyses": 1,
+    "crypto_analyses": 0,
     "stock_analyses": 0,
     "pages_built": 71,
     "council_reviews": 6,
     "proposals_made": 3,
-    "council_tallies": 1
+    "council_tallies": 1,
+    "karen_audits": 2
   },
   "achievements": [],
   "last_active": "2026-02-22",
