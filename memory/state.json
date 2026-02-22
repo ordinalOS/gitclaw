@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 916,
+  "xp": 896,
   "level": "Expert",
   "stats": {
     "issues_triaged": 0,
@@ -17,19 +17,18 @@
     "fortunes_dispensed": 3,
     "roasts_delivered": 0,
     "comments_posted": 0,
-    "commits_made": 9,
+    "commits_made": 10,
     "solana_queries": 0,
     "solana_monitors": 30,
     "solana_builds": 0,
-    "hn_scrapes": 7,
+    "hn_scrapes": 8,
     "news_scrapes": 7,
-    "crypto_analyses": 0,
+    "crypto_analyses": 1,
     "stock_analyses": 0,
     "pages_built": 71,
     "council_reviews": 6,
     "proposals_made": 3,
-    "council_tallies": 1,
-    "karen_audits": 2
+    "council_tallies": 1
   },
   "achievements": [],
   "last_active": "2026-02-22",
