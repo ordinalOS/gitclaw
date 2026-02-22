@@ -1,5 +1,13 @@
 [
   {
+    "sha": "10f8126",
+    "date": "2026-02-22",
+    "time": "12:01",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-22T12:01Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "4b4dfa7",
     "date": "2026-02-22",
     "time": "08:02",
@@ -788,14 +796,6 @@
     "date": "2026-02-18",
     "time": "06:28",
     "message": "\ud83e\udde0 \u2696\ufe0f Council: wonderful reviewed PR #6",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "38d490d",
-    "date": "2026-02-18",
-    "time": "06:28",
-    "message": "\ud83e\udde0 \u2696\ufe0f Council: cia reviewed PR #6",
     "author": "gitclaw[bot]",
     "is_agent": true
   }
