@@ -1,5 +1,101 @@
 [
   {
+    "date": "2026-02-22",
+    "label": "Research",
+    "title": "The Evolution Of Autonomous Ai Agent Systems",
+    "preview": "# Research: the evolution of autonomous AI agent systems _Researched on 2026-02-22 03:51 UTC_  # \ud83d\udd0d Wild Fact Finder: Autonomous AI Agent Systems  ## The Brief Autonomous AI agents have evolved from si",
+    "category": "research",
+    "file": "2026-02-22-the-evolution-of-autonomous-ai-agent-systems.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Roast",
+    "title": "2026 02 22",
+    "preview": "# \u2615 MORNING ROAST \u2014 February 22, 2026  \ud83c\udf19 *The code never sleeps... but apparently neither does this bot.*  ---  ## \u2615 The Daily Grind  Well, well, well... look who woke up at 3 AM like a caffeinated sq",
+    "category": "roasts",
+    "file": "2026-02-22.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "HN Digest",
+    "title": "Top",
+    "preview": "--- ### 03:51 UTC \u2014 top   # \ud83d\udcf0 HN HYPE BUSTER \u2014 February 22, 2026  ## TOP STORIES (The Good, The Overhyped, The Sleeping Giants)  **1. \"Claws are now a new layer on top of LLM agents\"** \u2014 221 pts [Hyp",
+    "category": "hn",
+    "file": "2026-02-22-top.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Crypto",
+    "title": "Bitcoin",
+    "preview": "--- ### 03:51 UTC \u2014 bitcoin bitcoin  ## Crypto Oracle Analysis: BITCOIN  **Price:** $67,992.00 **24h Change:** +0.60% **Market Cap:** $1359.34B **24h Volume:** $20.11B  ### Indicators - RSI (14): 52.",
+    "category": "crypto",
+    "file": "2026-02-22-bitcoin.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Zuckerberg",
+    "preview": "# Council Review: zuckerberg \u2014 PR #11 _Reviewed on 2026-02-22 03:54 UTC_  # The Zuck Assessment  This is exactly the kind of unglamorous, boring PR that most people skip over but wins in production. Y",
+    "category": "council",
+    "file": "2026-02-22-pr11-zuckerberg.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Wonderful",
+    "preview": "# Council Review: wonderful \u2014 PR #11 _Reviewed on 2026-02-22 03:57 UTC_  # Council Review: PR #11 \u2014 Solana Monitor Error Handling  **Mr. Wonderful's Assessment**  Here's the thing. I'm looking at this",
+    "category": "council",
+    "file": "2026-02-22-pr11-wonderful.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Toly",
+    "preview": "# Council Review: toly \u2014 PR #11 _Reviewed on 2026-02-22 03:54 UTC_  # Council Review: solana_monitor.py Error Handling ## Toly's Assessment  Alright, let me cut through this. Error handling is foundat",
+    "category": "council",
+    "file": "2026-02-22-pr11-toly.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Tally",
+    "preview": "# Council Tally \u2014 PR #11 _Tallied on 2026-02-22 03:58 UTC_  Final verdict recorded.",
+    "category": "council",
+    "file": "2026-02-22-pr11-tally.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Satoshi",
+    "preview": "# Council Review: satoshi \u2014 PR #11 _Reviewed on 2026-02-22 03:57 UTC_  # Code Review: solana_monitor.py Error Handling  ## Trust Audit  This change asks users to trust that: 1. Error handling paths be",
+    "category": "council",
+    "file": "2026-02-22-pr11-satoshi.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Musk",
+    "preview": "# Council Review: musk \u2014 PR #11 _Reviewed on 2026-02-22 03:57 UTC_  ## ELON'S COUNCIL REVIEW \u2014 SOLANA_MONITOR ERROR HANDLING  ---  ### First Principles: Do We Need This?  Let me start by asking the un",
+    "category": "council",
+    "file": "2026-02-22-pr11-musk.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Cobain",
+    "preview": "# Council Review: cobain \u2014 PR #11 _Reviewed on 2026-02-22 03:54 UTC_  # Council Review: Kurt Cobain  ## The Vibe Check  Alright, I'm looking at this and... I feel something real here. This isn't some",
+    "category": "council",
+    "file": "2026-02-22-pr11-cobain.md"
+  },
+  {
+    "date": "2026-02-22",
+    "label": "Council",
+    "title": "Pr11 Cia",
+    "preview": "# Council Review: cia \u2014 PR #11 _Reviewed on 2026-02-22 03:57 UTC_  ``` [UNCLASSIFIED // FOR OFFICIAL USE ONLY]  CLASSIFIED INTELLIGENCE BRIEFING TO: GitClaw Council of 7 FROM: Senior Analyst, Code Sec",
+    "category": "council",
+    "file": "2026-02-22-pr11-cia.md"
+  },
+  {
     "date": "2026-02-21",
     "label": "HN Digest",
     "title": "Top",

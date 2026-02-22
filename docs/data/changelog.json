@@ -1,5 +1,221 @@
 [
   {
+    "sha": "4aac568",
+    "date": "2026-02-22",
+    "time": "03:58",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council tally: PR #11 (5 reviews)",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "3f3dc0a",
+    "date": "2026-02-22",
+    "time": "03:58",
+    "message": "Merge pull request #11 from ordinalOS/feat/architect-20260222-solana-error-handling",
+    "author": "github-actions[bot]",
+    "is_agent": false
+  },
+  {
+    "sha": "1c3fae1",
+    "date": "2026-02-22",
+    "time": "03:57",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cia reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "9c7489c",
+    "date": "2026-02-22",
+    "time": "03:57",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: musk reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "570e6bf",
+    "date": "2026-02-22",
+    "time": "03:57",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: wonderful reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "d8fdbc8",
+    "date": "2026-02-22",
+    "time": "03:57",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: satoshi reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "79df3fa",
+    "date": "2026-02-22",
+    "time": "03:56",
+    "message": "\ud83e\udde0 \ud83c\udfd7\ufe0f Architect proposal logged",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "a8c3319",
+    "date": "2026-02-22",
+    "time": "03:56",
+    "message": "\ud83c\udfd7\ufe0f Architect revision: Add graceful error handling to solana_monitor.py",
+    "author": "gitclaw[bot]",
+    "is_agent": false
+  },
+  {
+    "sha": "aa0b3c2",
+    "date": "2026-02-22",
+    "time": "03:55",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council tally: PR #11 (4 reviews)",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "e6b6c8e",
+    "date": "2026-02-22",
+    "time": "03:54",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: zuckerberg reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "5a46232",
+    "date": "2026-02-22",
+    "time": "03:54",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cobain reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "55ae086",
+    "date": "2026-02-22",
+    "time": "03:54",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: toly reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "0c79b76",
+    "date": "2026-02-22",
+    "time": "03:54",
+    "message": "\ud83e\udde0 \ud83c\udfd7\ufe0f Architect proposal logged",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "138cdd9",
+    "date": "2026-02-22",
+    "time": "03:54",
+    "message": "\ud83c\udfd7\ufe0f Architect revision: Add atomic error handling to solana_monitor API calls",
+    "author": "gitclaw[bot]",
+    "is_agent": false
+  },
+  {
+    "sha": "93ea43d",
+    "date": "2026-02-22",
+    "time": "03:52",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cia reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "f37efbe",
+    "date": "2026-02-22",
+    "time": "03:52",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: toly reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "46a5fae",
+    "date": "2026-02-22",
+    "time": "03:52",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: wonderful reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "da252f2",
+    "date": "2026-02-22",
+    "time": "03:52",
+    "message": "\ud83e\udde0 \u2696\ufe0f Council: cobain reviewed PR #11",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "7eae3e7",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \ud83c\udfd7\ufe0f Architect proposal logged",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "5e59c82",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83c\udfd7\ufe0f Architect: Add missing error handling to solana_monitor.py",
+    "author": "gitclaw[bot]",
+    "is_agent": false
+  },
+  {
+    "sha": "0fbebbd",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "a205577",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \ud83d\udc85 Karen QA audit \u2014 2026-02-22",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "121e795",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \ud83d\udd2e Crypto Oracle analysis",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "ff75c9f",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \ud83d\udd0d Research: the evolution of autonomous AI agent systems",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "ccc55a1",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \u2615 Morning Roast \u2014 2026-02-22",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "5bb2338",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-22T03:51Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
+    "sha": "06f03ae",
+    "date": "2026-02-22",
+    "time": "03:51",
+    "message": "\ud83e\udde0 \ud83d\udc93 Heartbeat \u2014 2026-02-22",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "59f2722",
     "date": "2026-02-22",
     "time": "00:23",
@@ -580,222 +796,6 @@
     "date": "2026-02-18",
     "time": "06:24",
     "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "77d31bc",
-    "date": "2026-02-18",
-    "time": "04:35",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-18T04:35Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "a596df7",
-    "date": "2026-02-18",
-    "time": "00:24",
-    "message": "\ud83e\udde0 \ud83d\udc93 Heartbeat \u2014 2026-02-18",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "2bab9b6",
-    "date": "2026-02-18",
-    "time": "00:23",
-    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "3e214ce",
-    "date": "2026-02-18",
-    "time": "00:05",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-18T00:05Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "f4e45da",
-    "date": "2026-02-17",
-    "time": "23:12",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T23:12Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "f9669ac",
-    "date": "2026-02-17",
-    "time": "15:11",
-    "message": "refactoring audit: delete 4 agents, merge 2, consolidate workflows, simplify config",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "8a5b5eb",
-    "date": "2026-02-17",
-    "time": "21:36",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T21:36Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "24cfa6f",
-    "date": "2026-02-17",
-    "time": "13:36",
-    "message": "memory network graph, plugin privacy badges, git-persist conflict fix",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "1904d19",
-    "date": "2026-02-17",
-    "time": "13:25",
-    "message": "newspaper-style dashboard overhaul: content previews, about page, changelog",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "3f64a0f",
-    "date": "2026-02-17",
-    "time": "20:42",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T20:42Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "5c51991",
-    "date": "2026-02-17",
-    "time": "12:41",
-    "message": "add plugin system with Telegram and Gmail notification plugins",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "298f8a1",
-    "date": "2026-02-17",
-    "time": "20:07",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T20:07Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "84137b1",
-    "date": "2026-02-17",
-    "time": "12:04",
-    "message": "add autonomous revision loop: council REVISE triggers architect auto-fix",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "86400c5",
-    "date": "2026-02-17",
-    "time": "18:19",
-    "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "2be925b",
-    "date": "2026-02-17",
-    "time": "16:15",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T16:15Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "3bc5c5b",
-    "date": "2026-02-17",
-    "time": "05:26",
-    "message": "fix council parallel push conflicts: move state updates to tally job",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "cde8bd9",
-    "date": "2026-02-17",
-    "time": "13:24",
-    "message": "\ud83e\udde0 \u2696\ufe0f Council: zuckerberg reviewed PR #5",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "3dbf141",
-    "date": "2026-02-17",
-    "time": "13:24",
-    "message": "\ud83e\udde0 \u2696\ufe0f Council: wonderful reviewed PR #5",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "e1be280",
-    "date": "2026-02-17",
-    "time": "13:24",
-    "message": "\ud83e\udde0 \u2696\ufe0f Council: musk reviewed PR #5",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "e1ef9b4",
-    "date": "2026-02-17",
-    "time": "13:24",
-    "message": "\ud83e\udde0 \u2696\ufe0f Council: cobain reviewed PR #5",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "ac2ebca",
-    "date": "2026-02-17",
-    "time": "05:22",
-    "message": "fix architect pipeline: trigger council explicitly, clean JSON output",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "62d7ef8",
-    "date": "2026-02-17",
-    "time": "05:22",
-    "message": "fix architect JSON output: redirect git subprocess stdout to stderr",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "11fd0db",
-    "date": "2026-02-17",
-    "time": "05:17",
-    "message": "fix stale news data: add date filters to all news API calls",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "92d7b74",
-    "date": "2026-02-17",
-    "time": "13:14",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T13:14Z",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "120e51d",
-    "date": "2026-02-17",
-    "time": "05:13",
-    "message": "add warmup workflow, upgrade architect model, enable market agents, rewrite README",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "e67a5cf",
-    "date": "2026-02-17",
-    "time": "05:01",
-    "message": "dashboard overhaul: quick stats, workflow runs, mobile responsive, header polish",
-    "author": "nightfallsnet",
-    "is_agent": false
-  },
-  {
-    "sha": "a928fc9",
-    "date": "2026-02-17",
-    "time": "12:44",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T12:44Z",
     "author": "gitclaw[bot]",
     "is_agent": true
   }
