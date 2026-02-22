@@ -1,5 +1,13 @@
 [
   {
+    "sha": "89052a5",
+    "date": "2026-02-21",
+    "time": "20:01",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-21T20:01Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "635488d",
     "date": "2026-02-21",
     "time": "18:06",
@@ -788,14 +796,6 @@
     "date": "2026-02-17",
     "time": "12:13",
     "message": "\ud83e\udde0 \ud83d\udce1 Solana monitoring sweep",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "9842812",
-    "date": "2026-02-17",
-    "time": "12:06",
-    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-17T12:06Z",
     "author": "gitclaw[bot]",
     "is_agent": true
   }
