@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 936,
+  "xp": 966,
   "level": "Expert",
   "stats": {
     "issues_triaged": 0,
@@ -28,7 +28,8 @@
     "pages_built": 71,
     "council_reviews": 6,
     "proposals_made": 4,
-    "council_tallies": 1
+    "council_tallies": 1,
+    "proposals_revised": 1
   },
   "achievements": [],
   "last_active": "2026-02-22",
