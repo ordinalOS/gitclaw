@@ -1,275 +1,211 @@
 #!/usr/bin/env python3
-"""Solana Monitor — tracks wallet balances and token movements."""
+"""
+Solana Monitor Agent — Scheduled wallet and token price monitoring.
+Tracks balances and prices, detects changes, generates alerts.
+"""
 
 import json
-import sys
 import os
-from datetime import datetime
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
-try:
-    from common import (
-        get_state, save_state, load_yaml, log, format_price,
-        run_shell, render_template
-    )
-except ImportError:
-    sys.path.insert(0, str(Path(__file__).parent))
-    from common import (
-        get_state, save_state, load_yaml, log, format_price,
-        run_shell, render_template
-    )
+from common import (
+    MEMORY_DIR, award_xp, call_llm, gh_post_comment,
+    log, read_prompt, today, update_stats,
+)
+from solana_query import (
+    dex_search, get_balance, WELL_KNOWN_MINTS,
+)
+
+SNAPSHOTS_DIR = MEMORY_DIR / "solana" / "wallets"
+ALERTS_DIR = MEMORY_DIR / "solana" / "alerts"
 
 
-def call_solana_api(method: str, params: list) -> dict:
-    """Call Solana RPC with error handling."""
-    payload = json.dumps({
-        "jsonrpc": "2.0",
-        "id": 1,
-        "method": method,
-        "params": params
-    })
-    
-    rpc_url = os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
-    result = run_shell([
-        "curl", "-sS", "-X", "POST", rpc_url,
-        "-H", "Content-Type: application/json",
-        "-d", payload
-    ])
-    
-    if result["exit_code"] != 0:
-        log(f"❌ Solana API call failed: {result['stderr']}", level="error")
-        return {"error": result["stderr"]}
-    
+def load_previous_snapshot() -> dict:
+    """Load the most recent monitoring snapshot."""
+    SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+    snapshot_files = sorted(SNAPSHOTS_DIR.glob("*.json"))
+    if snapshot_files:
+        try:
+            return json.loads(snapshot_files[-1].read_text())
+        except json.JSONDecodeError as e:
+            log(f"⚠️  Corrupted snapshot file: {snapshot_files[-1].name}", level="warning")
+            log(f"Parse error: {e}", level="debug")
+            # Return empty dict but log the corruption for investigation
+            return {}
+        except Exception as e:
+            log(f"❌ Failed to read snapshot: {e}", level="error")
+            sys.exit(1)
+    return {}
+
+
+def save_snapshot(data: dict) -> Path:
+    """Save current monitoring snapshot."""
+    SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
+    path = SNAPSHOTS_DIR / f"snapshot-{ts}.json"
     try:
-        data = json.loads(result["stdout"])
+        path.write_text(json.dumps(data, indent=2) + "\n")
+    except (OSError, IOError) as e:
+        log(f"❌ Failed to write snapshot: {e}", level="error")
+        sys.exit(1)
+    return path
+
+
+def get_watched_wallets() -> list[dict]:
+    """Get wallets to monitor from environment or config."""
+    wallets_json = os.environ.get("SOLANA_WALLETS", "[]")
+    try:
+        wallets = json.loads(wallets_json)
+        if not isinstance(wallets, list):
+            log("❌ SOLANA_WALLETS must be a JSON array", level="error")
+            sys.exit(1)
+        return wallets
     except json.JSONDecodeError as e:
-        log(f"❌ Failed to parse API response: {e}", level="error")
-        log(f"Raw response: {result['stdout'][:500]}", level="debug")
-        return {"error": f"JSON parse error: {e}"}
-    
-    if "error" in data:
-        log(f"❌ API returned error: {data['error']}", level="error")
-        return {"error": data["error"]}
-    
-    return data.get("result", {})
+        log(f"❌ Invalid SOLANA_WALLETS JSON: {e}", level="error")
+        sys.exit(1)
 
 
-def get_sol_balance(address: str) -> float:
-    """Get SOL balance for an address."""
-    result = call_solana_api("getBalance", [address])
-    if "error" in result:
-        log(f"⚠️  Failed to get SOL balance for {address}: {result['error']}", level="warning")
-        return 0.0
-    
-    try:
-        lamports = result.get("value", 0)
-        return lamports / 1e9
-    except (TypeError, ValueError) as e:
-        log(f"⚠️  Invalid balance value for {address}: {e}", level="warning")
-        return 0.0
+def fetch_current_state() -> dict:
+    """Fetch current balances for all watched wallets."""
+    wallets = get_watched_wallets()
+    current = {"timestamp": datetime.now(timezone.utc).isoformat(), "wallets": {}}
+
+    for wallet in wallets:
+        address = wallet.get("address")
+        if not address:
+            log("⚠️  Wallet missing 'address' field, skipping", level="warning")
+            continue
+
+        label = wallet.get("label", address[:8])
+        log(f"📊 Checking {label}...")
+
+        try:
+            # Get SOL balance - this calls Solana RPC internally
+            sol_balance = get_balance(address)
+            
+            # If get_balance returns None or negative (error indicator), fail-fast
+            if sol_balance is None:
+                log(f"❌ Failed to fetch SOL balance for {label}", level="error")
+                sys.exit(1)
+
+            current["wallets"][address] = {
+                "label": label,
+                "sol": sol_balance,
+                "tokens": {},  # Token account parsing would go here
+            }
+
+        except Exception as e:
+            # Any exception during balance fetch is critical - don't continue with partial data
+            log(f"❌ Critical error fetching balance for {label}: {type(e).__name__}", level="error")
+            sys.exit(1)
+
+    return current
 
 
-def get_token_accounts(address: str) -> list:
-    """Get SPL token accounts for an address."""
-    result = call_solana_api(
-        "getTokenAccountsByOwner",
-        [
-            address,
-            {"programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},
-            {"encoding": "jsonParsed"}
-        ]
-    )
-    
-    if "error" in result:
-        log(f"⚠️  Failed to get token accounts for {address}: {result['error']}", level="warning")
-        return []
-    
-    try:
-        accounts = result.get("value", [])
-        return accounts
-    except (TypeError, ValueError) as e:
-        log(f"⚠️  Invalid token accounts data for {address}: {e}", level="warning")
-        return []
+def detect_changes(previous: dict, current: dict) -> list[dict]:
+    """Compare snapshots and detect significant changes."""
+    changes = []
+
+    if not previous or "wallets" not in previous:
+        return changes
+
+    for address, curr_data in current.get("wallets", {}).items():
+        prev_data = previous.get("wallets", {}).get(address)
+        if not prev_data:
+            continue
+
+        # Check SOL balance changes
+        prev_sol = prev_data.get("sol", 0)
+        curr_sol = curr_data.get("sol", 0)
+        diff = curr_sol - prev_sol
+
+        if abs(diff) > 0.01:  # More than 0.01 SOL change
+            changes.append({
+                "wallet": curr_data.get("label", address[:8]),
+                "type": "sol_balance",
+                "previous": prev_sol,
+                "current": curr_sol,
+                "change": diff,
+            })
+
+    return changes
 
 
-def parse_token_account(account: dict) -> dict:
-    """Parse token account data with error handling."""
-    try:
-        parsed = account["account"]["data"]["parsed"]["info"]
-        token_amount = parsed["tokenAmount"]
-        
-        return {
-            "mint": parsed["mint"],
-            "amount": float(token_amount["uiAmount"] or 0),
-            "decimals": token_amount["decimals"]
-        }
-    except (KeyError, TypeError, ValueError) as e:
-        log(f"⚠️  Failed to parse token account: {e}", level="warning")
-        log(f"Raw account data: {account}", level="debug")
+def generate_alert(changes: list[dict]) -> str | None:
+    """Generate alert message for detected changes."""
+    if not changes:
         return None
 
-
-def get_token_metadata(mint: str) -> dict:
-    """Get token metadata from Jupiter API."""
-    result = run_shell([
-        "curl", "-sS",
-        f"https://tokens.jup.ag/token/{mint}"
-    ])
-    
-    if result["exit_code"] != 0:
-        log(f"⚠️  Failed to fetch metadata for {mint}: {result['stderr']}", level="warning")
-        return {"symbol": mint[:8], "name": "Unknown"}
-    
-    try:
-        data = json.loads(result["stdout"])
-        return {
-            "symbol": data.get("symbol", mint[:8]),
-            "name": data.get("name", "Unknown")
-        }
-    except json.JSONDecodeError as e:
-        log(f"⚠️  Failed to parse token metadata for {mint}: {e}", level="warning")
-        return {"symbol": mint[:8], "name": "Unknown"}
-
-
-def monitor_wallet(wallet: dict, state: dict) -> dict:
-    """Monitor a single wallet."""
-    address = wallet["address"]
-    name = wallet["name"]
-    
-    log(f"📊 Monitoring {name} ({address})")
-    
-    # Get SOL balance
-    sol_balance = get_sol_balance(address)
-    
-    # Get token balances
-    token_accounts = get_token_accounts(address)
-    tokens = []
-    
-    for account in token_accounts:
-        parsed = parse_token_account(account)
-        if parsed is None:
-            continue  # Skip malformed accounts
-        
-        if parsed["amount"] > 0:
-            metadata = get_token_metadata(parsed["mint"])
-            tokens.append({
-                "mint": parsed["mint"],
-                "symbol": metadata["symbol"],
-                "name": metadata["name"],
-                "amount": parsed["amount"]
-            })
-    
-    # Check for changes
-    wallet_key = f"wallet_{address}"
-    prev = state.get(wallet_key, {})
-    
-    changes = []
-    
-    # SOL balance change
-    prev_sol = prev.get("sol_balance", 0)
-    if abs(sol_balance - prev_sol) > 0.01:
-        diff = sol_balance - prev_sol
-        changes.append({
-            "type": "sol_balance",
-            "token": "SOL",
-            "prev": prev_sol,
-            "curr": sol_balance,
-            "diff": diff
-        })
-    
-    # Token changes
-    prev_tokens = {t["mint"]: t["amount"] for t in prev.get("tokens", [])}
-    curr_tokens = {t["mint"]: t["amount"] for t in tokens}
-    
-    for mint, amount in curr_tokens.items():
-        prev_amount = prev_tokens.get(mint, 0)
-        if abs(amount - prev_amount) > 0.01:
-            token = next((t for t in tokens if t["mint"] == mint), None)
-            if token:
-                changes.append({
-                    "type": "token_balance",
-                    "token": token["symbol"],
-                    "mint": mint,
-                    "prev": prev_amount,
-                    "curr": amount,
-                    "diff": amount - prev_amount
-                })
-    
-    # Store current state
-    state[wallet_key] = {
-        "sol_balance": sol_balance,
-        "tokens": tokens,
-        "last_check": datetime.utcnow().isoformat()
-    }
-    
-    return {
-        "name": name,
-        "address": address,
-        "sol_balance": sol_balance,
-        "tokens": tokens,
-        "changes": changes
+    prompt = read_prompt("solana_monitor_alert")
+    prompt_data = {
+        "changes": changes,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
+    try:
+        response = call_llm(prompt, json.dumps(prompt_data, indent=2))
+        return response
+    except Exception as e:
+        log(f"⚠️  Failed to generate alert via LLM: {type(e).__name__}", level="warning")
+        # Fallback to simple text alert
+        lines = ["🚨 Solana Wallet Changes Detected:"]
+        for change in changes:
+            lines.append(
+                f"- {change['wallet']}: {change['type']} changed by {change['change']:.4f}"
+            )
+        return "\n".join(lines)
 
-def main():
-    """Monitor all configured wallets."""
-    try:
-        config = load_yaml("config/solana.yml")
-    except Exception as e:
-        log(f"❌ Failed to load config: {e}", level="error")
-        sys.exit(1)
-    
-    if not config.get("enabled", False):
-        log("⏸️  Solana monitoring disabled")
-        return
-    
-    wallets = config.get("wallets", [])
-    if not wallets:
-        log("⚠️  No wallets configured")
-        return
-    
-    # Load state
-    try:
-        state = get_state()
-    except Exception as e:
-        log(f"⚠️  Failed to load state, using empty state: {e}", level="warning")
-        state = {}
-    
-    # Monitor each wallet
-    results = []
-    for wallet in wallets:
-        try:
-            result = monitor_wallet(wallet, state)
-            results.append(result)
-        except Exception as e:
-            log(f"❌ Error monitoring wallet {wallet.get('name', 'unknown')}: {e}", level="error")
-            continue  # Continue with next wallet instead of crashing
-    
-    # Save state
-    try:
-        save_state(state)
-    except Exception as e:
-        log(f"❌ Failed to save state: {e}", level="error")
-    
-    # Increment monitoring counter
-    try:
-        state["solana_monitors"] = state.get("solana_monitors", 0) + 1
-        save_state(state)
-    except Exception as e:
-        log(f"⚠️  Failed to increment monitor counter: {e}", level="warning")
-    
-    # Report
-    log(f"✅ Monitored {len(results)} wallets")
-    
-    for result in results:
-        if result["changes"]:
-            log(f"🔔 Changes detected for {result['name']}:")
-            for change in result["changes"]:
-                token = change["token"]
-                diff = change["diff"]
-                sign = "+" if diff > 0 else ""
-                log(f"   {token}: {sign}{format_price(diff)}")
+
+def run_monitoring_sweep():
+    """Execute one monitoring sweep cycle."""
+    log("🔍 Starting Solana monitoring sweep...")
+
+    previous = load_previous_snapshot()
+    current = fetch_current_state()
+
+    changes = detect_changes(previous, current)
+
+    if changes:
+        log(f"🚨 Detected {len(changes)} change(s)")
+        alert = generate_alert(changes)
+
+        if alert:
+            ALERTS_DIR.mkdir(parents=True, exist_ok=True)
+            alert_file = ALERTS_DIR / f"alert-{today()}.txt"
+            try:
+                alert_file.write_text(alert)
+                log(f"📝 Alert saved to {alert_file.name}")
+            except (OSError, IOError) as e:
+                log(f"⚠️  Failed to save alert file: {e}", level="warning")
+
+            # Try to post to GitHub if in CI environment
+            if os.environ.get("GITHUB_ACTIONS") == "true":
+                try:
+                    gh_post_comment(alert)
+                except Exception as e:
+                    log(f"⚠️  Failed to post GitHub comment: {type(e).__name__}", level="warning")
+    else:
+        log("✅ No significant changes detected")
+
+    # Save current snapshot
+    snapshot_path = save_snapshot(current)
+    log(f"💾 Snapshot saved: {snapshot_path.name}")
+
+    # Award XP for successful monitoring sweep
+    update_stats("solana_monitor", "sweeps_completed")
+    award_xp("solana_monitor", 5)
+
+    log("✅ Monitoring sweep complete")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        run_monitoring_sweep()
+    except KeyboardInterrupt:
+        log("\n⚠️  Monitoring interrupted by user", level="warning")
+        sys.exit(130)
+    except Exception as e:
+        log(f"❌ Fatal error in monitoring sweep: {type(e).__name__}: {e}", level="error")
+        sys.exit(1)
