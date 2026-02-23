@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 1266,
+  "xp": 1326,
   "level": "Master",
   "stats": {
     "issues_triaged": 0,
@@ -26,10 +26,9 @@
     "crypto_analyses": 0,
     "stock_analyses": 0,
     "pages_built": 85,
-    "council_reviews": 15,
+    "council_reviews": 23,
     "proposals_made": 5,
-    "council_tallies": 3,
-    "proposals_revised": 2
+    "council_tallies": 5
   },
   "achievements": [],
   "last_active": "2026-02-23",
