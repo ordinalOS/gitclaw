@@ -1,238 +1,203 @@
-"""
-GitClaw Agent Commons
-Shared utilities, LLM client, and state management for all agents.
-The Python equivalent of scripts/utils.sh + scripts/llm.sh.
-"""
+#!/usr/bin/env python3
+"""Common utilities for GitClaw agents."""
 
 import json
 import os
-import subprocess
 import sys
-import urllib.error
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
-# ── Paths ────────────────────────────────────────────────────────────────────
 
-REPO_ROOT = Path(subprocess.check_output(
-    ["git", "rev-parse", "--show-toplevel"], text=True
-).strip())
-
-STATE_FILE = REPO_ROOT / "memory" / "state.json"
-CONFIG_DIR = REPO_ROOT / "config"
-PROMPTS_DIR = REPO_ROOT / "templates" / "prompts"
-MEMORY_DIR = REPO_ROOT / "memory"
-
-
-# ── LLM Client ──────────────────────────────────────────────────────────────
-
-def call_llm(
-    system_prompt: str,
-    user_message: str,
-    provider: str | None = None,
-    model: str | None = None,
-    max_tokens: int = 2048,
-) -> str:
-    """Call an LLM API and return the response text."""
-    import urllib.request
-
-    provider = provider or os.environ.get("GITCLAW_PROVIDER", "anthropic")
-    model = model or os.environ.get("GITCLAW_MODEL", "claude-haiku-4-5-20251001")
-
-    if provider == "anthropic":
-        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-        if not api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY not set")
-
-        payload = json.dumps({
-            "model": model,
-            "max_tokens": max_tokens,
-            "system": system_prompt,
-            "messages": [{"role": "user", "content": user_message}],
-        }).encode()
-
-        req = urllib.request.Request(
-            "https://api.anthropic.com/v1/messages",
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "x-api-key": api_key,
-                "anthropic-version": "2023-06-01",
-            },
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read())
-                return data["content"][0]["text"]
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
-            log("LLM", f"Anthropic API error: {exc}")
-            raise RuntimeError(f"LLM API call failed: {exc}") from exc
-
-    elif provider == "openai":
-        api_key = os.environ.get("OPENAI_API_KEY", "")
-        if not api_key:
-            raise RuntimeError("OPENAI_API_KEY not set")
-
-        payload = json.dumps({
-            "model": model,
-            "max_tokens": max_tokens,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message},
-            ],
-        }).encode()
-
-        req = urllib.request.Request(
-            "https://api.openai.com/v1/chat/completions",
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {api_key}",
-            },
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                data = json.loads(resp.read())
-                return data["choices"][0]["message"]["content"]
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
-            log("LLM", f"OpenAI API error: {exc}")
-            raise RuntimeError(f"LLM API call failed: {exc}") from exc
-
-    raise ValueError(f"Unknown provider: {provider}")
+def load_state():
+    """Load agent state from memory/state.json.
+    
+    Returns empty state structure if file is missing or malformed.
+    """
+    state_file = Path("memory/state.json")
+    
+    default_state = {
+        "xp": 0,
+        "level": "Newbie",
+        "stats": {},
+        "achievements": [],
+        "last_action": None
+    }
+    
+    try:
+        if not state_file.exists():
+            print(f"⚠️  State file not found, initializing empty state", file=sys.stderr)
+            return default_state
+            
+        with open(state_file) as f:
+            state = json.load(f)
+            # Ensure required keys exist
+            for key in default_state:
+                if key not in state:
+                    state[key] = default_state[key]
+            return state
+    except json.JSONDecodeError as e:
+        print(f"⚠️  Malformed state file: {e}, using empty state", file=sys.stderr)
+        return default_state
+    except Exception as e:
+        print(f"⚠️  Error loading state: {e}, using empty state", file=sys.stderr)
+        return default_state
 
 
-# ── State Management ─────────────────────────────────────────────────────────
-
-def load_state() -> dict:
-    """Load agent state from memory/state.json."""
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
-    return {}
-
-
-def save_state(state: dict) -> None:
+def save_state(state):
     """Save agent state to memory/state.json."""
-    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    STATE_FILE.write_text(json.dumps(state, indent=2) + "\n")
+    state_file = Path("memory/state.json")
+    state_file.parent.mkdir(exist_ok=True)
+    
+    with open(state_file, "w") as f:
+        json.dump(state, f, indent=2)
 
 
-def update_stats(key: str, increment: int = 1) -> dict:
-    """Increment a stat counter and return updated state."""
-    state = load_state()
-    stats = state.setdefault("stats", {})
-    stats[key] = stats.get(key, 0) + increment
-    save_state(state)
-    return state
-
-
-def award_xp(amount: int) -> dict:
-    """Award XP and update level."""
+def add_xp(amount, reason):
+    """Award XP and check for level-ups."""
     state = load_state()
     state["xp"] = state.get("xp", 0) + amount
-    state["level"] = get_level(state["xp"])
-    state["last_active"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    save_state(state)
-    return state
-
-
-# ── XP & Leveling ────────────────────────────────────────────────────────────
-
-XP_LEVELS = [
-    (0, "Unawakened"),
-    (50, "Novice"),
-    (150, "Apprentice"),
-    (300, "Journeyman"),
-    (500, "Adept"),
-    (800, "Expert"),
-    (1200, "Master"),
-    (1800, "Grandmaster"),
-    (2500, "Legend"),
-    (5000, "Mythic"),
-    (10000, "Transcendent"),
-]
-
-
-def get_level(xp: int) -> str:
-    """Get level name for a given XP amount."""
-    level = "Unawakened"
-    for threshold, name in XP_LEVELS:
-        if xp >= threshold:
-            level = name
-    return level
-
-
-def xp_bar(xp: int) -> str:
-    """Generate a visual XP progress bar."""
-    current_threshold = 0
-    next_threshold = 50
-
-    for threshold, _ in XP_LEVELS:
-        if threshold <= xp:
-            current_threshold = threshold
-        else:
-            next_threshold = threshold
+    
+    # Level thresholds
+    levels = [
+        (0, "Newbie"),
+        (100, "Beginner"),
+        (300, "Intermediate"),
+        (600, "Advanced"),
+        (1000, "Expert"),
+        (1500, "Master"),
+        (2500, "Legend")
+    ]
+    
+    old_level = state.get("level", "Newbie")
+    for threshold, level in reversed(levels):
+        if state["xp"] >= threshold:
+            state["level"] = level
             break
-
-    if next_threshold == current_threshold:
-        return "██████████ MAX"
-
-    progress = xp - current_threshold
-    total = next_threshold - current_threshold
-    filled = int((progress / total) * 10)
-
-    bar = "█" * filled + "░" * (10 - filled)
-    return f"{bar} {xp} XP"
-
-
-# ── Memory Helpers ───────────────────────────────────────────────────────────
-
-def append_memory(category: str, filename: str, content: str) -> Path:
-    """Append content to a memory file with timestamp."""
-    target_dir = MEMORY_DIR / category
-    target_dir.mkdir(parents=True, exist_ok=True)
-    target_file = target_dir / filename
-
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-    entry = f"\n---\n**[{timestamp}]**\n\n{content}\n"
-
-    with open(target_file, "a") as f:
-        f.write(entry)
-
-    return target_file
+    
+    state["last_action"] = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "xp_gained": amount,
+        "reason": reason
+    }
+    
+    save_state(state)
+    
+    if state["level"] != old_level:
+        print(f"🎉 Level up! {old_level} → {state['level']}")
+    print(f"✨ +{amount} XP: {reason} (Total: {state['xp']} XP)")
 
 
-def read_prompt(name: str) -> str:
-    """Read a system prompt template."""
-    prompt_file = PROMPTS_DIR / f"{name}.md"
-    if not prompt_file.exists():
-        raise FileNotFoundError(f"Prompt not found: {prompt_file}")
-    return prompt_file.read_text()
+def increment_stat(stat_name, amount=1):
+    """Increment a stat counter."""
+    state = load_state()
+    if "stats" not in state:
+        state["stats"] = {}
+    state["stats"][stat_name] = state["stats"].get(stat_name, 0) + amount
+    save_state(state)
 
 
-# ── GitHub API Helpers ───────────────────────────────────────────────────────
-
-def gh_post_comment(issue_number: int, body: str) -> None:
-    """Post a comment on an issue/PR via gh CLI."""
-    subprocess.run(
-        ["gh", "api",
-         f"repos/{os.environ['GITHUB_REPOSITORY']}/issues/{issue_number}/comments",
-         "-f", f"body={body}"],
-        check=True, capture_output=True,
-    )
-
-
-def gh_add_labels(issue_number: int, labels: list[str]) -> None:
-    """Add labels to an issue."""
-    subprocess.run(
-        ["gh", "issue", "edit", str(issue_number),
-         "--add-label", ",".join(labels)],
-        check=True, capture_output=True,
-    )
-
-
-def today() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+def unlock_achievement(achievement_id, name, description):
+    """Unlock an achievement."""
+    state = load_state()
+    if "achievements" not in state:
+        state["achievements"] = []
+    
+    # Check if already unlocked
+    if any(a["id"] == achievement_id for a in state["achievements"]):
+        return
+    
+    achievement = {
+        "id": achievement_id,
+        "name": name,
+        "description": description,
+        "unlocked_at": datetime.utcnow().isoformat()
+    }
+    
+    state["achievements"].append(achievement)
+    save_state(state)
+    print(f"🏆 Achievement unlocked: {name}")
+    print(f"   {description}")
 
 
-def log(agent: str, message: str) -> None:
-    print(f"[🤖 {agent}] {message}", file=sys.stderr)
+def get_stat(stat_name):
+    """Get current value of a stat."""
+    state = load_state()
+    return state.get("stats", {}).get(stat_name, 0)
+
+
+def format_timestamp(iso_string):
+    """Format ISO timestamp for display."""
+    try:
+        dt = datetime.fromisoformat(iso_string.replace('Z', '+00:00'))
+        return dt.strftime("%Y-%m-%d %H:%M UTC")
+    except:
+        return iso_string
+
+
+def load_config(config_path):
+    """Load YAML config file (requires PyYAML in environment)."""
+    import yaml
+    with open(config_path) as f:
+        return yaml.safe_load(f)
+
+
+def get_repo_root():
+    """Get repository root directory."""
+    return Path(os.environ.get("GITHUB_WORKSPACE", "."))
+
+
+def get_memory_dir():
+    """Get memory directory path."""
+    return get_repo_root() / "memory"
+
+
+def ensure_memory_dir():
+    """Ensure memory directory exists."""
+    memory_dir = get_memory_dir()
+    memory_dir.mkdir(exist_ok=True)
+    return memory_dir
+
+
+def read_file(path):
+    """Read file contents safely."""
+    try:
+        with open(path) as f:
+            return f.read()
+    except FileNotFoundError:
+        return None
+
+
+def write_file(path, content):
+    """Write file contents safely."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as f:
+        f.write(content)
+
+
+def append_file(path, content):
+    """Append to file safely."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a") as f:
+        f.write(content)
+
+
+def list_files(directory, pattern="*"):
+    """List files in directory matching pattern."""
+    return list(Path(directory).glob(pattern))
+
+
+def get_github_token():
+    """Get GitHub token from environment."""
+    return os.environ.get("GITHUB_TOKEN")
+
+
+def get_repo_name():
+    """Get repository name from environment."""
+    return os.environ.get("GITHUB_REPOSITORY")
+
+
+def is_ci():
+    """Check if running in CI environment."""
+    return os.environ.get("CI") == "true"
