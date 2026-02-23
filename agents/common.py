@@ -18,171 +18,150 @@ DEFAULT_STATE = {
     "schema_version": STATE_SCHEMA_VERSION,
     "initialized_at": None,  # Set at creation time
     "agents": {},
-    "proposals": [],
     "last_architect_run": None,
-    "checksum": None,  # Calculated at write time
+    "proposals": {},
+    "council_reviews": {},
 }
 
-# ── State Management ─────────────────────────────────────────────────────────
+# ── Path Resolution ──────────────────────────────────────────────────────────
 
 def get_repo_root() -> Path:
-    """Get repository root path."""
-    return Path(
-        subprocess.check_output(
-            ["git", "rev-parse", "--show-toplevel"],
-            text=True,
-            stderr=subprocess.DEVNULL,
-        ).strip()
+    """Get repository root via git."""
+    result = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=True,
     )
+    return Path(result.stdout.strip())
 
+REPO_ROOT = get_repo_root()
+STATE_FILE = REPO_ROOT / "memory" / "state.json"
+MEMORY_DIR = REPO_ROOT / "memory"
 
-def calculate_state_checksum(state: dict) -> str:
-    """Calculate SHA256 checksum of state (excluding checksum field)."""
-    state_copy = {k: v for k, v in state.items() if k != "checksum"}
-    content = json.dumps(state_copy, sort_keys=True)
-    return hashlib.sha256(content.encode()).hexdigest()[:16]
+# ── State File Management ────────────────────────────────────────────────────
 
+def compute_state_checksum(state: dict) -> str:
+    """Compute SHA-256 checksum of state dict for corruption detection."""
+    canonical = json.dumps(state, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(canonical.encode()).hexdigest()
 
-def initialize_state_file(state_path: Path) -> dict:
-    """Create state.json with known-good schema if it doesn't exist."""
-    if state_path.exists():
-        return None  # Already exists, do nothing
-
-    state_path.parent.mkdir(parents=True, exist_ok=True)
+def ensure_state_file() -> None:
+    """Create state.json atomically if it doesn't exist.
     
+    This runs at module import time to guarantee the file exists before
+    any agent tries to load it. Uses atomic write to prevent corruption.
+    """
+    if STATE_FILE.exists():
+        return
+    
+    # Ensure memory directory exists
+    MEMORY_DIR.mkdir(parents=True, exist_ok=True)
+    
+    # Create default state with timestamp
     state = DEFAULT_STATE.copy()
     state["initialized_at"] = datetime.now(timezone.utc).isoformat()
-    state["checksum"] = calculate_state_checksum(state)
     
-    # Atomic write: temp file + rename
-    fd, tmp_path = tempfile.mkstemp(
-        dir=state_path.parent,
-        prefix=".state_",
+    # Compute checksum for future verification
+    checksum = compute_state_checksum(state)
+    state["_checksum"] = checksum
+    
+    # Atomic write: write to temp file, then rename
+    temp_fd, temp_path = tempfile.mkstemp(
+        dir=MEMORY_DIR,
+        prefix=".state-",
         suffix=".json.tmp",
     )
     try:
-        with os.fdopen(fd, "w") as f:
+        with os.fdopen(temp_fd, 'w') as f:
             json.dump(state, f, indent=2)
-            f.write("\n")
-        os.chmod(tmp_path, 0o600)  # Restrict permissions
-        os.rename(tmp_path, state_path)
+            f.flush()
+            os.fsync(f.fileno())
+        
+        # Atomic rename
+        os.replace(temp_path, STATE_FILE)
+        
+        # Structured logging for audit trail
+        log_data = {
+            "timestamp": state["initialized_at"],
+            "action": "state_initialized",
+            "path": str(STATE_FILE),
+            "schema_version": STATE_SCHEMA_VERSION,
+            "checksum": checksum[:16],  # First 16 chars for log brevity
+        }
+        print(f"[STATE_INIT] {json.dumps(log_data)}", file=sys.stderr)
     except Exception:
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+        # Clean up temp file on failure
+        if os.path.exists(temp_path):
+            os.unlink(temp_path)
         raise
-    
-    log("STATE", f"Initialized state file: {state_path}")
-    return state
-
-
-def validate_state_schema(state: dict, state_path: Path) -> None:
-    """Validate state structure matches expected schema."""
-    required_fields = {"schema_version", "initialized_at", "agents", "proposals"}
-    missing = required_fields - set(state.keys())
-    
-    if missing:
-        raise ValueError(
-            f"State file corrupted: missing required fields {missing}. "
-            f"Path: {state_path}. Delete the file to reinitialize."
-        )
-    
-    if state.get("schema_version") != STATE_SCHEMA_VERSION:
-        log(
-            "STATE",
-            f"Warning: schema version mismatch. Expected {STATE_SCHEMA_VERSION}, "
-            f"got {state.get('schema_version')}. Path: {state_path}",
-        )
-
-
-def verify_state_checksum(state: dict, state_path: Path) -> bool:
-    """Verify state checksum to detect corruption."""
-    if "checksum" not in state:
-        log("STATE", f"Warning: no checksum in state file: {state_path}")
-        return False
-    
-    stored = state["checksum"]
-    calculated = calculate_state_checksum(state)
-    
-    if stored != calculated:
-        log(
-            "STATE",
-            f"ERROR: State checksum mismatch (corruption detected). "
-            f"Path: {state_path}. Expected {stored}, got {calculated}.",
-        )
-        return False
-    
-    return True
-
 
 def load_state() -> dict:
-    """Load agent state, initializing if necessary."""
-    repo_root = get_repo_root()
-    state_path = repo_root / "memory" / "state.json"
+    """Load state from file with corruption detection.
     
-    # Ensure state file exists with known-good schema
-    initialized = initialize_state_file(state_path)
-    if initialized:
-        return initialized
+    Raises:
+        RuntimeError: If state file is corrupted or invalid
+    """
+    with open(STATE_FILE, 'r') as f:
+        state = json.load(f)
     
-    # Load existing state
-    try:
-        with open(state_path, "r") as f:
-            state = json.load(f)
-    except json.JSONDecodeError as e:
+    # Verify schema version
+    if state.get("schema_version") != STATE_SCHEMA_VERSION:
         raise RuntimeError(
-            f"State file contains invalid JSON: {state_path}. "
-            f"Error: {e}. Delete the file to reinitialize."
-        ) from e
-    except OSError as e:
-        raise RuntimeError(
-            f"Cannot read state file: {state_path}. "
-            f"Error: {e}. Check file permissions."
-        ) from e
-    
-    # Validate schema
-    validate_state_schema(state, state_path)
-    
-    # Verify checksum
-    if not verify_state_checksum(state, state_path):
-        log(
-            "STATE",
-            f"Proceeding with potentially corrupted state. "
-            f"Recommend manual verification: {state_path}",
+            f"State schema version mismatch: "
+            f"expected {STATE_SCHEMA_VERSION}, "
+            f"got {state.get('schema_version')}"
         )
+    
+    # Verify checksum if present
+    stored_checksum = state.pop("_checksum", None)
+    if stored_checksum:
+        actual_checksum = compute_state_checksum(state)
+        if actual_checksum != stored_checksum:
+            raise RuntimeError(
+                f"State file corruption detected: "
+                f"checksum mismatch at {STATE_FILE}"
+            )
     
     return state
 
-
 def save_state(state: dict) -> None:
-    """Save agent state atomically with checksum."""
-    repo_root = get_repo_root()
-    state_path = repo_root / "memory" / "state.json"
+    """Save state to file atomically with checksum."""
+    state = state.copy()
+    state["schema_version"] = STATE_SCHEMA_VERSION
     
-    # Update checksum
-    state["checksum"] = calculate_state_checksum(state)
+    # Compute and store checksum
+    checksum = compute_state_checksum(state)
+    state["_checksum"] = checksum
     
     # Atomic write
-    fd, tmp_path = tempfile.mkstemp(
-        dir=state_path.parent,
-        prefix=".state_",
+    temp_fd, temp_path = tempfile.mkstemp(
+        dir=MEMORY_DIR,
+        prefix=".state-",
         suffix=".json.tmp",
     )
     try:
-        with os.fdopen(fd, "w") as f:
+        with os.fdopen(temp_fd, 'w') as f:
             json.dump(state, f, indent=2)
-            f.write("\n")
-        os.chmod(tmp_path, 0o600)
-        os.rename(tmp_path, state_path)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temp_path, STATE_FILE)
     except Exception:
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+        if os.path.exists(temp_path):
+            os.unlink(temp_path)
         raise
 
+# Initialize state file at import time
+ensure_state_file()
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 
 def log(component: str, message: str) -> None:
-    """Log a message with timestamp and component prefix."""
-    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    sanitized_msg = message.replace(os.path.expanduser("~"), "~")
-    print(f"[{timestamp}] [{component}] {sanitized_msg}", file=sys.stderr)
+    """Log structured message to stderr."""
+    timestamp = datetime.now(timezone.utc).isoformat()
+    log_entry = {
+        "timestamp": timestamp,
+        "component": component,
+        "message": message,
+    }
+    print(json.dumps(log_entry), file=sys.stderr)
