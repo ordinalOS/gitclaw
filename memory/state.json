@@ -5,7 +5,7 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 1206,
+  "xp": 1236,
   "level": "Master",
   "stats": {
     "issues_triaged": 0,
@@ -28,7 +28,8 @@
     "pages_built": 85,
     "council_reviews": 15,
     "proposals_made": 5,
-    "council_tallies": 3
+    "council_tallies": 3,
+    "proposals_revised": 1
   },
   "achievements": [],
   "last_active": "2026-02-23",
