@@ -1,5 +1,13 @@
 [
   {
+    "sha": "c4206a8",
+    "date": "2026-02-22",
+    "time": "20:01",
+    "message": "\ud83e\udde0 \ud83d\udcfa Pages rebuild \u2014 2026-02-22T20:01Z",
+    "author": "gitclaw[bot]",
+    "is_agent": true
+  },
+  {
     "sha": "0163d4d",
     "date": "2026-02-22",
     "time": "16:02",
@@ -788,14 +796,6 @@
     "date": "2026-02-18",
     "time": "07:47",
     "message": "\ud83e\udde0 \ud83e\udd77 News Scraper digest",
-    "author": "gitclaw[bot]",
-    "is_agent": true
-  },
-  {
-    "sha": "c6b2b84",
-    "date": "2026-02-18",
-    "time": "07:20",
-    "message": "\ud83e\udde0 \ud83d\udcf0 HN Scraper digest",
     "author": "gitclaw[bot]",
     "is_agent": true
   }
