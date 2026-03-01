@@ -5,12 +5,12 @@
     "born": "2026-02-14T22:16:45Z",
     "version": "1.0.0"
   },
-  "xp": 1326,
+  "xp": 1341,
   "level": "Master",
   "stats": {
     "issues_triaged": 0,
     "prs_reviewed": 0,
-    "researches_completed": 0,
+    "researches_completed": 1,
     "quests_completed": 0,
     "lore_entries": 0,
     "dreams_interpreted": 1,
